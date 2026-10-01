@@ -1,0 +1,18 @@
+set(DSPCORE_MODULE_HEADERS "")
+
+if(DSPCORE_CORE)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Core.h")
+endif()
+
+target_sources(DspCore PRIVATE ${DSPCORE_MODULE_HEADERS})
+dspcore_stage_headers(${DSPCORE_MODULE_HEADERS})
+dspcore_add_dox(${DSPCORE_MODULE_HEADERS})
+
+install(FILES ${DSPCORE_MODULE_HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/DspCore"
+    CONFIGURATIONS Release)
+
+if(DSPCORE_CORE)
+    add_subdirectory(Core)
+endif()
+

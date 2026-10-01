@@ -1,0 +1,20 @@
+/**
+ * @defgroup DspCore_Core Core
+ * @ingroup DspCore
+ * @brief Version information for DspCore and its dependencies.
+ *
+ * The scaffold exposes only `DspCore::Core::Version()`
+ * and `FoundationVersion()`. Signal-processing modules are added in small,
+ * tested phases (see `ACTION_PLAN.md`).
+ */
+
+/**
+ * @namespace DspCore
+ * @brief DspCore public namespace.
+ */
+
+/**
+ * @namespace DspCore::Core
+ * @ingroup DspCore_Core
+ * @brief DspCore core services.
+ */

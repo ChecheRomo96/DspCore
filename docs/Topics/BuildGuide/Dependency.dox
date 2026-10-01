@@ -1,0 +1,29 @@
+/**
+ * @defgroup DspCore_BuildGuide_Dependency Dependencies
+ * @ingroup DspCore_BuildGuide
+ * @brief Foundation package resolution and compatibility contract.
+ *
+ * DspCore links `Foundation::Foundation` publicly. It requires Foundation
+ * `1.4.0` or a newer `1.x` release, and rejects packages whose recorded
+ * platform differs from the selected DspCore preset.
+ *
+ * Resolution order (`cmake/DspCoreFoundation.cmake`):
+ *
+ * 1. A `Foundation::Foundation` target defined by a parent project.
+ * 2. `-DDSPCORE_FOUNDATION_PREFIX=<prefix>` or the `DSPCORE_FOUNDATION_PREFIX`
+ *    environment variable. An unusable explicit prefix is an error.
+ * 3. `../Foundation/dist/<preset>` for sibling repositories. An incompatible
+ *    sibling export is ignored with a warning.
+ * 4. Normal `find_package(Foundation CONFIG)` search rules.
+ * 5. When `DSPCORE_FETCH_FOUNDATION` is `ON` (default):
+ *    - the GitHub Release package `Foundation-<version>-<preset>` for tag
+ *      `v<version>`, verified against its published SHA-256 file;
+ *    - otherwise the Foundation sources at that tag, fetched with
+ *      `FetchContent` and built with DspCore's toolchain. Installing DspCore then
+ *      also installs Foundation into the same prefix.
+ *
+ * Fetched content lives in `build/<preset>/_deps/` and is reused across
+ * reconfigurations. `FETCHCONTENT_SOURCE_DIR_FOUNDATION` builds a local
+ * Foundation working copy instead of cloning, and
+ * `-DDSPCORE_FETCH_FOUNDATION=OFF` disables network access.
+ */

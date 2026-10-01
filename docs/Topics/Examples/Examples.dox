@@ -1,0 +1,37 @@
+/**
+ * @defgroup DspCore_Examples Examples
+ * @brief Runnable demonstrations of DspCore APIs.
+ *
+ * Examples mirror the source hierarchy and share portable code between the
+ * Arduino sketch and native desktop adapter:
+ *
+ * @code
+ * examples/DspCore/<module>/<example>/
+ * |-- CMakeLists.txt
+ * |-- <example>.ino
+ * |-- Shared.h
+ * |-- Shared.cpp
+ * `-- Desktop/
+ *     |-- CMakeLists.txt
+ *     `-- main.cpp
+ * @endcode
+ *
+ * Available examples:
+ *
+ * | Target | Shows |
+ * | --- | --- |
+ * | `DspCore_Core_Version` | DspCore and Foundation versions |
+ *
+ * Build and run one on the desktop:
+ *
+ * @code{.bash}
+ * ./scripts/build.sh macos_arm64 --examples-on
+ * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
+ * @endcode
+ *
+ * Enable and export Release examples with:
+ *
+ * @code{.bash}
+ * ./scripts/export.sh macos_arm64 --fresh --examples-on
+ * @endcode
+ */

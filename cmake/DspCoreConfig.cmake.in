@@ -1,0 +1,29 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Foundation @DSPCORE_FOUNDATION_VERSION@ CONFIG)
+
+include("${CMAKE_CURRENT_LIST_DIR}/DspCoreBuildInfo.cmake")
+
+if(DEFINED Foundation_PLATFORM AND
+   NOT Foundation_PLATFORM STREQUAL "" AND
+   NOT Foundation_PLATFORM STREQUAL DSPCORE_PLATFORM)
+    set(DSPCORE_FOUND FALSE)
+    string(CONCAT DSPCORE_NOT_FOUND_MESSAGE
+        "DspCore package '${DSPCORE_PLATFORM}' cannot use Foundation package "
+        "'${Foundation_PLATFORM}'.")
+    return()
+endif()
+
+if(DEFINED Foundation_CXX_STANDARD AND
+   Foundation_CXX_STANDARD GREATER DSPCORE_CXX_STANDARD)
+    set(DSPCORE_FOUND FALSE)
+    string(CONCAT DSPCORE_NOT_FOUND_MESSAGE
+        "Foundation requires C++${Foundation_CXX_STANDARD}, but DspCore was "
+        "built for C++${DSPCORE_CXX_STANDARD}.")
+    return()
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/DspCoreTargets.cmake")
+
+check_required_components(DspCore)

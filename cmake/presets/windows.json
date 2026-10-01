@@ -1,0 +1,64 @@
+{
+  "version": 6,
+  "include": [
+    "base.json",
+    "../../tools/RoModularBuild/cmake/presets/native.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "windows_msvc_x64",
+      "inherits": ["base", "romodular_windows_msvc_x64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "windows_msvc_x64"
+      }
+    },
+    {
+      "name": "windows_clang_x64",
+      "inherits": ["base", "romodular_windows_clang_x64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "windows_clang_x64",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^(x86_64|AMD64|amd64)$"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows_msvc_x64",
+      "configurePreset": "windows_msvc_x64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows_clang_x64",
+      "configurePreset": "windows_clang_x64",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows_msvc_x64",
+      "configurePreset": "windows_msvc_x64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows_clang_x64",
+      "configurePreset": "windows_clang_x64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

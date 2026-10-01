@@ -1,0 +1,99 @@
+#!/bin/sh
+
+LAUNCHER_DIRECTORY=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+dspcore_example_count() {
+    EXAMPLE_COUNT=0
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+        [ -f "$EXAMPLE_EXECUTABLE" ] || continue
+        [ -x "$EXAMPLE_EXECUTABLE" ] || continue
+        EXAMPLE_COUNT=$((EXAMPLE_COUNT + 1))
+    done
+}
+
+dspcore_print_menu() {
+    EXAMPLE_INDEX=0
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+        [ -f "$EXAMPLE_EXECUTABLE" ] || continue
+        [ -x "$EXAMPLE_EXECUTABLE" ] || continue
+        EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))
+        printf '  %s) %s\n' "$EXAMPLE_INDEX" "${EXAMPLE_EXECUTABLE##*/}"
+    done
+}
+
+dspcore_run_example() {
+    REQUESTED_INDEX=$1
+    EXAMPLE_INDEX=0
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+        [ -f "$EXAMPLE_EXECUTABLE" ] || continue
+        [ -x "$EXAMPLE_EXECUTABLE" ] || continue
+        EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))
+        [ "$EXAMPLE_INDEX" -ne "$REQUESTED_INDEX" ] || break
+    done
+
+    printf '\nRunning %s...\n\n' "${EXAMPLE_EXECUTABLE##*/}"
+    "$EXAMPLE_EXECUTABLE"
+    EXAMPLE_STATUS=$?
+    printf '\n----------------------------------------\n'
+    printf 'Process finished with exit code %s\n' "$EXAMPLE_STATUS"
+}
+
+dspcore_ask_to_continue() {
+    while :; do
+        printf '\nRun another example? [Y/n]: '
+        IFS= read -r CONTINUE_SELECTION || return 1
+
+        case "$CONTINUE_SELECTION" in
+            ''|y|Y)
+                return 0
+                ;;
+            n|N|q|Q)
+                return 1
+                ;;
+            *)
+                printf 'Please enter y or n.\n'
+                ;;
+        esac
+    done
+}
+
+while :; do
+    if [ -t 1 ] && command -v clear >/dev/null 2>&1; then
+        clear
+    fi
+
+    dspcore_example_count
+    printf 'DspCore Examples\n'
+    printf '===================\n\n'
+
+    if [ "$EXAMPLE_COUNT" -eq 0 ]; then
+        printf 'No executable examples were found in:\n%s\n' "$LAUNCHER_DIRECTORY" >&2
+        printf '\nPress Enter to finish...'
+        read -r _
+        exit 1
+    fi
+
+    dspcore_print_menu
+    printf '\nSelect an example [1-%s] or q to quit: ' "$EXAMPLE_COUNT"
+    IFS= read -r EXAMPLE_SELECTION || exit 0
+
+    case "$EXAMPLE_SELECTION" in
+        q|Q)
+            exit 0
+            ;;
+        ''|*[!0-9]*)
+            printf '\nInvalid selection. Press Enter to return to the menu...'
+            read -r _
+            continue
+            ;;
+    esac
+
+    if [ "$EXAMPLE_SELECTION" -lt 1 ] || [ "$EXAMPLE_SELECTION" -gt "$EXAMPLE_COUNT" ]; then
+        printf '\nInvalid selection. Press Enter to return to the menu...'
+        read -r _
+        continue
+    fi
+
+    dspcore_run_example "$EXAMPLE_SELECTION"
+    dspcore_ask_to_continue || exit 0
+done

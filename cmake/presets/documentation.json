@@ -1,0 +1,27 @@
+{
+  "version": 6,
+
+  "include": [
+    "base.json"
+  ],
+
+  "configurePresets": [
+    {
+      "name": "documentation",
+      "inherits": "docs_base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "DSPCORE_PLATFORM": "documentation",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/dist/documentation"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "documentation",
+      "configurePreset": "documentation"
+    }
+  ]
+}

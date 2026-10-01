@@ -1,0 +1,16 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "include": [
+    "cmake/presets/documentation.json",
+    "cmake/presets/windows.json",
+    "cmake/presets/linux.json",
+    "cmake/presets/macos.json",
+    "cmake/presets/avr-gcc.json",
+    "cmake/presets/embedded.json"
+  ]
+}
