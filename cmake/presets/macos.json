@@ -1,0 +1,63 @@
+{
+  "version": 6,
+  "include": [
+    "base.json",
+    "../../tools/RoModularBuild/cmake/presets/native.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "macos_arm64",
+      "inherits": ["base", "romodular_macos_arm64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "macos_arm64"
+      }
+    },
+    {
+      "name": "macos_x64",
+      "inherits": ["base", "romodular_macos_x64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "macos_x64"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "macos_arm64",
+      "configurePreset": "macos_arm64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "macos_x64",
+      "configurePreset": "macos_x64",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "macos_arm64",
+      "configurePreset": "macos_arm64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "macos_x64",
+      "configurePreset": "macos_x64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

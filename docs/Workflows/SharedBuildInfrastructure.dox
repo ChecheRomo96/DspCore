@@ -1,0 +1,46 @@
+/**
+ * @defgroup DspCore_Workflows_SharedInfrastructure Shared Build Infrastructure
+ * @ingroup DspCore_Workflows
+ * @brief DspCore's pinned RoModularBuild integration and ownership boundary.
+ *
+ * DspCore consumes `tools/RoModularBuild` as a Git submodule pinned to a tagged
+ * revision. Initialize it after cloning:
+ *
+ * @code{.bash}
+ * git submodule update --init --recursive
+ * @endcode
+ *
+ * @section DspCoreSharedInfrastructureOwnership Ownership
+ *
+ * RoModularBuild owns project-independent mechanics:
+ *
+ * - native compiler and generator preset bases;
+ * - generic GNU Arm Embedded and AVR-GCC toolchains;
+ * - configure, build, test, install, and clean workflow engines; and
+ * - reusable CI composite actions.
+ *
+ * DspCore owns project policy:
+ *
+ * - public preset names and `DSPCORE_*` feature options;
+ * - Foundation discovery and version compatibility;
+ * - the `DspCore::DspCore` package, export, and downstream consumer validation;
+ * - source modules, tests, examples, Doxygen, and release policy; and
+ * - exact firmware, board, and hardware validation fixtures.
+ *
+ * @section DspCoreSharedInfrastructureAdapters Adapters
+ *
+ * Public commands under `scripts/` remain stable. Thin adapters provide DspCore's
+ * roots and option names to the shared engines. Local toolchain wrappers map
+ * the established `DSPCORE_*` cache variables to the project-independent
+ * `ROMODULAR_*` variables before including the shared implementation.
+ *
+ * This compatibility layer prevents the infrastructure migration from
+ * changing DspCore's public presets, build directories, or cache interface.
+ * Debug and Release remain configurations of one platform preset.
+ *
+ * @section DspCoreSharedInfrastructurePin Updating the Pin
+ *
+ * Treat `tools/RoModularBuild` as read-only from DspCore. Update its gitlink only
+ * as an explicit dependency change, pin a tagged revision, and rerun native,
+ * package-consumer, embedded compile/link, and documentation validation.
+ */

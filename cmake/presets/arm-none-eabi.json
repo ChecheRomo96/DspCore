@@ -1,0 +1,63 @@
+{
+  "version": 6,
+  "include": [
+    "base.json",
+    "../../tools/RoModularBuild/cmake/presets/arm-none-eabi.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "arm_none_eabi_cortex_m0plus_soft",
+      "inherits": ["base", "romodular_arm_none_eabi_cortex_m0plus_soft"],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi/cortex-m0plus-soft.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "arm_none_eabi_cortex_m0plus_soft"
+      }
+    },
+    {
+      "name": "arm_none_eabi_cortex_m3_soft",
+      "inherits": ["base", "romodular_arm_none_eabi_cortex_m3_soft"],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi/cortex-m3-soft.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "arm_none_eabi_cortex_m3_soft"
+      }
+    },
+    {
+      "name": "arm_none_eabi_cortex_m4f_hard",
+      "inherits": ["base", "romodular_arm_none_eabi_cortex_m4f_hard"],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi/cortex-m4f-hard.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "arm_none_eabi_cortex_m4f_hard"
+      }
+    },
+    {
+      "name": "arm_none_eabi_cortex_m7f_hard",
+      "inherits": ["base", "romodular_arm_none_eabi_cortex_m7f_hard"],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi/cortex-m7f-hard.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "arm_none_eabi_cortex_m7f_hard"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "arm_none_eabi_cortex_m0plus_soft",
+      "configurePreset": "arm_none_eabi_cortex_m0plus_soft",
+      "configuration": "Debug"
+    },
+    {
+      "name": "arm_none_eabi_cortex_m3_soft",
+      "configurePreset": "arm_none_eabi_cortex_m3_soft",
+      "configuration": "Debug"
+    },
+    {
+      "name": "arm_none_eabi_cortex_m4f_hard",
+      "configurePreset": "arm_none_eabi_cortex_m4f_hard",
+      "configuration": "Debug"
+    },
+    {
+      "name": "arm_none_eabi_cortex_m7f_hard",
+      "configurePreset": "arm_none_eabi_cortex_m7f_hard",
+      "configuration": "Debug"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+/**
+ * @mainpage DspCore
+ *
+ * DspCore is the signal-processing layer of the RoModular ecosystem: lookup
+ * tables, interpolation, generators, filters and transforms for desktop and
+ * embedded targets, built on Foundation.
+ *
+ * @note Version 0.1.0 is the scaffold; features arrive in the phases of
+ * `ACTION_PLAN.md`.
+ *
+ * @section DspCoreMainModules Modules
+ *
+ * - @ref DspCore_Core "Core": DspCore and Foundation version information.
+ *
+ * @section DspCoreMainDependency Dependencies
+ *
+ * DspCore links `Foundation::Foundation` (Foundation 1.4 or a newer 1.x
+ * release). It uses local
+ * packages when available and otherwise fetches the pinned release from
+ * GitHub; see @ref DspCore_BuildGuide_Dependency.
+ */

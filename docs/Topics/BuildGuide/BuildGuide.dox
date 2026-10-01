@@ -1,0 +1,19 @@
+/**
+ * @defgroup DspCore_BuildGuide Build Guide
+ * @brief Configure DspCore against a matching Foundation package.
+ *
+ * DspCore locates or fetches Foundation automatically (see
+ * @ref DspCore_BuildGuide_Dependency):
+ *
+ * @code{.bash}
+ * ./scripts/configure.sh macos_arm64 --fresh
+ * ./scripts/build.sh macos_arm64 --config Debug
+ * @endcode
+ *
+ * To use a specific Foundation package, point DspCore at its prefix:
+ *
+ * @code{.bash}
+ * ./scripts/configure.sh macos_arm64 --fresh -- \
+ *   -DDSPCORE_FOUNDATION_PREFIX=../Foundation/dist/macos_arm64
+ * @endcode
+ */

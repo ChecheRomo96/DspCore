@@ -1,0 +1,14 @@
+/**
+ * @defgroup DspCore_BuildGuide_Platforms Platform Presets
+ * @ingroup DspCore_BuildGuide
+ * @brief Public DspCore presets backed by pinned RoModularBuild profiles.
+ *
+ * DspCore provides native Windows, macOS, and Linux presets plus AVR-GCC and GNU
+ * Arm Embedded profiles. The public preset names and `DSPCORE_*` options live in
+ * this repository. Compiler, generator, and generic cross-toolchain mechanics
+ * are inherited from the pinned `tools/RoModularBuild` submodule.
+ *
+ * A preset is usable only when the required compiler toolchain and a compatible
+ * Foundation package or source fallback are available. See
+ * @ref DspCore_Workflows_SharedInfrastructure for the ownership boundary.
+ */

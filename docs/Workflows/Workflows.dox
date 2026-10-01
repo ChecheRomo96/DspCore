@@ -1,0 +1,18 @@
+/**
+ * @defgroup DspCore_Workflows Workflows
+ * @brief Repeatable configure, build, test, documentation, install, and export.
+ *
+ * | Workflow | POSIX | Windows PowerShell |
+ * | -------- | ----- | ------------------ |
+ * | Configure | `scripts/configure.sh` | `scripts/configure.ps1` |
+ * | Build | `scripts/build.sh` | `scripts/build.ps1` |
+ * | Test | `scripts/test.sh` | `scripts/test.ps1` |
+ * | Installed package test | `scripts/test-package.sh` | `scripts/test-package.ps1` |
+ * | Documentation | `scripts/docs.sh` | `scripts/docs.ps1` |
+ * | Install | `scripts/install.sh` | `scripts/install.ps1` |
+ * | Export | `scripts/export.sh` | `scripts/export.ps1` |
+ * | Clean | `scripts/clean.sh` | `scripts/clean.ps1` |
+ *
+ * Presets remain the source of truth. Extra cache variables may be passed
+ * after `--` on POSIX or through `-CMakeArgs` in PowerShell.
+ */

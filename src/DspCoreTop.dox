@@ -1,0 +1,8 @@
+/**
+ * @defgroup DspCore DspCore
+ * @brief Portable signal processing built on Foundation.
+ *
+ * DspCore uses the `DspCore` namespace and consumes the stable CMake targets
+ * `Foundation::Foundation`. Applications may include `DspCore.h` for the
+ * complete enabled surface or a documented module/component header for narrow access.
+ */

@@ -1,0 +1,117 @@
+{
+  "version": 6,
+  "include": [
+    "base.json",
+    "../../tools/RoModularBuild/cmake/presets/native.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "linux_gcc_x64",
+      "inherits": ["base", "romodular_linux_gcc_x64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "linux_gcc_x64",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^(x86_64|AMD64|amd64)$"
+      }
+    },
+    {
+      "name": "linux_clang_x64",
+      "inherits": ["base", "romodular_linux_clang_x64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "linux_clang_x64",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^(x86_64|AMD64|amd64)$"
+      }
+    },
+    {
+      "name": "linux_gcc_arm64",
+      "inherits": ["base", "romodular_linux_gcc_arm64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "linux_gcc_arm64",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^(aarch64|arm64)$"
+      }
+    },
+    {
+      "name": "linux_clang_arm64",
+      "inherits": ["base", "romodular_linux_clang_arm64"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "linux_clang_arm64",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^(aarch64|arm64)$"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux_gcc_x64",
+      "configurePreset": "linux_gcc_x64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux_clang_x64",
+      "configurePreset": "linux_clang_x64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux_gcc_arm64",
+      "configurePreset": "linux_gcc_arm64",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux_clang_arm64",
+      "configurePreset": "linux_clang_arm64",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "linux_gcc_x64",
+      "configurePreset": "linux_gcc_x64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux_clang_x64",
+      "configurePreset": "linux_clang_x64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux_gcc_arm64",
+      "configurePreset": "linux_gcc_arm64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux_clang_arm64",
+      "configurePreset": "linux_clang_arm64",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

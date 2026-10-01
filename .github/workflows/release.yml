@@ -1,0 +1,344 @@
+name: Build and Publish Release Packages
+
+run-name: Release packages for ${{ inputs.tag || github.ref_name }}
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to package, for example v0.2.0 or v0.3.0-rc.1
+        required: true
+        type: string
+      publish:
+        description: Publish the packages as a GitHub Release
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    name: Validate release metadata
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+      EVENT_NAME: ${{ github.event_name }}
+      REQUESTED_PUBLISH: ${{ inputs.publish }}
+
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      source_version: ${{ steps.release.outputs.source_version }}
+      release_version: ${{ steps.release.outputs.release_version }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
+      publish: ${{ steps.release.outputs.publish }}
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Validate tag and project version
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          source_version=$(
+            sed -nE \
+              's/^[[:space:]]*project\(DspCore[[:space:]]+VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' \
+              CMakeLists.txt | head -n 1
+          )
+
+          if [[ -z "$source_version" ]]; then
+            echo "Unable to read the DspCore version from CMakeLists.txt" >&2
+            exit 1
+          fi
+
+          if [[ ! "$RELEASE_TAG" =~ ^v${source_version}(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "Tag '$RELEASE_TAG' does not match source version '$source_version'" >&2
+            exit 1
+          fi
+
+          if [[ -z "$(git tag --points-at HEAD --list "$RELEASE_TAG")" ]]; then
+            echo "'$RELEASE_TAG' is not an existing tag on the checked-out commit" >&2
+            exit 1
+          fi
+
+          release_version=${RELEASE_TAG#v}
+          prerelease=false
+          if [[ "$RELEASE_TAG" != "v${source_version}" ]]; then
+            prerelease=true
+          fi
+
+          publish=false
+          if [[ "$EVENT_NAME" == "push" || "$REQUESTED_PUBLISH" == "true" ]]; then
+            publish=true
+          fi
+
+          {
+            echo "tag=$RELEASE_TAG"
+            echo "source_version=$source_version"
+            echo "release_version=$release_version"
+            echo "prerelease=$prerelease"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## DspCore release package build"
+            echo
+            echo "- Tag: \`$RELEASE_TAG\`"
+            echo "- Source version: \`$source_version\`"
+            echo "- Package label: \`$release_version\`"
+            echo "- Prerelease: \`$prerelease\`"
+            echo "- Publish: \`$publish\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  package:
+    name: ${{ matrix.name }}
+    needs: metadata
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      RELEASE_VERSION: ${{ needs.metadata.outputs.release_version }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS 15 / Apple Clang / Arm64
+            runner: macos-15
+            preset: macos_arm64
+            platform: unix
+            archive: tar.gz
+
+          - name: Ubuntu 24.04 / GCC / x64
+            runner: ubuntu-24.04
+            preset: linux_gcc_x64
+            platform: unix
+            archive: tar.gz
+
+          - name: Ubuntu 24.04 / Clang / x64
+            runner: ubuntu-24.04
+            preset: linux_clang_x64
+            platform: unix
+            archive: tar.gz
+
+          - name: Windows 2025 / MSVC / x64
+            runner: windows-2025-vs2026
+            preset: windows_msvc_x64
+            platform: windows
+            archive: zip
+
+          - name: Windows 2025 / Clang / x64
+            runner: windows-2025-vs2026
+            preset: windows_clang_x64
+            platform: windows
+            archive: zip
+
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.metadata.outputs.tag }}
+          submodules: recursive
+
+      - name: Export, verify identity, and validate Release package
+        if: matrix.platform == 'unix'
+        shell: bash
+        run: >-
+          ./scripts/test-package.sh "${{ matrix.preset }}"
+          --fresh --parallel 4
+
+      - name: Export, verify identity, and validate Release package
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: >-
+          ./scripts/test-package.ps1 "${{ matrix.preset }}"
+          -Fresh -Parallel 4
+
+      - name: Create tarball and checksum
+        if: matrix.platform == 'unix'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          package_name="DspCore-${RELEASE_VERSION}-${{ matrix.preset }}"
+          asset_name="${package_name}.tar.gz"
+          package_root="$RUNNER_TEMP/$package_name"
+
+          cp -R "dist/${{ matrix.preset }}" "$package_root"
+          cp LICENSE README.md CHANGELOG.md "$package_root/"
+          (
+            cd "$RUNNER_TEMP"
+            cmake -E tar czf "$asset_name" --format=gnutar -- "$package_name"
+            cmake -E sha256sum "$asset_name" > "${asset_name}.sha256"
+          )
+
+      - name: Create zip archive and checksum
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $packageName = "DspCore-${env:RELEASE_VERSION}-${{ matrix.preset }}"
+          $assetName = "${packageName}.zip"
+          $packageRoot = Join-Path $env:RUNNER_TEMP $packageName
+          $assetPath = Join-Path $env:RUNNER_TEMP $assetName
+
+          Copy-Item `
+              -LiteralPath "dist/${{ matrix.preset }}" `
+              -Destination $packageRoot `
+              -Recurse
+          Copy-Item -LiteralPath "LICENSE" -Destination $packageRoot
+          Copy-Item -LiteralPath "README.md" -Destination $packageRoot
+          Copy-Item -LiteralPath "CHANGELOG.md" -Destination $packageRoot
+          Compress-Archive `
+              -LiteralPath $packageRoot `
+              -DestinationPath $assetPath `
+              -CompressionLevel Optimal
+
+          Push-Location $env:RUNNER_TEMP
+          try {
+              cmake -E sha256sum $assetName |
+                  Set-Content -LiteralPath "${assetName}.sha256" -Encoding ascii
+          }
+          finally {
+              Pop-Location
+          }
+
+      - name: Upload packaged Release
+        uses: actions/upload-artifact@v7
+        with:
+          name: DspCore-${{ env.RELEASE_VERSION }}-${{ matrix.preset }}
+          path: |
+            ${{ runner.temp }}/DspCore-${{ env.RELEASE_VERSION }}-${{ matrix.preset }}.${{ matrix.archive }}
+            ${{ runner.temp }}/DspCore-${{ env.RELEASE_VERSION }}-${{ matrix.preset }}.${{ matrix.archive }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload package failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failure-release-${{ matrix.preset }}-${{ github.run_attempt }}
+          path: |
+            build/${{ matrix.preset }}/CMakeCache.txt
+            build/${{ matrix.preset }}/CMakeFiles/CMakeConfigureLog.yaml
+            build/${{ matrix.preset }}/Testing/Temporary/
+            build/${{ matrix.preset }}/test-results/
+            build/package-consumer/${{ matrix.preset }}/CMakeCache.txt
+            build/package-consumer/${{ matrix.preset }}/CMakeFiles/CMakeConfigureLog.yaml
+            build/package-consumer/${{ matrix.preset }}/Testing/Temporary/
+            dist/${{ matrix.preset }}/
+            ${{ runner.temp }}/DspCore-${{ env.RELEASE_VERSION }}-${{ matrix.preset }}.${{ matrix.archive }}
+            ${{ runner.temp }}/DspCore-${{ env.RELEASE_VERSION }}-${{ matrix.preset }}.${{ matrix.archive }}.sha256
+          if-no-files-found: warn
+          retention-days: 14
+
+  verify:
+    name: Verify complete Release set
+    needs:
+      - metadata
+      - package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      RELEASE_VERSION: ${{ needs.metadata.outputs.release_version }}
+
+    steps:
+      - name: Download validated packages
+        uses: actions/download-artifact@v8
+        with:
+          pattern: DspCore-${{ env.RELEASE_VERSION }}-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify package set and checksums
+        shell: bash
+        working-directory: release-assets
+        run: |
+          set -euo pipefail
+
+          archive_count=$(
+            find . -maxdepth 1 -type f \
+              \( -name '*.tar.gz' -o -name '*.zip' \) \
+              -print | wc -l | tr -d ' '
+          )
+          checksum_count=$(
+            find . -maxdepth 1 -type f -name '*.sha256' \
+              -print | wc -l | tr -d ' '
+          )
+
+          if [[ "$archive_count" != "5" || "$checksum_count" != "5" ]]; then
+            echo "Expected 5 archives and 5 checksums; found ${archive_count} and ${checksum_count}" >&2
+            find . -maxdepth 1 -type f -print | sort >&2
+            exit 1
+          fi
+
+          sha256sum --check *.sha256
+
+      - name: Upload release-set failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failure-release-set-${{ github.run_attempt }}
+          path: release-assets/
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish:
+    name: Publish GitHub Release
+    needs:
+      - metadata
+      - verify
+    if: needs.metadata.outputs.publish == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TAG: ${{ needs.metadata.outputs.tag }}
+      RELEASE_VERSION: ${{ needs.metadata.outputs.release_version }}
+      PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
+
+    steps:
+      - name: Download verified packages
+        uses: actions/download-artifact@v8
+        with:
+          pattern: DspCore-${{ env.RELEASE_VERSION }}-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish release and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          arguments=(
+            release create "$RELEASE_TAG"
+            release-assets/*
+            --repo "$GITHUB_REPOSITORY"
+            --verify-tag
+            --title "DspCore ${RELEASE_TAG}"
+            --generate-notes
+          )
+
+          if [[ "$PRERELEASE" == "true" ]]; then
+            arguments+=(--prerelease)
+          else
+            arguments+=(--latest)
+          fi
+
+          gh "${arguments[@]}"

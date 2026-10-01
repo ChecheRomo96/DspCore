@@ -1,0 +1,25 @@
+{
+  "version": 6,
+  "include": [
+    "base.json",
+    "../../tools/RoModularBuild/cmake/presets/avr-gcc.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "atmega328p_avrgcc_avr5",
+      "inherits": ["base", "romodular_atmega328p_avrgcc_avr5"],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/avr-gcc/atmega328p.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "atmega328p_avrgcc_avr5",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^avr5$"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "atmega328p_avrgcc_avr5",
+      "configurePreset": "atmega328p_avrgcc_avr5",
+      "configuration": "Debug"
+    }
+  ]
+}

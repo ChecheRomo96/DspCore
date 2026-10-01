@@ -1,0 +1,3 @@
+[submodule "tools/RoModularBuild"]
+	path = tools/RoModularBuild
+	url = https://github.com/ChecheRomo96/RoModularBuild.git

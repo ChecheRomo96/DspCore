@@ -1,0 +1,58 @@
+{
+  "version": 6,
+  "include": [
+    "arm-none-eabi.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "psoc5lp_armgcc_cortex_m3_soft",
+      "inherits": "arm_none_eabi_cortex_m3_soft",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "psoc5lp_armgcc_cortex_m3_soft"
+      }
+    },
+    {
+      "name": "stm32f103_armgcc_cortex_m3_soft",
+      "inherits": "arm_none_eabi_cortex_m3_soft",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "stm32f103_armgcc_cortex_m3_soft"
+      }
+    },
+    {
+      "name": "stm32f407_armgcc_cortex_m4f_hard",
+      "inherits": "arm_none_eabi_cortex_m4f_hard",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "stm32f407_armgcc_cortex_m4f_hard"
+      }
+    },
+    {
+      "name": "stm32h743_armgcc_cortex_m7f_hard",
+      "inherits": "arm_none_eabi_cortex_m7f_hard",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "stm32h743_armgcc_cortex_m7f_hard"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "psoc5lp_armgcc_cortex_m3_soft",
+      "configurePreset": "psoc5lp_armgcc_cortex_m3_soft",
+      "configuration": "Debug"
+    },
+    {
+      "name": "stm32f103_armgcc_cortex_m3_soft",
+      "configurePreset": "stm32f103_armgcc_cortex_m3_soft",
+      "configuration": "Debug"
+    },
+    {
+      "name": "stm32f407_armgcc_cortex_m4f_hard",
+      "configurePreset": "stm32f407_armgcc_cortex_m4f_hard",
+      "configuration": "Debug"
+    },
+    {
+      "name": "stm32h743_armgcc_cortex_m7f_hard",
+      "configurePreset": "stm32h743_armgcc_cortex_m7f_hard",
+      "configuration": "Debug"
+    }
+  ]
+}

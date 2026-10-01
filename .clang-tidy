@@ -1,0 +1,18 @@
+# Static analysis for DspCore sources (ACTION_PLAN.md phase 11). Run through
+# scripts/analyze.sh or scripts/analyze.ps1 against a configured preset.
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  portability-*,
+  misc-*,
+  -bugprone-easily-swappable-parameters,
+  -misc-const-correctness,
+  -misc-include-cleaner,
+  -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
+  -clang-analyzer-optin.core.EnumCastOutOfRange
+WarningsAsErrors: '*'
+HeaderFilterRegex: '/DspCore/(src|build/[^/]+/include/DspCore-[^/]+)/'
+FormatStyle: none

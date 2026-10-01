@@ -1,0 +1,42 @@
+{
+    "version": 6,
+
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+
+            "binaryDir": "${sourceDir}/build/${presetName}",
+
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+
+                "DSPCORE_FULL_BUILD": "OFF",
+                "DSPCORE_DOCS": "OFF",
+                "DSPCORE_TESTING": "OFF",
+                "DSPCORE_EXAMPLES": "OFF",
+                "DSPCORE_COVERAGE": "OFF"
+            }
+        },
+
+        {
+            "name": "docs_base",
+            "hidden": true,
+            "inherits": "base",
+
+            "cacheVariables": {
+                "DSPCORE_DOCS": "ON"
+            }
+        },
+
+        {
+            "name": "testing_base",
+            "hidden": true,
+            "inherits": "base",
+
+            "cacheVariables": {
+                "DSPCORE_TESTING": "ON"
+            }
+        }
+    ]
+}

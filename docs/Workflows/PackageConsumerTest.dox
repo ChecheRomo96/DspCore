@@ -1,0 +1,26 @@
+/**
+ * @defgroup DspCore_Workflows_PackageConsumer Installed Package Consumer Test
+ * @ingroup DspCore_Workflows
+ * @brief Validate DspCore exactly as an independent downstream project uses it.
+ *
+ * The package consumer test performs a Release export, configures the isolated
+ * project in `tests/PackageConsumer`, builds it using only `DspCore::DspCore`, and runs
+ * it. The consumer intentionally calls `Foundation::Math::GCD` without linking
+ * `Foundation::Foundation` directly. This verifies both parts of DspCore's public
+ * dependency contract:
+ *
+ * - `DspCoreConfig.cmake` locates Foundation with `find_dependency()`.
+ * - `DspCore::DspCore` propagates Foundation headers and link requirements.
+ *
+ * @code{.bash}
+ * ./scripts/test-package.sh macos_arm64 --fresh
+ * @endcode
+ *
+ * @code{.powershell}
+ * ./scripts/test-package.ps1 windows_msvc_x64 -Fresh
+ * @endcode
+ *
+ * Use `--foundation-prefix` or `-FoundationPrefix` when Foundation is not in
+ * the sibling `../Foundation/dist/<preset>` location. This workflow is for
+ * runnable desktop presets; cross-compiled packages are validated separately.
+ */

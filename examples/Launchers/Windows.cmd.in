@@ -1,0 +1,70 @@
+@echo off
+setlocal EnableExtensions EnableDelayedExpansion
+
+:menu
+cls
+echo DspCore Examples
+echo ===================
+echo.
+
+set "DSPCORE_EXAMPLE_COUNT=0"
+for %%F in ("%~dp0DspCore_*.exe") do (
+    if exist "%%~fF" (
+        set /a DSPCORE_EXAMPLE_COUNT+=1
+        set "DSPCORE_EXAMPLE[!DSPCORE_EXAMPLE_COUNT!]=%%~fF"
+        echo   !DSPCORE_EXAMPLE_COUNT!^) %%~nF
+    )
+)
+
+if !DSPCORE_EXAMPLE_COUNT! EQU 0 goto no_examples
+
+echo.
+set "DSPCORE_SELECTION="
+set /p "DSPCORE_SELECTION=Select an example [1-!DSPCORE_EXAMPLE_COUNT!] or q to quit: "
+
+if /I "!DSPCORE_SELECTION!"=="Q" exit /b 0
+if "!DSPCORE_SELECTION!"=="" goto invalid_selection
+for /f "delims=0123456789" %%A in ("!DSPCORE_SELECTION!") do goto invalid_selection
+if !DSPCORE_SELECTION! LSS 1 goto invalid_selection
+if !DSPCORE_SELECTION! GTR !DSPCORE_EXAMPLE_COUNT! goto invalid_selection
+
+set "DSPCORE_SELECTED_EXAMPLE="
+for /L %%I in (1,1,!DSPCORE_EXAMPLE_COUNT!) do (
+    if "!DSPCORE_SELECTION!"=="%%I" (
+        set "DSPCORE_SELECTED_EXAMPLE=!DSPCORE_EXAMPLE[%%I]!"
+    )
+)
+
+echo.
+echo Running !DSPCORE_SELECTED_EXAMPLE!...
+echo.
+
+"!DSPCORE_SELECTED_EXAMPLE!"
+set "DSPCORE_STATUS=!ERRORLEVEL!"
+
+echo ----------------------------------------
+echo Process finished with exit code !DSPCORE_STATUS!
+echo.
+
+:run_another
+set "DSPCORE_RUN_ANOTHER="
+set /p "DSPCORE_RUN_ANOTHER=Run another example? [Y/n]: "
+if "!DSPCORE_RUN_ANOTHER!"=="" goto menu
+if /I "!DSPCORE_RUN_ANOTHER!"=="Y" goto menu
+if /I "!DSPCORE_RUN_ANOTHER!"=="N" exit /b 0
+if /I "!DSPCORE_RUN_ANOTHER!"=="Q" exit /b 0
+echo Please enter Y or N.
+goto run_another
+
+:invalid_selection
+echo.
+echo Invalid selection.
+pause
+goto menu
+
+:no_examples
+echo No executable examples were found in:
+echo %~dp0
+echo.
+pause
+exit /b 1

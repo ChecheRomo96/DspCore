@@ -1,0 +1,198 @@
+name: Embedded Build and Package
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: embedded-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  avr:
+    name: AVR-GCC / ATmega328P / AVR5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install AVR toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes gcc-avr binutils-avr avr-libc
+
+      - name: Report toolchain
+        uses: ./tools/RoModularBuild/actions/report-toolchain
+        with:
+          compiler: avr-g++
+
+      - name: Build Debug
+        uses: ./tools/RoModularBuild/actions/project-workflow
+        with:
+          command: build
+          preset: atmega328p_avrgcc_avr5
+          configuration: Debug
+          target: DspCore
+          fresh: true
+          parallel: 4
+
+      - name: Build Release
+        uses: ./tools/RoModularBuild/actions/project-workflow
+        with:
+          command: build
+          preset: atmega328p_avrgcc_avr5
+          configuration: Release
+          target: DspCore
+          parallel: 4
+
+      - name: Export Release package
+        shell: bash
+        run: ./scripts/export.sh atmega328p_avrgcc_avr5 --fresh --parallel 4
+
+      - name: Upload AVR package
+        uses: actions/upload-artifact@v7
+        with:
+          name: DspCore-atmega328p_avrgcc_avr5
+          path: dist/atmega328p_avrgcc_avr5
+          if-no-files-found: error
+          retention-days: 7
+
+  arm:
+    name: Arm GCC / ${{ matrix.preset }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - arm_none_eabi_cortex_m0plus_soft
+          - arm_none_eabi_cortex_m3_soft
+          - arm_none_eabi_cortex_m4f_hard
+          - arm_none_eabi_cortex_m7f_hard
+          - psoc5lp_armgcc_cortex_m3_soft
+          - stm32f103_armgcc_cortex_m3_soft
+          - stm32f407_armgcc_cortex_m4f_hard
+          - stm32h743_armgcc_cortex_m7f_hard
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install Arm toolchain and runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes \
+            gcc-arm-none-eabi \
+            binutils-arm-none-eabi \
+            libnewlib-arm-none-eabi \
+            libstdc++-arm-none-eabi-newlib
+
+      - name: Report toolchain
+        uses: ./tools/RoModularBuild/actions/report-toolchain
+        with:
+          compiler: arm-none-eabi-g++
+
+      - name: Build Debug
+        uses: ./tools/RoModularBuild/actions/project-workflow
+        with:
+          command: build
+          preset: ${{ matrix.preset }}
+          configuration: Debug
+          target: DspCore
+          fresh: true
+          parallel: 4
+
+      - name: Build Release
+        uses: ./tools/RoModularBuild/actions/project-workflow
+        with:
+          command: build
+          preset: ${{ matrix.preset }}
+          configuration: Release
+          target: DspCore
+          parallel: 4
+
+      - name: Export Release package
+        shell: bash
+        run: ./scripts/export.sh "${{ matrix.preset }}" --fresh --parallel 4
+
+      - name: Upload Arm package
+        uses: actions/upload-artifact@v7
+        with:
+          name: DspCore-${{ matrix.preset }}
+          path: dist/${{ matrix.preset }}
+          if-no-files-found: error
+          retention-days: 7
+
+  arduino:
+    name: Arduino AVR / Uno source mode / ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu / Bash
+            runner: ubuntu-24.04
+            platform: unix
+
+          - name: Windows / PowerShell
+            runner: windows-2025-vs2026
+            platform: windows
+
+    env:
+      DSPCORE_FOUNDATION_SOURCE: ${{ github.workspace }}/foundation-source
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      # Keep in step with DSPCORE_FOUNDATION_VERSION in cmake/DspCoreFoundation.cmake.
+      - name: Checkout the pinned Foundation release
+        uses: actions/checkout@v5
+        with:
+          repository: ChecheRomo96/Foundation
+          ref: v1.4.0
+          path: foundation-source
+
+      - name: Install arduino-cli
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install Arduino AVR core
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr@1.8.8
+          arduino-cli version
+
+      - name: Compile every example sketch for Arduino Uno
+        if: matrix.platform == 'unix'
+        shell: bash
+        run: ./scripts/test-arduino.sh
+
+      - name: Compile every example sketch for Arduino Uno
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: ./scripts/test-arduino.ps1
