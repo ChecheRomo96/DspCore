@@ -1,6 +1,4 @@
-// The Arduino builder only discovers libraries included from the sketch.
-#include <Foundation.h>
-#include <DspCore.h>
+#include <DspCore_Core.h>
 
 #include "Shared.h"
 

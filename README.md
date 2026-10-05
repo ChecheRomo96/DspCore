@@ -51,13 +51,13 @@ The generated documentation starts at
 
 ## Arduino
 
-Install Foundation and DspCore as Arduino libraries, then include both from
-the sketch itself, because the Arduino builder only discovers
-libraries that the sketch includes:
+Install Foundation and DspCore as Arduino libraries, then include DspCore, or
+only the modules the sketch uses. Every DspCore header also brings in
+Foundation, so the Arduino builder finds both libraries:
 
 ```cpp
-#include <Foundation.h>
-#include <DspCore.h>
+#include <DspCore.h>       // every module
+#include <DspCore_Core.h>  // or only the core module
 ```
 
 DspCore requires C++17. On the stock Arduino AVR core add `-std=gnu++17`, for

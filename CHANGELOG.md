@@ -5,6 +5,13 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ## [Unreleased]
 
+### Changed
+
+- Arduino sketches no longer need to include `<Foundation.h>`: every DspCore
+  header brings in Foundation, so including `<DspCore.h>` or a single module
+  header such as `<DspCore_Core.h>` is enough for the Arduino builder to find
+  both libraries. The example includes only the module it demonstrates.
+
 ### Added
 
 - 0.1.0 scaffold: RoModularBuild, native, AVR and Arm presets, Bash and
