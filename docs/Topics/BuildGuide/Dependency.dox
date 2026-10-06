@@ -4,7 +4,7 @@
  * @brief Foundation package resolution and compatibility contract.
  *
  * DspCore links `Foundation::Foundation` publicly. It requires Foundation
- * `1.4.0` or a newer `1.x` release, and rejects packages whose recorded
+ * `2.0.0` or a newer `2.x` release (built on CPSTL `1.1.0`), and rejects packages whose recorded
  * platform differs from the selected DspCore preset.
  *
  * Resolution order (`cmake/DspCoreFoundation.cmake`):

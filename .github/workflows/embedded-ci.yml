@@ -161,6 +161,7 @@ jobs:
 
     env:
       DSPCORE_FOUNDATION_SOURCE: ${{ github.workspace }}/foundation-source
+      DSPCORE_CPSTL_SOURCE: ${{ github.workspace }}/cpstl-source
 
     steps:
       - name: Checkout repository
@@ -173,8 +174,17 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ChecheRomo96/Foundation
-          ref: v1.4.0
+          ref: v2.0.0
           path: foundation-source
+
+      # Foundation 2.0.0 depends on CPSTL; keep in step with Foundation's
+      # FOUNDATION_CPSTL_VERSION.
+      - name: Checkout the CPSTL release Foundation requires
+        uses: actions/checkout@v5
+        with:
+          repository: ChecheRomo96/CPSTL
+          ref: v1.1.0
+          path: cpstl-source
 
       - name: Install arduino-cli
         uses: arduino/setup-arduino-cli@v2
