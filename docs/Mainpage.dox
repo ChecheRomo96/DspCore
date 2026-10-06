@@ -14,8 +14,8 @@
  *
  * @section DspCoreMainDependency Dependencies
  *
- * DspCore links `Foundation::Foundation` (Foundation 1.4 or a newer 1.x
- * release). It uses local
+ * DspCore links `Foundation::Foundation` (Foundation 2.0 or a newer 2.x
+ * release, built on CPSTL). It uses local
  * packages when available and otherwise fetches the pinned release from
  * GitHub; see @ref DspCore_BuildGuide_Dependency.
  */

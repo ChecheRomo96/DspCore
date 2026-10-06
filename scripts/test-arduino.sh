@@ -5,13 +5,15 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 . "$SCRIPT_DIR/common.sh"
 
 usage() {
-    printf '%s\n' "Usage: $0 [--fqbn <board>] [--foundation <source-directory>]"
+    printf '%s\n' "Usage: $0 [--fqbn <board>] [--foundation <source-directory>] [--cpstl <source-directory>]"
     printf '%s\n' "Foundation defaults to DSPCORE_FOUNDATION_SOURCE or the sibling ../Foundation."
+    printf '%s\n' "CPSTL defaults to DSPCORE_CPSTL_SOURCE or the sibling ../CPSTL."
 }
 
 # The validated Arduino source-mode board. Other cores are not validated here.
 FQBN=arduino:avr:uno
 FOUNDATION=${DSPCORE_FOUNDATION_SOURCE:-$DSPCORE_ROOT/../Foundation}
+CPSTL=${DSPCORE_CPSTL_SOURCE:-$DSPCORE_ROOT/../CPSTL}
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -23,6 +25,11 @@ while [ "$#" -gt 0 ]; do
         --foundation)
             dspcore_require_value "$1" "${2:-}"
             FOUNDATION=$2
+            shift 2
+            ;;
+        --cpstl)
+            dspcore_require_value "$1" "${2:-}"
+            CPSTL=$2
             shift 2
             ;;
         -h|--help)
@@ -39,6 +46,9 @@ command -v arduino-cli >/dev/null 2>&1 || dspcore_die "arduino-cli not found"
 [ -f "$FOUNDATION/library.properties" ] || \
     dspcore_die "Foundation Arduino library not found at $FOUNDATION"
 FOUNDATION=$(dspcore_absolute_path "$FOUNDATION")
+[ -f "$CPSTL/library.properties" ] || \
+    dspcore_die "CPSTL Arduino library not found at $CPSTL"
+CPSTL=$(dspcore_absolute_path "$CPSTL")
 
 # DspCore requires C++17. The stock Arduino AVR core compiles with gnu++11, and
 # its avr-gcc 7.3 supports C++17 when asked; other cores keep their flags.
@@ -67,6 +77,7 @@ for SKETCH in "$DSPCORE_ROOT"/examples/DspCore/*/*/*.ino; do
         --fqbn "$FQBN" \
         --library "$DSPCORE_ROOT" \
         --library "$FOUNDATION" \
+        --library "$CPSTL" \
         --build-path "$BUILD_ROOT/$NAME" \
         --warnings default \
         "$@" \

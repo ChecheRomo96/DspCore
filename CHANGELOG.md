@@ -7,6 +7,11 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ### Changed
 
+- DspCore requires Foundation 2.0.0 or a newer 2.x release, which builds on
+  CPSTL 1.1.0. Arduino users install CPSTL next to Foundation;
+  `scripts/test-arduino.sh` and `.ps1` take `--cpstl` (default
+  `DSPCORE_CPSTL_SOURCE` or `../CPSTL`).
+
 - Arduino sketches no longer need to include `<Foundation.h>`: every DspCore
   header brings in Foundation, so including `<DspCore.h>` or a single module
   header such as `<DspCore_Core.h>` is enough for the Arduino builder to find
