@@ -3,8 +3,8 @@
 DspCore is the signal-processing layer of the RoModular ecosystem: lookup
 tables, interpolation, generators, filters and transforms for desktop and
 embedded targets. It is built on Foundation, has no MIDI or music-theory
-dependencies, and never allocates memory or throws exceptions in real-time
-paths.
+dependencies. It never throws exceptions, and memory use is the
+implementer's choice.
 
 > **Status: early development.** Version 0.1.0 is the scaffold: build,
 > packaging, CI and version information only. Features arrive in the phases of
