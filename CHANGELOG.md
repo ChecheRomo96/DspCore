@@ -3,7 +3,7 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
-## [Unreleased]
+## [0.1.0] - 2026-10-08
 
 ### Changed
 
