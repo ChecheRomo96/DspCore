@@ -61,9 +61,9 @@ Foundation, so the Arduino builder finds both libraries:
 #include <DspCore_Core.h>  // or only the core module
 ```
 
-DspCore requires C++17. On the stock Arduino AVR core add `-std=gnu++17`, for
-example with
-`arduino-cli compile --build-property "compiler.cpp.extra_flags=-std=gnu++17"`.
+DspCore Arduino source builds support stock C++11 cores, including the Arduino
+AVR core, without compiler-flag overrides. CMake and direct-source builds
+continue to require C++17.
 
 ## License
 

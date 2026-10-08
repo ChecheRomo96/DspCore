@@ -50,15 +50,6 @@ FOUNDATION=$(dspcore_absolute_path "$FOUNDATION")
     dspcore_die "CPSTL Arduino library not found at $CPSTL"
 CPSTL=$(dspcore_absolute_path "$CPSTL")
 
-# DspCore requires C++17. The stock Arduino AVR core compiles with gnu++11, and
-# its avr-gcc 7.3 supports C++17 when asked; other cores keep their flags.
-set --
-case "$FQBN" in
-    arduino:avr:*)
-        set -- --build-property "compiler.cpp.extra_flags=-std=gnu++17"
-        ;;
-esac
-
 BUILD_ROOT="$DSPCORE_ROOT/build/arduino/$(printf '%s' "$FQBN" | tr ':' '_')"
 rm -rf "$BUILD_ROOT"
 
@@ -80,7 +71,6 @@ for SKETCH in "$DSPCORE_ROOT"/examples/DspCore/*/*/*.ino; do
         --library "$CPSTL" \
         --build-path "$BUILD_ROOT/$NAME" \
         --warnings default \
-        "$@" \
         "$SKETCH_DIR" >"$LOG" 2>&1 || STATUS=$?
     cat -- "$LOG"
     [ "$STATUS" -eq 0 ] || dspcore_die "$NAME failed to compile"

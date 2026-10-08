@@ -19,7 +19,9 @@
     #endif
 #endif
 
-#if !defined(DOXYGEN) && (DSPCORE_CPLUSPLUS < 201703L)
+#if !defined(DOXYGEN) && defined(ARDUINO) && (DSPCORE_CPLUSPLUS < 201103L)
+    #error "DspCore requires C++11 or newer for Arduino source builds"
+#elif !defined(DOXYGEN) && !defined(ARDUINO) && (DSPCORE_CPLUSPLUS < 201703L)
     #error "DspCore requires C++17 or newer"
 #endif
 
