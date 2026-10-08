@@ -3,6 +3,13 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## Unreleased
+
+### Changed
+
+- Arduino source builds now accept stock C++11 cores without injecting
+  `-std=gnu++17`. CMake and direct-source integrations remain C++17.
+
 ## [0.1.0] - 2026-10-08
 
 ### Changed
