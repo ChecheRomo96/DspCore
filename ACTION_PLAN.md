@@ -3,10 +3,11 @@
 ## Objective
 
 Build DspCore as a portable C++17 signal-processing library for desktop and
-embedded targets: lookup tables, interpolation, generators, streaming filters
-and transforms. It consumes Foundation for general utilities, has no MIDI or
-music-theory dependencies. It never throws exceptions, and memory use is the
-implementer's choice.
+direct-source embedded targets, with C++11 Arduino source compatibility:
+lookup tables, interpolation, generators, streaming filters and transforms.
+It consumes Foundation for general utilities, has no MIDI or music-theory
+dependencies. It never throws exceptions, and memory use is the implementer's
+choice.
 
 The dependency direction is:
 
