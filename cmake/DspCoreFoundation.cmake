@@ -22,7 +22,7 @@
 # and the internal cache entry DSPCORE_FOUNDATION_RESOLVED_PREFIX (empty when
 # Foundation is built from source and installed alongside DspCore).
 
-set(DSPCORE_FOUNDATION_VERSION "2.0.0")
+set(DSPCORE_FOUNDATION_VERSION "2.0.5")
 set(DSPCORE_FOUNDATION_REPOSITORY "ChecheRomo96/Foundation" CACHE STRING
     "GitHub repository (owner/name) used to fetch Foundation")
 option(DSPCORE_FETCH_FOUNDATION

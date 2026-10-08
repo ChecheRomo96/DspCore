@@ -174,7 +174,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ChecheRomo96/Foundation
-          ref: v2.0.0
+          ref: v2.0.5
           path: foundation-source
 
       # Foundation 2.0.0 depends on CPSTL; keep in step with Foundation's
@@ -183,7 +183,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ChecheRomo96/CPSTL
-          ref: v1.1.0
+          ref: v1.1.5
           path: cpstl-source
 
       - name: Install arduino-cli
