@@ -22,7 +22,7 @@
 # and the internal cache entry DSPCORE_FOUNDATION_RESOLVED_PREFIX (empty when
 # Foundation is built from source and installed alongside DspCore).
 
-set(DSPCORE_FOUNDATION_VERSION "1.4.0")
+set(DSPCORE_FOUNDATION_VERSION "2.0.5")
 set(DSPCORE_FOUNDATION_REPOSITORY "ChecheRomo96/Foundation" CACHE STRING
     "GitHub repository (owner/name) used to fetch Foundation")
 option(DSPCORE_FETCH_FOUNDATION
@@ -154,7 +154,7 @@ if(NOT TARGET Foundation::Foundation AND NOT DSPCORE_FOUNDATION_PREFIX STREQUAL 
     if(NOT TARGET Foundation::Foundation)
         message(FATAL_ERROR
             "DSPCORE_FOUNDATION_PREFIX='${DSPCORE_FOUNDATION_PREFIX}' does not contain "
-            "a Foundation ${DSPCORE_FOUNDATION_VERSION}+ (1.x) package.")
+            "a Foundation ${DSPCORE_FOUNDATION_VERSION}+ (2.x) package.")
     endif()
     set(DSPCORE_FOUNDATION_SOURCE "prefix")
     set(DSPCORE_FOUNDATION_RESOLVED_PREFIX "${DSPCORE_FOUNDATION_PREFIX}")
@@ -172,7 +172,7 @@ if(NOT TARGET Foundation::Foundation)
         else()
             message(WARNING
                 "Ignoring ${sibling_prefix}: it is not a compatible Foundation "
-                "${DSPCORE_FOUNDATION_VERSION}+ (1.x) package. Re-export it or "
+                "${DSPCORE_FOUNDATION_VERSION}+ (2.x) package. Re-export it or "
                 "let DspCore fetch Foundation.")
         endif()
     endif()
@@ -249,7 +249,7 @@ endif()
 
 if(NOT TARGET Foundation::Foundation)
     message(FATAL_ERROR
-        "DspCore requires Foundation ${DSPCORE_FOUNDATION_VERSION}+ (1.x) for the "
+        "DspCore requires Foundation ${DSPCORE_FOUNDATION_VERSION}+ (2.x) for the "
         "same platform and ABI. Set DSPCORE_FOUNDATION_PREFIX to a Foundation "
         "package, export ../Foundation/dist/${DSPCORE_PLATFORM}, or enable "
         "DSPCORE_FETCH_FOUNDATION.")
