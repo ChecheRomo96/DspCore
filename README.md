@@ -6,7 +6,7 @@ embedded targets. It is built on Foundation, has no MIDI or music-theory
 dependencies. It never throws exceptions, and memory use is the
 implementer's choice.
 
-> **Status: early development.** Version 0.1.0 is the scaffold: build,
+> **Status: early development.** Version 0.1.1 is the scaffold: build,
 > packaging, CI and version information only. Features arrive in the phases of
 > `ACTION_PLAN.md`.
 
