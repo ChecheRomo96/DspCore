@@ -5,7 +5,7 @@
  * tables, interpolation, generators, filters and transforms for desktop and
  * embedded targets, built on Foundation.
  *
- * @note Version 0.1.0 is the scaffold; features arrive in the phases of
+ * @note Version 0.1.1 is the scaffold; features arrive in the phases of
  * `ACTION_PLAN.md`.
  *
  * @section DspCoreMainModules Modules
