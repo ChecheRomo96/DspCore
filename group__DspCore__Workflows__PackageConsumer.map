@@ -1,0 +1,4 @@
+<map id="Installed Package Consumer Test" name="Installed Package Consumer Test">
+<area shape="rect" id="Node000002" href="$group__DspCore__Workflows.html" title="Repeatable configure, build, test, documentation, install, and export." alt="" coords="5,5,95,31"/>
+<area shape="rect" id="Node000001" title="Validate DspCore exactly as an independent downstream project uses it." alt="" coords="143,5,377,31"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Build Guide" name="Build Guide">
+<area shape="rect" id="Node000001" title="Configure DspCore against a matching Foundation package." alt="" coords="5,31,103,56"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__BuildGuide__Dependency.html" title="Foundation package resolution and compatibility contract." alt="" coords="159,5,273,31"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__BuildGuide__Platforms.html" title="Public DspCore presets backed by pinned RoModularBuild profiles." alt="" coords="151,55,281,80"/>
+</map>
