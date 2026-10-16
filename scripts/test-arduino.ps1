@@ -31,7 +31,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $Cpstl "library.properties"))) {
 }
 $Cpstl = (Resolve-Path -LiteralPath $Cpstl).Path
 
-$examplesRoot = Join-Path $root "examples/DspCore"
+$examplesRoot = Join-Path $root "examples"
 $buildRoot = Join-Path $root ("build/arduino/" + ($Fqbn -replace ":", "_"))
 if (Test-Path -LiteralPath $buildRoot) {
     Remove-Item -LiteralPath $buildRoot -Recurse -Force
