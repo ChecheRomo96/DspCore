@@ -7,11 +7,26 @@
   "configurePresets": [
     {
       "name": "atmega328p_avrgcc_avr5",
-      "inherits": ["base", "romodular_atmega328p_avrgcc_avr5"],
+      "inherits": [
+        "base",
+        "romodular_atmega328p_avrgcc_avr5"
+      ],
       "toolchainFile": "${sourceDir}/cmake/toolchains/avr-gcc/atmega328p.cmake",
       "cacheVariables": {
         "DSPCORE_PLATFORM": "atmega328p_avrgcc_avr5",
         "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^avr5$"
+      }
+    },
+    {
+      "name": "atmega2560_avrgcc_avr6",
+      "inherits": [
+        "base",
+        "romodular_atmega2560_avrgcc_avr6"
+      ],
+      "toolchainFile": "${sourceDir}/cmake/toolchains/avr-gcc/atmega2560.cmake",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "atmega2560_avrgcc_avr6",
+        "DSPCORE_EXPECTED_SYSTEM_PROCESSOR": "^avr6$"
       }
     }
   ],
@@ -19,6 +34,11 @@
     {
       "name": "atmega328p_avrgcc_avr5",
       "configurePreset": "atmega328p_avrgcc_avr5",
+      "configuration": "Debug"
+    },
+    {
+      "name": "atmega2560_avrgcc_avr6",
+      "configurePreset": "atmega2560_avrgcc_avr6",
       "configuration": "Debug"
     }
   ]
