@@ -3,6 +3,13 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## [0.1.3] - 2026-10-16
+
+### Changed
+
+- Remove the redundant library-name directory from examples; update CMake, Arduino validation and documentation.
+- Require Foundation 2.0.8 and validate against CPSTL 1.1.12 in embedded CI.
+
 ## [0.1.2] - 2026-10-16
 
 ### Changed
