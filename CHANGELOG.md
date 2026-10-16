@@ -3,6 +3,14 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## [0.1.2] - 2026-10-16
+
+### Changed
+
+- Pin RoModularBuild v0.6.2 and consume its shared compiler/preset interfaces.
+- Add ATmega2560 / AVR6 and STM32G0B1 platform coverage to embedded builds.
+- Refresh released dependency pins across CMake and Arduino CI.
+
 ## [0.1.1] - 2026-10-08
 
 ### Changed

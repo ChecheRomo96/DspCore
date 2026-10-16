@@ -31,6 +31,13 @@
       "cacheVariables": {
         "DSPCORE_PLATFORM": "stm32h743_armgcc_cortex_m7f_hard"
       }
+    },
+    {
+      "name": "stm32g0b1cbt6_armgcc_cortex_m0plus_soft",
+      "inherits": "arm_none_eabi_cortex_m0plus_soft",
+      "cacheVariables": {
+        "DSPCORE_PLATFORM": "stm32g0b1cbt6_armgcc_cortex_m0plus_soft"
+      }
     }
   ],
   "buildPresets": [
@@ -52,6 +59,11 @@
     {
       "name": "stm32h743_armgcc_cortex_m7f_hard",
       "configurePreset": "stm32h743_armgcc_cortex_m7f_hard",
+      "configuration": "Debug"
+    },
+    {
+      "name": "stm32g0b1cbt6_armgcc_cortex_m0plus_soft",
+      "configurePreset": "stm32g0b1cbt6_armgcc_cortex_m0plus_soft",
       "configuration": "Debug"
     }
   ]
