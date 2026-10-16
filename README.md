@@ -1,5 +1,7 @@
 # DspCore
 
+**Documentation:** [API and build guide](https://checheromo96.github.io/DspCore/) · [API class index](https://checheromo96.github.io/DspCore/annotated.html)
+
 DspCore is the signal-processing layer of the RoModular ecosystem: lookup
 tables, interpolation, generators, filters and transforms for desktop and
 embedded targets. It is built on Foundation, has no MIDI or music-theory
