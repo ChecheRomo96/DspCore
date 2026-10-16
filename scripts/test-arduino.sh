@@ -56,9 +56,9 @@ rm -rf "$BUILD_ROOT"
 # Compile each sketch against the repository and Foundation as libraries,
 # exactly as an Arduino user who installed both would.
 COUNT=0
-for SKETCH in "$DSPCORE_ROOT"/examples/DspCore/*/*/*.ino; do
+for SKETCH in "$DSPCORE_ROOT"/examples/*/*/*.ino; do
     SKETCH_DIR=$(dirname -- "$SKETCH")
-    NAME=${SKETCH_DIR#"$DSPCORE_ROOT/examples/DspCore/"}
+    NAME=${SKETCH_DIR#"$DSPCORE_ROOT/examples/"}
     LOG="$BUILD_ROOT/$NAME.log"
     mkdir -p -- "$(dirname -- "$LOG")"
     printf '%s\n' "== $NAME ($FQBN)"

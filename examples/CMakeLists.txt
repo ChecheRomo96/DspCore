@@ -22,7 +22,9 @@ if(APPLE OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(DSPCORE_DESKTOP_EXAMPLES_SUPPORTED ON)
 endif()
 
-add_subdirectory(DspCore)
+if(DSPCORE_CORE)
+    add_subdirectory(Core)
+endif()
 
 set(DSPCORE_EXAMPLES_LAUNCHER_DIRECTORY
     "${CMAKE_CURRENT_BINARY_DIR}/launchers")

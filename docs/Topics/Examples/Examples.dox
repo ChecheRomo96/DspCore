@@ -6,7 +6,7 @@
  * Arduino sketch and native desktop adapter:
  *
  * @code
- * examples/DspCore/<module>/<example>/
+ * examples/<module>/<example>/
  * |-- CMakeLists.txt
  * |-- <example>.ino
  * |-- Shared.h
