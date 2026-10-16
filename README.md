@@ -72,3 +72,9 @@ Copyright (c) 2026 José Manuel Romo. All rights reserved.
 DspCore is currently proprietary. No permission is granted for external use,
 compilation, modification, redistribution, integration, or commercial use
 without prior written authorization. See [LICENSE](LICENSE).
+
+Shared embedded build support is pinned to RoModularBuild `v0.6.2`.
+The `atmega328p_avrgcc_avr5`, `atmega2560_avrgcc_avr6` and
+`stm32g0b1cbt6_armgcc_cortex_m0plus_soft` presets retain repository-specific
+feature and package policy. CI compile/package checks do not establish physical
+board execution.
