@@ -99,6 +99,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      pages: write
 
     steps:
       - name: Download validated documentation
@@ -114,3 +115,13 @@ jobs:
           publish_branch: docs
           publish_dir: build/documentation/docs/html
           force_orphan: true
+
+      # GITHUB_TOKEN pushes do not trigger a branch-based Pages build.
+      - name: Request GitHub Pages rebuild
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl --fail --silent --show-error --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/pages/builds"
