@@ -5,7 +5,7 @@
 static_assert(FLT_RADIX == 2, "DspCore requires binary floating-point");
 static_assert(FLT_MANT_DIG >= 24, "DspCore requires binary32 significand precision");
 static_assert(FLT_MAX_EXP >= 128, "DspCore requires binary32 upper exponent range");
-static_assert(FLT_MIN_EXP <= -125, "DspCore requires binary32 lower exponent range");
+static_assert(FLT_MIN_EXP < -124, "DspCore requires binary32 lower exponent range");
 static_assert(DBL_MANT_DIG >= FLT_MANT_DIG, "double must preserve float precision");
 static_assert(DBL_MAX_EXP >= FLT_MAX_EXP, "double must preserve float upper range");
 static_assert(DBL_MIN_EXP <= FLT_MIN_EXP, "double must preserve float lower range");
