@@ -1,0 +1,93 @@
+/**
+ * @page DspCore_Numeric Numeric and buffer contracts
+ *
+ * This specification governs DSP components; the module topics distinguish
+ * implemented APIs from planned filters and control processing.
+ *
+ * @section DspCore_Numeric_Types Samples and arithmetic
+ *
+ * - **SPEC-NUM-1**: Floating-point processing uses float by default. Algorithms
+ *   may offer explicit double arithmetic; choosing double storage must never
+ *   silently reduce computation to float. Public scalar choices do not change
+ *   with the target. float has binary radix, at least 24 significand bits and
+ *   an exponent range including binary32; double is at least as precise and
+ *   wide as float. double need not be 64 bits (notably on AVR).
+ * - **SPEC-NUM-2**: Storage and arithmetic are separate contracts. Initial
+ *   processing kernels use floating-point arithmetic. Signed integer PCM is
+ *   a storage representation, not an implicit fixed-point implementation.
+ *   Fixed-point kernels require a separate format/overflow contract and a
+ *   Foundation arithmetic prerequisite; they are not implemented here.
+ * - **SPEC-NUM-3**: Nominal audio samples are bipolar [-1,1]; nominal controls
+ *   and envelopes are unipolar [0,1]. Generic processing permits headroom and
+ *   never clips implicitly. A component must state different units or ranges,
+ *   such as hertz, seconds or cycles. PID errors and outputs may be signed.
+ * - **SPEC-NUM-4**: Explicit normalized signed PCM conversion maps -1 to the
+ *   integer minimum and +1 to its maximum, saturates outside that interval,
+ *   and rounds intermediate values to nearest with ties away from zero.
+ *   Each sign uses its own full-scale magnitude. NaN maps to zero and
+ *   infinities saturate. Conversion must check bounds before integer casts;
+ *   signed overflow and out-of-range casts are forbidden. These are future
+ *   conversion requirements, not a conversion API in this release.
+ * - **SPEC-NUM-5**: Checked setup rejects non-finite parameters and invalid
+ *   domains without changing existing valid state. Stateful processing must
+ *   document its non-finite sample policy before implementation. Stateless
+ *   arithmetic may propagate NaN/Inf; it must not cause unsafe casts or memory
+ *   access. Denormal flushing is never enabled globally by the library.
+ * - **SPEC-NUM-6**: Error tolerances depend on the algorithm and actual scalar
+ *   precision. Tests use reference values plus absolute/relative tolerances,
+ *   not a blanket exact-equality rule. Compile success proves no throughput
+ *   or real-time guarantee. Hardware performance must be measured separately.
+ *
+ * @section DspCore_Numeric_Buffers Storage and failure
+ *
+ * - **SPEC-BUF-1**: Processing accepts caller-owned buffers and workspace;
+ *   processing calls do not allocate. Optional owning LUT containers may
+ *   allocate only through explicitly documented storage operations. Callers
+ *   can reserve capacity before time-critical processing.
+ * - **SPEC-BUF-2**: Counts describe elements. Every dimension multiplication
+ *   and count-times-sizeof multiplication is checked before allocation or
+ *   indexing. Invalid sizes and allocation failure return failure without
+ *   changing dimensions, capacity, pointer or existing samples.
+ * - **SPEC-BUF-3**: Empty buffers allow a null pointer and are safe no-ops;
+ *   nonempty buffers require adequate non-null storage. Checked entry points
+ *   reject invalid descriptors before writing. Raw-pointer APIs cannot prove
+ *   allocation extent: the caller supplies the stated accessible extent.
+ * - **SPEC-BUF-4**: Owning LUTs are move-only and store arithmetic sample
+ *   types, excluding bool. New logical elements are zero-initialized; reserve
+ *   preserves logical size and values. Resizing within capacity reuses storage.
+ *   Empty resize retains capacity; explicit release clears pointer, dimensions
+ *   and capacity. Moved-from objects are valid and empty. Containers owning
+ *   heap memory are not trivially copyable value types.
+ * - **SPEC-BUF-5**: Multidimensional data uses x-contiguous row-major storage:
+ *   2D index y*width+x; 3D index (z*height+y)*width+x. Any zero extent makes
+ *   the shape empty and canonicalizes all extents to zero. Resize preserves
+ *   the flat prefix; preserving geometric coordinates requires an explicit
+ *   reshape/copy operation. Storage never invokes a virtual generator.
+ * - **SPEC-BUF-6**: Out-of-place APIs require disjoint input, output and
+ *   workspace ranges unless overlap is explicitly supported. In-place APIs
+ *   must be named/documented and tested for that use. No hidden scratch
+ *   allocation compensates for overlap; APIs that cannot check overlap state
+ *   it as a caller precondition.
+ *
+ * @section DspCore_Numeric_Boundaries Coordinates and control
+ *
+ * - **SPEC-DOM-1**: Interpolation arithmetic is separate from lookup boundary
+ *   handling. Lookup explicitly selects clamp, wrap or rejection; periodic
+ *   phase is measured in cycles and wraps to [0,1), including negative phase.
+ *   Checked coordinate interpolation rejects collapsed/non-finite bounds;
+ *   singleton LUT axes are handled by lookup without dividing by zero.
+ * - **SPEC-DOM-2**: Segment sample ranges are half-open [first,last). Empty
+ *   ranges write nothing; singleton segments write the start value. Longer
+ *   segments include both endpoints exactly (except constant singleton LUT shapes).
+ *   Curve zero has a defined linear
+ *   limit, evaluated stably for small magnitudes. A singleton shape LUT acts
+ *   as a constant across the requested segment.
+ * - **SPEC-CTL-1**: Control operates in signal/system units without MIDI
+ *   dependencies. Smoothers, ramps, slew limits, hysteresis/deadband, PID and
+ *   parameter mapping belong here. Components state their update interval,
+ *   units, reset state and output limits. Stateful updates receive a validated
+ *   interval or sample rate; no wall clock or scheduler is hidden inside DSP.
+ *   PID anti-windup and derivative behavior require their own later contract.
+ *
+ * See @ref DspCore_Architecture for scope and planned modules.
+ */

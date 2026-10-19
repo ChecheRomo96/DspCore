@@ -9,3 +9,18 @@ option(DSPCORE_CORE "Enable DspCore::Core" ON)
 if(DSPCORE_FULL_BUILD)
     set(DSPCORE_CORE ON CACHE BOOL "Enable DspCore::Core" FORCE)
 endif()
+
+option(DSPCORE_LUT "Enable DspCore::LUT" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_LUT ON CACHE BOOL "Enable DspCore::LUT" FORCE)
+endif()
+
+option(DSPCORE_INTERPOLATION "Enable DspCore::Interpolation" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_INTERPOLATION ON CACHE BOOL "Enable DspCore::Interpolation" FORCE)
+endif()
+
+option(DSPCORE_GENERATORS "Enable DspCore::Generators" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_GENERATORS ON CACHE BOOL "Enable DspCore::Generators" FORCE)
+endif()

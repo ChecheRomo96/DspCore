@@ -1,0 +1,30 @@
+/**
+ * @page DspCore_Architecture Architecture and planned content
+ *
+ * Dependency direction: Foundation -> DspCore -> MIDILAR. General utilities
+ * belong to Foundation, music theory to MCC, and MIDI interpretation to
+ * MIDILAR. DspCore processes signals and control systems independently.
+ *
+ * Content (Core/version, LUT storage, interpolation and generators are implemented; other modules are planned):
+ * - Numeric: scalar precision, ranges and explicit conversion policy.
+ * - LUT: 1D, 2D and 3D storage, independent of generators.
+ * - Interpolation: linear, bilinear and trilinear.
+ * - Generators: periodic tables, noise, envelopes, shaping and windows.
+ * - Filters: FIR and IIR/biquad streaming processing.
+ * - Control: smoothing, ramps, slew limiters, hysteresis, deadband, PID and
+ *   parameter mapping.
+ * - Analysis: peak, RMS and envelope followers.
+ * - Transforms: DFT, IDFT, FFT and IFFT.
+ *
+ * MIDILAR's musical control layer interprets notes, pedals, RPN/NRPN,
+ * controllers and parameter bindings. It may consume DspCore smoothing and
+ * mapping, but DspCore never interprets MIDI messages.
+ *
+ * Historical implementations were reviewed at MIDILAR commit
+ * bc70ce639f8bb72f79995e1ec742b73aef544112. They are design input, not a
+ * compatibility promise. See docs/Design/LegacyDspReview.md in the source
+ * checkout for findings and probe evidence.
+ *
+ * @ref DspCore_Numeric defines the numerical and buffer requirements for
+ * migration. Further implementation follows ACTION_PLAN.md phase by phase.
+ */

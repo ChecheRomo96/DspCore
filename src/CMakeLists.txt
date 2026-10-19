@@ -32,6 +32,21 @@ if(DSPCORE_CORE)
         "${CMAKE_CURRENT_LIST_DIR}/DspCore_Core.h")
 endif()
 
+if(DSPCORE_LUT)
+    list(APPEND DSPCORE_TOP_LEVEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/DspCore_LUT.h")
+    dspcore_add_macro(PUBLIC DSPCORE_LUT)
+endif()
+
+if(DSPCORE_INTERPOLATION)
+    list(APPEND DSPCORE_TOP_LEVEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/DspCore_Interpolation.h")
+    dspcore_add_macro(PUBLIC DSPCORE_INTERPOLATION)
+endif()
+
+if(DSPCORE_GENERATORS)
+    list(APPEND DSPCORE_TOP_LEVEL_HEADERS "${CMAKE_CURRENT_LIST_DIR}/DspCore_Generators.h")
+    dspcore_add_macro(PUBLIC DSPCORE_GENERATORS)
+endif()
+
 target_sources(DspCore PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/DspCore.cpp"
     ${DSPCORE_TOP_LEVEL_HEADERS})
@@ -50,7 +65,7 @@ if(DSPCORE_CORE)
     dspcore_add_macro(PUBLIC DSPCORE_CORE)
 endif()
 
-if(DSPCORE_CORE)
+if(DSPCORE_CORE OR DSPCORE_LUT OR DSPCORE_INTERPOLATION OR DSPCORE_GENERATORS)
     add_subdirectory(DspCore)
 endif()
 

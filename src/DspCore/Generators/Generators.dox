@@ -1,0 +1,144 @@
+/**
+ * @defgroup DspCore_Generators Generators
+ * @brief Allocation-free table and segment generation into caller-owned buffers.
+ *
+ * Include `<DspCore_Generators.h>` or an individual family header under
+ * `<DspCore/Generators/>`. All arithmetic and output use a consistent float
+ * or double type. No generator allocates, resizes a LUT, clips PCM, throws,
+ * or changes global floating-point mode. Integer output/conversion is deferred.
+ *
+ * @section DspCore_Generators_Contract Buffers and failure
+ *
+ * Functions return bool. Invalid parameters, nonempty null buffers, byte-count
+ * overflow, or invalid ranges return false before writing output or advancing
+ * noise state. The caller guarantees the stated accessible buffer extent;
+ * raw pointers cannot verify its actual allocation. A null pointer is allowed
+ * for zero count, with valid parameters. Empty ranges write nothing.
+ *
+ * Amplitudes/scales must be finite and nonnegative. Parameters and endpoints
+ * must be finite. Periodic/noise generators additionally require offset +/-
+ * amplitude to remain finite. Shape drive/gamma/gain must be strictly positive;
+ * envelope curve may be zero. Invalid domains are rejected, never silently
+ * replaced by arbitrary minimum drive or curve values.
+ *
+ * @section DspCore_Generators_Storage Using LUT storage
+ *
+ * Generators operate on contiguous public storage, independently of ownership
+ * or dimensions. Allocate beforehand, then pass GetBuffer and Size for a 1D
+ * table, or a row/slice pointer and width for higher dimensions. Changing
+ * parameters between rows/slices builds a 2D/3D family of curves. This replaces
+ * the historical virtual LUT3D::Eval and dimension-specific generator wrappers.
+ *
+ * @code{.cpp}
+ * DspCore::LUT::LUT3D<float> curves;
+ * if (!curves.Resize(5,2,2)) { return; }
+ * for (size_t z=0; z<2; ++z) {
+ *     for (size_t y=0; y<2; ++y) {
+ *         bool ok = DspCore::Generators::Shaping::GammaMorph(
+ *             curves.GetBuffer()+(z*2+y)*5, 5,
+ *             static_cast<float>(y), static_cast<float>(z+1));
+ *     }
+ * }
+ * @endcode
+ *
+ * @section DspCore_Generators_Precision Numerical behavior
+ *
+ * Float calls use float math functions; double calls use double functions.
+ * No platform-dependent public type substitution occurs; AVR double may have
+ * the same precision as float. Stable small-argument series avoid the
+ * exp/log cancellation defects in the legacy envelopes without depending on
+ * expm1/log1p availability in AVR libc. Normalized shape roundoff is bounded
+ * to its mathematical range; no general signal saturation is introduced.
+ * Huge counts may exceed coordinate resolution; no uniqueness/throughput
+ * guarantee is made beyond the selected arithmetic type's precision.
+ *
+ * See @ref DspCore_Numeric and @ref DspCore_Examples.
+ */
+/**
+ * @defgroup DspCore_Generators_Periodic Periodic tables
+ * @ingroup DspCore_Generators
+ * @brief Sine, saw, square and triangle cycles without a duplicate endpoint.
+ *
+ * Phase is in cycles, wraps negative/large finite values into [0,1), and is
+ * computed from the sample index rather than accumulated. A singleton samples
+ * the supplied phase. Output is offset + amplitude * waveform(phase+i/N).
+ *
+ * | Wave | Phase zero | Quarter-cycle | Half-cycle | Three-quarter-cycle |
+ * | --- | --- | --- | --- | --- |
+ * | Sine | 0 | 1 | 0 | -1 |
+ * | Saw | 0 | 0.5 | -1 | -0.5 |
+ * | Square | 1 | 1 | -1 | -1 |
+ * | Triangle | 0 | 1 | 0 | -1 |
+ *
+ * These conventions preserve the historical saw/triangle phase offsets.
+ * The tables are naive and not band-limited. They are not streaming oscillators
+ * with a sample rate or anti-aliasing. Use periodic lookup with Boundary::Wrap
+ * for tables without duplicated endpoints. Example: Generators/Periodic.
+ */
+/**
+ * @defgroup DspCore_Generators_Shaping Shaping curves
+ * @ingroup DspCore_Generators
+ * @brief Atan/tanh raw, normalized and positive-half curves; gamma and gamma morph.
+ *
+ * Atan/Tanh sample x in [-1,1]. Half variants sample [0,1]. Norm divides by
+ * atan(drive) or tanh(drive), giving exact endpoints after scaling. A singleton
+ * samples x=0 for every shaping family. Tiny positive normalized drive uses
+ * its linear limit. Raw atan may exceed magnitude one (bounded by pi/2);
+ * its scale must be <= maximum representable value / (pi/2).
+ *
+ * Gamma samples x^gamma on [0,1] with endpoints zero and scale. GammaMorph
+ * uses exponent=pow(gain,morph); non-finite or zero derived exponents fail
+ * before writing. Positive finite gain and finite morph are required.
+ * Normalized results are bounded against numerical overshoot before scaling.
+ * This phase provides offline curve builders, not a per-sample waveshaper.
+ * Example: Generators/Shaping.
+ */
+/**
+ * @defgroup DspCore_Generators_Envelopes Envelope segments
+ * @ingroup DspCore_Generators
+ * @brief Linear, exponential, logarithmic and optional LUT-shaped segments.
+ *
+ * Ranges are half-open [first,last), with last defaulting to total. Unlike
+ * legacy code, last>total is rejected instead of clamped. Empty valid ranges
+ * write nothing. Singletons write start. Longer segments include exact start
+ * and end. Exponential shape=(1-exp(-curve*t))/(1-exp(-curve)); logarithmic
+ * shape=log(1+curve*t)/log(1+curve). Nonnegative curve zero has a linear limit;
+ * curves <= 8*epsilon also use that limit to avoid underflow/cancellation.
+ *
+ * LUTSegment is available when both LUT and Interpolation are enabled. Shape
+ * samples must be finite in [0,1]. Tables of size >=2 must have exact zero/one
+ * endpoints; intermediate samples need not be monotonic. A singleton shape
+ * maps start+(end-start)*shape[0] across the entire segment, except a singleton
+ * segment always writes start. This is an intentional constant-shape exception
+ * to the usual endpoint rule. Empty/invalid tables fail. The entire claimed
+ * output buffer must be disjoint from the logical shape storage; overlap is
+ * rejected before writing. Table validation precedes output and does not
+ * allocate. Output is written only within [first,last).
+ * Examples: Generators/Envelopes and Generators/LUTEnvelope.
+ */
+/**
+ * @defgroup DspCore_Generators_Noise White noise
+ * @ingroup DspCore_Generators
+ * @brief Reproducible xorshift32 sequence with explicit caller-owned state.
+ *
+ * White requires a nonzero uint32_t state reference. Zero is rejected because
+ * it is an absorbing state of xorshift32. No default seed is restarted on each
+ * call. Reuse the updated state for continuity across arbitrary block sizes.
+ * Output is offset + amplitude*(2*state/UINT32_MAX-1), nominally in
+ * offset+[-amplitude,amplitude]. Floating rounding can reach endpoints.
+ * This is deterministic pseudorandom signal generation, not cryptography.
+ * An empty call leaves a valid state unchanged. Example: Generators/Noise.
+ */
+/**
+ * @defgroup DspCore_Generators_Windows Windows
+ * @ingroup DspCore_Generators
+ * @brief Symmetric Hann and Hamming coefficient tables.
+ *
+ * Hann=0.5-0.5*cos(2*pi*i/(N-1)). Hamming=0.54-0.46*cos(2*pi*i/(N-1)).
+ * Singleton windows equal one. Hann endpoints are exactly zero; Hamming
+ * endpoints are exactly 0.08 in the selected type. These are symmetric
+ * windows, not the periodic N-denominator variants. Constants are local to
+ * the library; no Arduino TWO_PI or include-order-dependent M_PI macro is
+ * required. These functions generate coefficients; they do not multiply an
+ * existing signal. Example: Generators/Windows.
+ */
