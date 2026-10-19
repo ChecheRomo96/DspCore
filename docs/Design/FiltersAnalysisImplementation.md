@@ -1,10 +1,9 @@
 # Streaming filters and analysis
 
-Phase 6 adds generic DspCore::Filters processors and DspCore::Analysis.
+Phase 5 adds generic DspCore::Filters processors and DspCore::Analysis.
 The user refined the architecture: only FIR and IIR process samples;
 Biquad groups the free coefficient calculators and the returned struct.
-This work and Control remain local; no commit/push/publication was requested
-for this architecture adjustment.
+Control systems, including Smoother, are outside DspCore.
 
 ## Filter architecture
 
@@ -47,7 +46,7 @@ preserve state. No clock, scheduler or MIDI interpretation is introduced.
 
 ## Verification
 
-- Windows MSVC: 82/82 tests pass (63 previous, 12 filter/calculator, 7 analysis).
+- Windows MSVC: 63/63 tests pass (44 previous, 12 filter/calculator, 7 analysis).
 - Filter tests cover FIR tap order, resets, generic IIR 4/2 and 1/1 counts,
   nonunit a0 normalization, independent difference-equation references,
   six returned coefficients, calculator validation, pole boundaries, separate
@@ -58,7 +57,7 @@ preserve state. No clock, scheduler or MIDI interpretation is introduced.
   empty/invalid input, attack/release references and double precision.
 - Five native examples pass, including the new generic Filters/IIR example
   and Filters/Biquad configuring an IIR from a returned coefficient value.
-- Twenty-two Arduino Uno sketches compile in stock C++11 (compile/link only;
+- Seventeen Arduino Uno sketches compile in stock C++11 (compile/link only;
   no board execution or throughput measurement).
 - Installed Release consumer builds/runs using the new calculator/IIR API.
 - AddressSanitizer passed 10,000 FIR/IIR/follower updates plus block lengths

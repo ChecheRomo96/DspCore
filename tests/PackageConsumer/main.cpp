@@ -48,14 +48,6 @@ int main() {
     if (!DspCore::Generators::Windows::Hann(generated,5) || generated[2] != 1.) return 1;
     std::cout << "Installed generators and LUT-shaped envelope: PASS\n";
 
-    DspCore::Control::Smoother<double> smoother;
-    DspCore::Control::LinearRamp<double> ramp;
-    DspCore::Control::PID<double> pid;
-    double controlled=0;
-    if(!smoother.Update(1.,0.1,controlled) || controlled!=1.) return 1;
-    if(!ramp.SetTarget(2.,1.) || !ramp.Update(1.,controlled) || controlled!=2.) return 1;
-    if(!pid.Update(0.5,0.,0.1,controlled) || controlled!=0.5) return 1;
-    std::cout << "Installed control state and PID: PASS\n";
 
     DspCore::Filters::FIR<double,2> fir;
     const double taps[]={0.5,0.5};

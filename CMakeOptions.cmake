@@ -25,10 +25,6 @@ if(DSPCORE_FULL_BUILD)
     set(DSPCORE_GENERATORS ON CACHE BOOL "Enable DspCore::Generators" FORCE)
 endif()
 
-option(DSPCORE_CONTROL "Enable DspCore::Control" ON)
-if(DSPCORE_FULL_BUILD)
-    set(DSPCORE_CONTROL ON CACHE BOOL "Enable DspCore::Control" FORCE)
-endif()
 
 option(DSPCORE_FILTERS "Enable DspCore::Filters" ON)
 if(DSPCORE_FULL_BUILD)

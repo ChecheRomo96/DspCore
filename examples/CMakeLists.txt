@@ -63,9 +63,6 @@ if(DSPCORE_GENERATORS)
     add_subdirectory(Generators)
 endif()
 
-if(DSPCORE_CONTROL)
-    add_subdirectory(Control)
-endif()
 
 if(DSPCORE_FILTERS)
     add_subdirectory(Filters)

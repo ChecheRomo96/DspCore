@@ -3,14 +3,14 @@
 **Documentation:** [API and build guide](https://checheromo96.github.io/DspCore/) · [API class index](https://checheromo96.github.io/DspCore/annotated.html)
 
 DspCore is the signal-processing layer of the RoModular ecosystem: lookup
-tables, interpolation, generators, filters, control and transforms for desktop and
+tables, interpolation, generators, filters, analysis and transforms for desktop and
 embedded targets. It is built on Foundation, has no MIDI or music-theory
 dependencies. It never throws exceptions, and memory use is the
 implementer's choice.
 
 > **Status: early development.** Core/version and owning LUT1D, LUT2D and LUT3D
-> storage, interpolation, explicit boundary lookup and table/segment generators
-> control primitives (including PID), generic FIR/IIR filters with Biquad coefficient calculators and signal analysis are implemented.
+> storage, interpolation, explicit boundary lookup, table/segment generators,
+> generic FIR/IIR filters with Biquad coefficient calculators and signal analysis are implemented.
 > Numeric/buffer contracts and the module
 > architecture are documented. Further algorithms follow `ACTION_PLAN.md`.
 

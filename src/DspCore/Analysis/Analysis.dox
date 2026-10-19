@@ -36,8 +36,7 @@
  *
  * This is an amplitude follower rather than RMS detection or a synthesizer
  * envelope generator. Examples: Analysis/Levels and Analysis/Envelope.
- * See @ref DspCore_Control for generic smoothing/control and
- * @ref DspCore_Generators_Envelopes for generated segments.
+ * See @ref DspCore_Generators_Envelopes for generated segments.
  */
 /** @namespace DspCore::Analysis
  * @brief Peak, RMS and amplitude-envelope measurements independent of MIDI.

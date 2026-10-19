@@ -70,8 +70,7 @@ to approve after this baseline; they are not silently substituted for float.
 Float is the convenience default; explicit double must preserve calculation
 precision. Fixed-point kernels remain a separate Foundation prerequisite.
 Initial migration targets LUTs/interpolation useful for both control and audio;
-no hardware audio-rate performance claim is made. Signal/system control is in
-scope; musical MIDI control stays in MIDILAR.
+no hardware audio-rate performance claim is made. Control systems are outside DspCore; musical MIDI control stays in MIDILAR.
 
 The normative invariant identifiers are SPEC-NUM-1..6, SPEC-BUF-1..6,
 SPEC-DOM-1..2 and SPEC-CTL-1 in docs/Topics/NumericContracts.dox.

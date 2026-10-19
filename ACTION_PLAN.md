@@ -4,7 +4,7 @@
 
 Build DspCore as a portable C++17 signal-processing library for desktop and
 direct-source embedded targets, with C++11 Arduino source compatibility:
-lookup tables, interpolation, generators, streaming filters, control, analysis and transforms.
+lookup tables, interpolation, generators, streaming filters, analysis and transforms.
 It consumes Foundation for general utilities, has no MIDI or music-theory
 dependencies. It never throws exceptions, and memory use is the implementer's
 choice.
@@ -46,7 +46,7 @@ User authorized this phase after approving the architecture and legacy review.
 - [x] Review historical algorithms and document defects before migration.
 - [x] Specify sample precision, normalized ranges and PCM conversion semantics.
 - [x] Specify allocation, overflow, empty shapes, moves and overlap contracts.
-- [x] Include signal/system control and keep musical interpretation in MIDILAR.
+- [x] Keep control systems outside DspCore and musical interpretation in MIDILAR.
 - [x] Publish Doxygen architecture and numeric/buffer topics.
 - [x] Add target-independent precision assertions to the library build.
 
@@ -95,40 +95,24 @@ Status: complete. User authorized this phase with "next" after phase 3.
 
 Semantics and validation are recorded in docs/Design/GeneratorsMigration.md.
 
-## Phase 5 - Signal/system control
+## Phase 5 - Streaming filters and analysis
 
-Status: complete locally. User authorized the next step after committing phases 1-4.
-
-- [x] One-pole smoother with stable dt/time-constant behavior.
-- [x] Retargetable linear ramp and asymmetric slew-rate limiter.
-- [x] Explicit linear mapping boundaries, continuous deadband and hysteresis.
-- [x] PID: output limits, conditional integration, filtered derivative on measurement.
-- [x] Explicit seconds, reset/configuration semantics and transactional failure contracts.
-- [x] Trivial-copy/size budgets for float/double state and the mapping policy enum.
-- [x] Unit/reference/feedback tests, five Arduino/desktop examples and Doxygen topics.
-- [x] Installed-package consumer and source-mode Arduino validation.
-
-The control phase is local reviewable work; the preceding phases and documentation
-index fixes were committed/pushed as requested. See docs/Design/ControlImplementation.md.
-
-## Phase 6 - Streaming filters and analysis
-
-Status: complete locally. User authorized "next" after Control.
+Status: implemented and validated. Control, including Smoother, is outside this repository.
 
 - [x] Fixed-tap FIR with inline coefficients/history and transactional updates.
 - [x] Generic IIR recurrence with independent numerator/denominator lengths and a0 normalization.
 - [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
 - [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.
 - [x] Rectified one-pole follower with independent attack/release seconds.
-- [x] Size/copyability checks, reference/response tests and four portable examples.
+- [x] Size/copyability checks, reference/response tests and five portable examples.
 - [x] Package consumer, Arduino compilation, Doxygen and AddressSanitizer probe.
 
 See docs/Design/FiltersAnalysisImplementation.md for contracts and evidence.
-Control and this phase remain local reviewable work pending publication.
+
 
 ## Subsequent phases
 
 Each phase needs the user's approval before it starts.
 
-7. Transforms (DFT/IDFT, FFT/IFFT).
-8. MIDILAR integration and the first DSP feature release.
+6. Transforms (DFT/IDFT, FFT/IFFT).
+7. MIDILAR integration and the first DSP feature release.

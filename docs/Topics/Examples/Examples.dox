@@ -32,11 +32,6 @@
  * | `DspCore_Generators_LUTEnvelope` | Normalized table mapping and constant singleton shapes |
  * | `DspCore_Generators_Noise` | State continuity between blocks and zero-seed rejection |
  * | `DspCore_Generators_Windows` | Symmetric Hann/Hamming coefficients and singleton windows |
- * | `DspCore_Control_Smoothing` | Time constant response and interval validation |
- * | `DspCore_Control_RampSlew` | Exact ramp arrival, retargeting and asymmetric rates |
- * | `DspCore_Control_Mapping` | Inverted range mapping, rejection and continuous deadband |
- * | `DspCore_Control_Hysteresis` | Latched inclusive thresholds |
- * | `DspCore_Control_PID` | Saturation recovery and a simulated first-order plant |
  * | `DspCore_Filters_FIR` | Impulse response, coefficient order and unity DC gain |
  * | `DspCore_Filters_Biquad` | By-value biquad calculators configuring a generic IIR |
  * | `DspCore_Filters_IIR` | Generic numerator/denominator lengths and a0 normalization |
