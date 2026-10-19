@@ -61,6 +61,4 @@ Interpolation modules; LUTSegment is available when both are enabled.
   and examples. The existing obsolete DOT_MULTI_TARGETS warning remains.
 - No Arm toolchain or hardware performance measurement was available.
 
-No commit, tag, push or publication was performed for this phase. The next
-phase is signal/system control, with its own contracts for update intervals,
-reset behavior, output limits and PID anti-windup.
+The next phase covers streaming filters and signal analysis.

@@ -17,10 +17,9 @@
  *   a storage representation, not an implicit fixed-point implementation.
  *   Fixed-point kernels require a separate format/overflow contract and a
  *   Foundation arithmetic prerequisite; they are not implemented here.
- * - **SPEC-NUM-3**: Nominal audio samples are bipolar [-1,1]; nominal controls
- *   and envelopes are unipolar [0,1]. Generic processing permits headroom and
+ * - **SPEC-NUM-3**: Nominal audio samples are bipolar [-1,1]; nominal envelopes are unipolar [0,1]. Generic processing permits headroom and
  *   never clips implicitly. A component must state different units or ranges,
- *   such as hertz, seconds or cycles. PID errors and outputs may be signed.
+ *   such as hertz, seconds or cycles.
  * - **SPEC-NUM-4**: Explicit normalized signed PCM conversion maps -1 to the
  *   integer minimum and +1 to its maximum, saturates outside that interval,
  *   and rounds intermediate values to nearest with ties away from zero.
@@ -69,7 +68,7 @@
  *   allocation compensates for overlap; APIs that cannot check overlap state
  *   it as a caller precondition.
  *
- * @section DspCore_Numeric_Boundaries Coordinates and control
+ * @section DspCore_Numeric_Boundaries Coordinates and boundaries
  *
  * - **SPEC-DOM-1**: Interpolation arithmetic is separate from lookup boundary
  *   handling. Lookup explicitly selects clamp, wrap or rejection; periodic
@@ -82,12 +81,6 @@
  *   Curve zero has a defined linear
  *   limit, evaluated stably for small magnitudes. A singleton shape LUT acts
  *   as a constant across the requested segment.
- * - **SPEC-CTL-1**: Control operates in signal/system units without MIDI
- *   dependencies. Smoothers, ramps, slew limits, hysteresis/deadband, PID and
- *   parameter mapping belong here. Components state their update interval,
- *   units, reset state and output limits. Stateful updates receive a validated
- *   interval or sample rate; no wall clock or scheduler is hidden inside DSP.
- *   PID anti-windup and derivative behavior are specified in @ref DspCore_Control_PID.
  *
  * See @ref DspCore_Architecture for scope and planned modules.
  */

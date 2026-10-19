@@ -19,9 +19,6 @@
     #include <DspCore_Generators.h>
 #endif
 
-#if __has_include(<DspCore_Control.h>)
-    #include <DspCore_Control.h>
-#endif
 
 #if __has_include(<DspCore_Filters.h>)
     #include <DspCore_Filters.h>

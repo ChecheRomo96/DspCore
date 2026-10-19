@@ -21,27 +21,21 @@ static_assert(DBL_MIN_EXP <= FLT_MIN_EXP, "double must preserve float lower rang
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Interpolation::Boundary, 1);
 #endif
 
-#if defined(DSPCORE_CONTROL)
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::MappingBoundary, 1);
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::Smoother<float>, 2*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::Smoother<double>, 2*sizeof(double));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::LinearRamp<float>, 5*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::LinearRamp<double>, 5*sizeof(double));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::SlewLimiter<float>, 3*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::SlewLimiter<double>, 3*sizeof(double));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::Hysteresis<float>, 3*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::Hysteresis<double>, 3*sizeof(double));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::PidParameters<float>, 6*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::PidParameters<double>, 6*sizeof(double));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::PID<float>, 12*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Control::PID<double>, 12*sizeof(double));
-#endif
 
 #if defined(DSPCORE_FILTERS)
+namespace {
+// ARM can align double to eight bytes while size_t occupies four bytes.
+// Include the ABI's tail padding without allowing extra processor state.
+constexpr size_t AlignedSizeBudget(size_t bytes,size_t alignment) noexcept {
+    return ((bytes+alignment-1)/alignment)*alignment;
+}
+}
 using DspCoreFirFloatBudget=DspCore::Filters::FIR<float,8>;
 using DspCoreFirDoubleBudget=DspCore::Filters::FIR<double,8>;
-DSPCORE_CHECK_VALUE_TYPE(DspCoreFirFloatBudget, 16*sizeof(float)+sizeof(size_t));
-DSPCORE_CHECK_VALUE_TYPE(DspCoreFirDoubleBudget, 16*sizeof(double)+sizeof(size_t));
+DSPCORE_CHECK_VALUE_TYPE(DspCoreFirFloatBudget,
+    AlignedSizeBudget(16*sizeof(float)+sizeof(size_t),alignof(DspCoreFirFloatBudget)));
+DSPCORE_CHECK_VALUE_TYPE(DspCoreFirDoubleBudget,
+    AlignedSizeBudget(16*sizeof(double)+sizeof(size_t),alignof(DspCoreFirDoubleBudget)));
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<float>, 6*sizeof(float));
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<double>, 6*sizeof(double));
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::IIR<float>, 10*sizeof(float));

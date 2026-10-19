@@ -3,22 +3,20 @@
  *
  * Dependency direction: Foundation -> DspCore -> MIDILAR. General utilities
  * belong to Foundation, music theory to MCC, and MIDI interpretation to
- * MIDILAR. DspCore processes signals and control systems independently.
+ * MIDILAR. DspCore processes signals independently.
  *
- * Content (Core/version, LUT storage, interpolation, generators, control, filters and analysis are implemented; transforms are planned):
+ * Content (Core/version, LUT storage, interpolation, generators, filters and analysis are implemented; transforms are planned):
  * - Numeric: scalar precision, ranges and explicit conversion policy.
  * - LUT: 1D, 2D and 3D storage, independent of generators.
  * - Interpolation: linear, bilinear and trilinear.
  * - Generators: periodic tables, noise, envelopes, shaping and windows.
  * - Filters: generic FIR/IIR processing; Biquad free coefficient calculators.
- * - Control: smoothing, ramps, slew limiters, hysteresis, deadband, PID and
- *   parameter mapping.
  * - Analysis: peak, RMS and envelope followers.
  * - Transforms: DFT, IDFT, FFT and IFFT.
  *
  * MIDILAR's musical control layer interprets notes, pedals, RPN/NRPN,
- * controllers and parameter bindings. It may consume DspCore smoothing and
- * mapping, but DspCore never interprets MIDI messages.
+ * controllers and parameter bindings. It may consume DspCore signal processing,
+ * but DspCore never interprets MIDI messages.
  *
  * Historical implementations were reviewed at MIDILAR commit
  * bc70ce639f8bb72f79995e1ec742b73aef544112. They are design input, not a

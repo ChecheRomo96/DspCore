@@ -3,18 +3,23 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
-## [Unreleased]
+## [0.2.0] - 2026-10-19
+
+### Fixed
+
+- Include ABI alignment padding in FIR state size budgets on ARM targets.
+
+### Removed
+
+- Control module, including Smoother, and its examples, tests and documentation;
+  control systems are outside DspCore.
 
 ### Added
 
 - Generic FIR/IIR processors and Biquad free functions returning six-coefficient
   structs by value; IIR normalizes a0 during configuration. Low/high-pass coefficient
   design, scaled block RMS/peak and attack/release envelope following.
-- Filter/analysis reference tests, four portable examples and module topics.
-- Signal/system Control module: one-pole smoothing, linear ramps, asymmetric
-  slew limits, mapping, deadband, hysteresis and PID with anti-windup.
-- Explicit timing/reset/limit contracts, control state size budgets, feedback
-  regression tests and five portable examples.
+- Filter/analysis reference tests, five portable examples and module topics.
 - Allocation-free float/double periodic tables, shaping curves, stable envelope
   segments, explicit-state white noise and symmetric Hann/Hamming windows.
 - LUT-shaped envelopes with checked overlap and complete singleton-shape filling.
@@ -26,7 +31,7 @@ This file records user-visible changes to DspCore. Release dates use the
 - Move-only LUT1D/2D/3D storage with checked sizes, zero-initialized growth,
   reserve, checked access and explicit release.
 - LUT regression/failure tests and three Arduino/desktop examples.
-- Numeric/buffer specification and planned signal/system control architecture.
+- Numeric/buffer specification and signal-processing architecture.
 - Compile-time float/double precision requirements for every library target.
 - Legacy DSP review documenting defects to resolve during migration.
 

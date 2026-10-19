@@ -6,7 +6,7 @@
 #include <Foundation_BuildSettings.h>
 
 #ifndef DSPCORE_VERSION
-    #define DSPCORE_VERSION "0.1.3"
+    #define DSPCORE_VERSION "0.2.0"
 #endif
 
 #ifndef DSPCORE_CPLUSPLUS

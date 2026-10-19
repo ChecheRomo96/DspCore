@@ -16,9 +16,6 @@ if(DSPCORE_GENERATORS)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Generators.h")
 endif()
 
-if(DSPCORE_CONTROL)
-    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Control.h")
-endif()
 
 if(DSPCORE_FILTERS)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Filters.h")
@@ -53,9 +50,6 @@ if(DSPCORE_GENERATORS)
     add_subdirectory(Generators)
 endif()
 
-if(DSPCORE_CONTROL)
-    add_subdirectory(Control)
-endif()
 
 if(DSPCORE_FILTERS)
     add_subdirectory(Filters)
