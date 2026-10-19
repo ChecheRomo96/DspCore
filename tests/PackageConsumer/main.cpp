@@ -48,6 +48,29 @@ int main() {
     if (!DspCore::Generators::Windows::Hann(generated,5) || generated[2] != 1.) return 1;
     std::cout << "Installed generators and LUT-shaped envelope: PASS\n";
 
+    DspCore::Control::Smoother<double> smoother;
+    DspCore::Control::LinearRamp<double> ramp;
+    DspCore::Control::PID<double> pid;
+    double controlled=0;
+    if(!smoother.Update(1.,0.1,controlled) || controlled!=1.) return 1;
+    if(!ramp.SetTarget(2.,1.) || !ramp.Update(1.,controlled) || controlled!=2.) return 1;
+    if(!pid.Update(0.5,0.,0.1,controlled) || controlled!=0.5) return 1;
+    std::cout << "Installed control state and PID: PASS\n";
+
+    DspCore::Filters::FIR<double,2> fir;
+    const double taps[]={0.5,0.5};
+    double filtered=0;
+    if(!fir.Configure(taps,2) || !fir.Process(1.,filtered) || filtered!=0.5) return 1;
+    auto coefficients=DspCore::Filters::Biquad::LowPass(48000.,1000.,0.707);
+    DspCore::Filters::IIR<double> iir;
+    if(!iir.Configure(coefficients)) return 1;
+    if(!iir.Process(1.,filtered)) return 1;
+    const double block[]={-3,4,0,0};
+    if(!DspCore::Analysis::RMS(block,4,filtered) || filtered!=2.5) return 1;
+    DspCore::Analysis::EnvelopeFollower<double> follower;
+    if(!follower.Update(-2.,0.01,filtered) || filtered!=2.) return 1;
+    std::cout << "Installed FIR/biquad, RMS and follower: PASS\n";
+
     return (gcd == 4U &&
             std::strcmp(DspCore::Core::Version(), DSPCORE_VERSION) == 0) ? 0 : 1;
 }

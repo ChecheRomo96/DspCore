@@ -1,0 +1,79 @@
+/**
+ * @defgroup DspCore_Filters Streaming filters
+ * @brief Two generic processors: FIR and IIR, configured by their coefficients.
+ *
+ * Include `<DspCore_Filters.h>` or FIR.h/IIR.h. Coefficient calculators are
+ * functions in @ref DspCore_Filters_Biquad, not processing classes.
+ * Process(input,output) advances one sample with inline persistent history.
+ * No processing, configuration or reset allocates, schedules, clips or throws.
+ *
+ * @section DspCore_Filters_Contract Processing contracts
+ *
+ * - **SPEC-FILT-1**: Float/double samples, coefficients and computed state must
+ *   be finite. Invalid configuration/update leaves coefficients, history and
+ *   output unchanged. A successful Configure resets delays. Scalar input and
+ *   output may alias. Raw coefficient array extent is a caller precondition.
+ * - **SPEC-FILT-2**: FIR<T,TapCount> stores numerator coefficients and input
+ *   history inline. TapCount is positive and fixed at compile time. Configure
+ *   requires exactly that many finite taps; b[0] multiplies the current input.
+ *   Default configuration is identity. Equation: y[n]=sum(b[k]*x[n-k]).
+ * - **SPEC-FILT-3**: IIR<T,NumeratorCount,DenominatorCount> independently sizes
+ *   its two coefficient arrays (both positive, default 3/3). Configure takes
+ *   raw pointers/counts, array references, or a struct exposing numerator and
+ *   denominator arrays. Counts must match; all values must be finite and a0
+ *   nonzero. Normalize every coefficient by a0 and validate the result before
+ *   committing. Negative a0 is supported. Source arrays/structs are unchanged.
+ * - **SPEC-FILT-4**: IIR uses the generic direct-form I recurrence:
+ *   y[n]=sum(b[k]/a0*x[n-k])-sum(a[k]/a0*y[n-k], k>=1).
+ *   Default configuration is identity. History and normalized coefficients are
+ *   inline; copying a filter duplicates state. Configure resets history and
+ *   may cause transients. No automatic coefficient smoothing is performed.
+ *
+ * Generic IIR validates representability, not arbitrary-order pole stability.
+ * Callers supplying custom coefficients own their stability decisions. Biquad
+ * calculators check strict second-order stability before returning a design.
+ * A finite configuration does not guarantee finite results for every input;
+ * overflow rejects that sample without consuming it or clipping it.
+ *
+ * @code{.cpp}
+ * auto coefficients = DspCore::Filters::Biquad::LowPass(48000.f,1000.f,0.707f);
+ * DspCore::Filters::IIR<float> filter;
+ * if (!filter.Configure(coefficients)) { return; }
+ * float output=0;
+ * bool ok=filter.Process(1.f,output);
+ * @endcode
+ *
+ * Use IIR with other coefficient counts for higher/lower-order recurrences;
+ * the processor does not depend on the Biquad header or a particular calculator.
+ * Examples: Filters/FIR, Filters/IIR and Filters/Biquad.
+ */
+/**
+ * @defgroup DspCore_Filters_Biquad Biquad coefficient calculators
+ * @ingroup DspCore_Filters
+ * @brief Free functions returning six-coefficient second-order descriptions.
+ *
+ * Namespace DspCore::Filters::Biquad contains Coefficients<T>, LowPass,
+ * HighPass and IsStable. There is no Biquad processing class or Design
+ * namespace. Coefficients<T> contains only numerator[3] (b0,b1,b2) and
+ * denominator[3] (a0,a1,a2), with identity defaults. It is trivially copyable
+ * and occupies six scalars. One value can configure independent IIR instances.
+ *
+ * LowPass(sampleRate,cutoff,Q) and HighPass(...) return this struct by value,
+ * including raw a0; IIR performs normalization. Require finite positive
+ * sample rate/Q and 0<cutoff<sampleRate/2. Invalid or numerically unrepresentable
+ * designs return denominator[0]==0 so IIR::Configure rejects them, preserving
+ * its previous configuration/history. No exception or hidden identity fallback.
+ *
+ * Calculations follow the [W3C Audio EQ Cookbook](https://www.w3.org/TR/audio-eq-cookbook/)
+ * (Robert Bristow-Johnson), with half-angle numerator identities. IsStable
+ * validates finite/normalizable coefficients and strict normalized pole bounds:
+ * -1<a2/a0<1 and -(1+a2/a0)<a1/a0<(1+a2/a0). Boundary poles are rejected.
+ * This optional check belongs to the coefficient calculation, not the generic
+ * IIR recurrence. No hidden cutoff/Q clamps or processing state are involved.
+ */
+/** @namespace DspCore::Filters
+ * @brief Generic FIR/IIR processing and coefficient calculation namespaces.
+ */
+/** @namespace DspCore::Filters::Biquad
+ * @brief Free second-order coefficient calculators and Coefficients<T> values.
+ */

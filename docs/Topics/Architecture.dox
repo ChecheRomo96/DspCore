@@ -5,12 +5,12 @@
  * belong to Foundation, music theory to MCC, and MIDI interpretation to
  * MIDILAR. DspCore processes signals and control systems independently.
  *
- * Content (Core/version, LUT storage, interpolation and generators are implemented; other modules are planned):
+ * Content (Core/version, LUT storage, interpolation, generators, control, filters and analysis are implemented; transforms are planned):
  * - Numeric: scalar precision, ranges and explicit conversion policy.
  * - LUT: 1D, 2D and 3D storage, independent of generators.
  * - Interpolation: linear, bilinear and trilinear.
  * - Generators: periodic tables, noise, envelopes, shaping and windows.
- * - Filters: FIR and IIR/biquad streaming processing.
+ * - Filters: generic FIR/IIR processing; Biquad free coefficient calculators.
  * - Control: smoothing, ramps, slew limiters, hysteresis, deadband, PID and
  *   parameter mapping.
  * - Analysis: peak, RMS and envelope followers.

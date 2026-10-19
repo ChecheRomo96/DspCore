@@ -10,7 +10,7 @@
             if (contents && !document.getElementById('dspcore-api-index-note')) {
                 const note = document.createElement('p');
                 note.id = 'dspcore-api-index-note';
-                note.appendChild(document.createTextNode('This index lists classes only. For interpolation, generators and all module APIs, open '));
+                note.appendChild(document.createTextNode('This index lists classes only. For function-based APIs (interpolation, generators, mapping and analysis) and the complete module hierarchy, open '));
                 const link = document.createElement('a');
                 link.href = 'topics.html';
                 link.textContent = 'Topics: complete module index';

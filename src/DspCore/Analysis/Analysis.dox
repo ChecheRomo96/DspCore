@@ -1,0 +1,44 @@
+/**
+ * @defgroup DspCore_Analysis Signal analysis
+ * @brief Block peak/RMS measurements and an attack/release amplitude follower.
+ *
+ * Include `<DspCore_Analysis.h>` or Levels.h/EnvelopeFollower.h individually.
+ * All operations use the selected float/double precision and allocate nothing.
+ *
+ * @section DspCore_Analysis_Levels Block measurements
+ *
+ * - **SPEC-ANA-1**: Peak and RMS validate a finite sample block, checked count
+ *   in elements, and non-null storage when nonempty. Failure leaves output
+ *   unchanged. Empty blocks, including nullptr with zero count, produce zero.
+ *   The caller guarantees accessible input extent. Output may alias an input
+ *   sample: it is committed only after all reads finish.
+ * - **SPEC-ANA-2**: Peak returns maximum absolute amplitude. RMS includes DC
+ *   and measures only the supplied block; it is not a sliding or accumulating
+ *   window. RMS scales by peak before squaring, avoiding overflow for maximum
+ *   finite signals and retaining small signals. Normalized roundoff is bounded
+ *   at one before rescaling, reflecting the mathematical RMS<=peak bound.
+ *   Reductions use the selected precision; large-block rounding remains its
+ *   normal limitation. No mean removal, dB conversion or loudness weighting
+ *   is hidden in either measurement.
+ *
+ * @section DspCore_Analysis_Follower Envelope follower
+ *
+ * - **SPEC-ANA-3**: EnvelopeFollower rectifies each sample and applies a
+ *   one-pole smoother with attack when magnitude>current value, release
+ *   otherwise. Configure takes nonnegative finite time constants in seconds
+ *   and preserves value. Default zero times snap immediately to magnitude.
+ *   Reset accepts a finite nonnegative initial amplitude. Update requires
+ *   finite sample and positive finite dt in seconds; failure preserves state
+ *   and output. No sample clock or rate is inferred.
+ * - **SPEC-ANA-4**: One-pole alpha=1-exp(-dt/tau) uses a stable small-ratio
+ *   series and a snap at ratios >=40. No global denormal mode is changed.
+ *   State is a trivially copyable three-scalar object with target size budgets.
+ *
+ * This is an amplitude follower rather than RMS detection or a synthesizer
+ * envelope generator. Examples: Analysis/Levels and Analysis/Envelope.
+ * See @ref DspCore_Control for generic smoothing/control and
+ * @ref DspCore_Generators_Envelopes for generated segments.
+ */
+/** @namespace DspCore::Analysis
+ * @brief Peak, RMS and amplitude-envelope measurements independent of MIDI.
+ */

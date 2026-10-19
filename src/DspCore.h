@@ -19,4 +19,16 @@
     #include <DspCore_Generators.h>
 #endif
 
+#if __has_include(<DspCore_Control.h>)
+    #include <DspCore_Control.h>
+#endif
+
+#if __has_include(<DspCore_Filters.h>)
+    #include <DspCore_Filters.h>
+#endif
+
+#if __has_include(<DspCore_Analysis.h>)
+    #include <DspCore_Analysis.h>
+#endif
+
 #endif // DSPCORE_H

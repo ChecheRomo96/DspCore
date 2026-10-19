@@ -1,0 +1,1 @@
+dspcore_add_test(DspCoreFilterTests FilterTests.cc)
