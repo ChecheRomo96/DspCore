@@ -10,8 +10,8 @@ implementer's choice.
 
 > **Status: early development.** Core/version and owning LUT1D, LUT2D and LUT3D
 > storage, interpolation, explicit boundary lookup and table/segment generators
-> are implemented.
-> Numeric/buffer contracts and the planned control
+> control primitives (including PID), generic FIR/IIR filters with Biquad coefficient calculators and signal analysis are implemented.
+> Numeric/buffer contracts and the module
 > architecture are documented. Further algorithms follow `ACTION_PLAN.md`.
 
 Clone with the pinned build infrastructure:

@@ -2,7 +2,7 @@
  * @page DspCore_Numeric Numeric and buffer contracts
  *
  * This specification governs DSP components; the module topics distinguish
- * implemented APIs from planned filters and control processing.
+ * implemented APIs from planned transforms.
  *
  * @section DspCore_Numeric_Types Samples and arithmetic
  *
@@ -87,7 +87,7 @@
  *   parameter mapping belong here. Components state their update interval,
  *   units, reset state and output limits. Stateful updates receive a validated
  *   interval or sample rate; no wall clock or scheduler is hidden inside DSP.
- *   PID anti-windup and derivative behavior require their own later contract.
+ *   PID anti-windup and derivative behavior are specified in @ref DspCore_Control_PID.
  *
  * See @ref DspCore_Architecture for scope and planned modules.
  */

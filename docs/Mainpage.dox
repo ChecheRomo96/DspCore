@@ -5,14 +5,17 @@
  * tables, interpolation, generators, filters, control and transforms for desktop and
  * embedded targets, built on Foundation.
  *
- * @note Development includes LUT storage, interpolation and generators; further features follow
+ * @note Development includes LUT storage, interpolation, generators, control, filters and analysis; further features follow
  * `ACTION_PLAN.md`.
  *
  * @section DspCoreMainModules Modules
  *
- * The complete API is organized under **Topics**. **Classes** lists storage
- * types only; interpolation and generator functions appear in their module topics.
+ * The complete API is organized under **Topics**. **Classes** lists state and storage
+ * types; stateless functions appear in their module topics.
  *
+ * - @ref DspCore_Filters "Filters": generic FIR/IIR processors and Biquad coefficient calculators.
+ * - @ref DspCore_Analysis "Analysis": peak, RMS and attack/release follower.
+ * - @ref DspCore_Control "Control": smoothing, ramps, mapping, hysteresis and PID.
  * - @ref DspCore_Generators "Generators": periodic, shaping, envelopes, noise and windows.
  * - @ref DspCore_Interpolation "Interpolation": formulas and explicit LUT boundaries.
  * - @ref DspCore_LUT "Lookup tables": 1D, 2D and 3D arithmetic storage.
@@ -28,4 +31,3 @@
  * packages when available and otherwise fetches the pinned release from
  * GitHub; see @ref DspCore_BuildGuide_Dependency.
  */
-

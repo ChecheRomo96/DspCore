@@ -7,6 +7,14 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ### Added
 
+- Generic FIR/IIR processors and Biquad free functions returning six-coefficient
+  structs by value; IIR normalizes a0 during configuration. Low/high-pass coefficient
+  design, scaled block RMS/peak and attack/release envelope following.
+- Filter/analysis reference tests, four portable examples and module topics.
+- Signal/system Control module: one-pole smoothing, linear ramps, asymmetric
+  slew limits, mapping, deadband, hysteresis and PID with anti-windup.
+- Explicit timing/reset/limit contracts, control state size budgets, feedback
+  regression tests and five portable examples.
 - Allocation-free float/double periodic tables, shaping curves, stable envelope
   segments, explicit-state white noise and symmetric Hann/Hamming windows.
 - LUT-shaped envelopes with checked overlap and complete singleton-shape filling.

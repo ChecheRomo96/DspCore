@@ -16,6 +16,18 @@ if(DSPCORE_GENERATORS)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Generators.h")
 endif()
 
+if(DSPCORE_CONTROL)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Control.h")
+endif()
+
+if(DSPCORE_FILTERS)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Filters.h")
+endif()
+
+if(DSPCORE_ANALYSIS)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Analysis.h")
+endif()
+
 target_sources(DspCore PRIVATE ${DSPCORE_MODULE_HEADERS})
 dspcore_stage_headers(${DSPCORE_MODULE_HEADERS})
 dspcore_add_dox(${DSPCORE_MODULE_HEADERS})
@@ -39,4 +51,26 @@ endif()
 
 if(DSPCORE_GENERATORS)
     add_subdirectory(Generators)
+endif()
+
+if(DSPCORE_CONTROL)
+    add_subdirectory(Control)
+endif()
+
+if(DSPCORE_FILTERS)
+    add_subdirectory(Filters)
+endif()
+
+
+if(DSPCORE_ANALYSIS)
+    add_subdirectory(Analysis)
+endif()
+
+
+if(DSPCORE_FILTERS OR DSPCORE_ANALYSIS)
+    set(DSPCORE_SIGNAL_DETAIL "${CMAKE_CURRENT_LIST_DIR}/Detail/SignalMath.h")
+    target_sources(DspCore PRIVATE ${DSPCORE_SIGNAL_DETAIL})
+    dspcore_stage_headers(${DSPCORE_SIGNAL_DETAIL})
+    install(FILES ${DSPCORE_SIGNAL_DETAIL}
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/DspCore/Detail" CONFIGURATIONS Release)
 endif()

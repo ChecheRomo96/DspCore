@@ -14,3 +14,15 @@ endif()
 if(DSPCORE_GENERATORS)
     add_subdirectory(Generators)
 endif()
+
+if(DSPCORE_CONTROL)
+    add_subdirectory(Control)
+endif()
+
+if(DSPCORE_FILTERS)
+    add_subdirectory(Filters)
+endif()
+
+if(DSPCORE_ANALYSIS)
+    add_subdirectory(Analysis)
+endif()

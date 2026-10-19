@@ -95,12 +95,40 @@ Status: complete. User authorized this phase with "next" after phase 3.
 
 Semantics and validation are recorded in docs/Design/GeneratorsMigration.md.
 
+## Phase 5 - Signal/system control
+
+Status: complete locally. User authorized the next step after committing phases 1-4.
+
+- [x] One-pole smoother with stable dt/time-constant behavior.
+- [x] Retargetable linear ramp and asymmetric slew-rate limiter.
+- [x] Explicit linear mapping boundaries, continuous deadband and hysteresis.
+- [x] PID: output limits, conditional integration, filtered derivative on measurement.
+- [x] Explicit seconds, reset/configuration semantics and transactional failure contracts.
+- [x] Trivial-copy/size budgets for float/double state and the mapping policy enum.
+- [x] Unit/reference/feedback tests, five Arduino/desktop examples and Doxygen topics.
+- [x] Installed-package consumer and source-mode Arduino validation.
+
+The control phase is local reviewable work; the preceding phases and documentation
+index fixes were committed/pushed as requested. See docs/Design/ControlImplementation.md.
+
+## Phase 6 - Streaming filters and analysis
+
+Status: complete locally. User authorized "next" after Control.
+
+- [x] Fixed-tap FIR with inline coefficients/history and transactional updates.
+- [x] Generic IIR recurrence with independent numerator/denominator lengths and a0 normalization.
+- [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
+- [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.
+- [x] Rectified one-pole follower with independent attack/release seconds.
+- [x] Size/copyability checks, reference/response tests and four portable examples.
+- [x] Package consumer, Arduino compilation, Doxygen and AddressSanitizer probe.
+
+See docs/Design/FiltersAnalysisImplementation.md for contracts and evidence.
+Control and this phase remain local reviewable work pending publication.
+
 ## Subsequent phases
 
 Each phase needs the user's approval before it starts.
 
-5. Signal/system control (smoothing, ramps/slew, hysteresis/deadband,
-   parameter mapping, then PID with its own behavior specification).
-6. Streaming filters and analysis (peak, RMS, envelope followers).
 7. Transforms (DFT/IDFT, FFT/IFFT).
 8. MIDILAR integration and the first DSP feature release.

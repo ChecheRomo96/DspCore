@@ -24,3 +24,18 @@ option(DSPCORE_GENERATORS "Enable DspCore::Generators" ON)
 if(DSPCORE_FULL_BUILD)
     set(DSPCORE_GENERATORS ON CACHE BOOL "Enable DspCore::Generators" FORCE)
 endif()
+
+option(DSPCORE_CONTROL "Enable DspCore::Control" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_CONTROL ON CACHE BOOL "Enable DspCore::Control" FORCE)
+endif()
+
+option(DSPCORE_FILTERS "Enable DspCore::Filters" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_FILTERS ON CACHE BOOL "Enable DspCore::Filters" FORCE)
+endif()
+
+option(DSPCORE_ANALYSIS "Enable DspCore::Analysis" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_ANALYSIS ON CACHE BOOL "Enable DspCore::Analysis" FORCE)
+endif()
