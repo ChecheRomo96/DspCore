@@ -4,7 +4,7 @@
 
 namespace DspCore { namespace LUT {
 /// @ingroup DspCore_LUT
-/// Owning, move-only 3D arithmetic table. See @ref DspCore_LUT.
+/// @brief Owning, move-only 3D arithmetic table. See @ref DspCore_LUT.
 template<typename T>
 class LUT3D : private Detail::Storage<T> {
     using Base = Detail::Storage<T>;
@@ -87,3 +87,4 @@ private:
 };
 }} // namespace DspCore::LUT
 #endif
+
