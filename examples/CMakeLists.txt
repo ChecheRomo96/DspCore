@@ -50,3 +50,15 @@ elseif(WIN32)
         DESTINATION "${CMAKE_INSTALL_BINDIR}/examples"
         CONFIGURATIONS Release COMPONENT Examples)
 endif()
+
+if(DSPCORE_LUT)
+    add_subdirectory(LUT)
+endif()
+
+if(DSPCORE_INTERPOLATION)
+    add_subdirectory(Interpolation)
+endif()
+
+if(DSPCORE_GENERATORS)
+    add_subdirectory(Generators)
+endif()

@@ -4,6 +4,18 @@ if(DSPCORE_CORE)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Core.h")
 endif()
 
+if(DSPCORE_LUT)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/LUT.h")
+endif()
+
+if(DSPCORE_INTERPOLATION)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Interpolation.h")
+endif()
+
+if(DSPCORE_GENERATORS)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Generators.h")
+endif()
+
 target_sources(DspCore PRIVATE ${DSPCORE_MODULE_HEADERS})
 dspcore_stage_headers(${DSPCORE_MODULE_HEADERS})
 dspcore_add_dox(${DSPCORE_MODULE_HEADERS})
@@ -16,3 +28,15 @@ if(DSPCORE_CORE)
     add_subdirectory(Core)
 endif()
 
+
+if(DSPCORE_LUT)
+    add_subdirectory(LUT)
+endif()
+
+if(DSPCORE_INTERPOLATION)
+    add_subdirectory(Interpolation)
+endif()
+
+if(DSPCORE_GENERATORS)
+    add_subdirectory(Generators)
+endif()

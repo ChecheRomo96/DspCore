@@ -1,0 +1,64 @@
+/**
+ * @defgroup DspCore_LUT Lookup tables
+ * @brief Move-only 1D, 2D and 3D arithmetic sample storage.
+ *
+ * Include `<DspCore_LUT.h>` or an individual `<DspCore/LUT/LUT1D.h>` header.
+ * `DspCore::LUT::LUT1D<T>`, `LUT2D<T>` and `LUT3D<T>` store mutable arithmetic
+ * types other than bool. Storage is independent of interpolation or generation.
+ *
+ * @section DspCore_LUT_Ownership Ownership and allocation
+ *
+ * Default construction is empty and does not allocate. Resize and Reserve
+ * return false on overflow or allocation failure, preserving all existing
+ * state. Reserve is an element count, not a byte count; it does not change
+ * logical size. Allocation uses non-throwing C malloc/free on every target.
+ * Arithmetic objects are constructed in allocated storage. Copy is disabled;
+ * moves transfer ownership without allocating and leave the source empty.
+ *
+ * @code{.cpp}
+ * DspCore::LUT::LUT1D<float> curve;
+ * if (!curve.Reserve(64) || !curve.Resize(5)) { return; }
+ * for (size_t x = 0; x < curve.Size(); ++x) {
+ *     curve.SetValue(x, static_cast<float>(x) / 4.0f);
+ * }
+ * // curve.GetValue(4) == 1.0f
+ * @endcode
+ *
+ * @section DspCore_LUT_Resize Dimensions and initialization
+ *
+ * Resize preserves the flat prefix. Newly exposed logical elements are zero,
+ * including elements exposed after shrinking and growing within capacity.
+ * Reshaping is not a geometric resampling operation. 2D uses y*width+x;
+ * 3D uses (z*height+y)*width+x, with x contiguous.
+ *
+ * Any zero extent canonicalizes all extents and Size to zero while retaining
+ * capacity and allocated storage. Release frees storage, clears the pointer,
+ * dimensions and capacity, and is safe repeatedly. No virtual Eval is called.
+ *
+ * @section DspCore_LUT_Access Access and invalidation
+ *
+ * SetValue returns false without writing for invalid coordinates. TryGet
+ * returns false without modifying its output. GetValue returns zero for an
+ * invalid coordinate; use TryGet when zero is a meaningful stored value.
+ * Fill changes logical elements only. GetBuffer exposes contiguous storage
+ * for callers/generators; only the first Size elements may be accessed.
+ * Const tables expose const pointers. Growing capacity and Release invalidate
+ * previous pointers. Moves transfer the storage and its pointer to the new
+ * owner. Shrinking or reshaping changes valid coordinates and element extent.
+ * Reserve and allocation failures do not invalidate existing pointers.
+ *
+ * These owning resource types are not trivially copyable sample value types.
+ * Do not resize/reserve/release in time-critical processing unless the caller
+ * has explicitly budgeted that work. See @ref DspCore_Numeric.
+ *
+ * @section DspCore_LUT_Examples Examples
+ *
+ * - LUT/Line: reserve, zero initialization, a normalized five-sample curve,
+ *   shrink/regrowth and retained capacity.
+ * - LUT/Surface: a row-major 3x2 surface, checked bounds and flat reshaping.
+ * - LUT/Volume: a 2x3x4 volume, ownership transfer, overflow rejection and
+ *   repeated release (regressions for the legacy 3D defects).
+ *
+ * All examples share their logic between Arduino and desktop and print
+ * actual values, expected values and an overall PASS/FAIL result.
+ */

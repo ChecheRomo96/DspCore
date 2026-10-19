@@ -1,0 +1,2 @@
+dspcore_add_test(DspCoreLUTTests LUTTests.cc)
+dspcore_add_test(DspCoreLUTAllocationTests AllocationFailureTests.cc)

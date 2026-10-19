@@ -4,7 +4,7 @@
 
 Build DspCore as a portable C++17 signal-processing library for desktop and
 direct-source embedded targets, with C++11 Arduino source compatibility:
-lookup tables, interpolation, generators, streaming filters and transforms.
+lookup tables, interpolation, generators, streaming filters, control, analysis and transforms.
 It consumes Foundation for general utilities, has no MIDI or music-theory
 dependencies. It never throws exceptions, and memory use is the implementer's
 choice.
@@ -15,7 +15,7 @@ The dependency direction is:
 Foundation <- DspCore <- MIDILAR
 ```
 
-The legacy `DspCore` module inside MIDILAR (`src/DspCore` on MIDILAR `main`)
+The legacy `DspCore` module inside MIDILAR (`src/DspCore` at MIDILAR commit `bc70ce6`)
 is design input only; nothing is copied without review and tests.
 
 ## Architectural decisions
@@ -38,15 +38,69 @@ Status: complete
 - [x] Installable CMake package, consumer test and Arduino library layout.
 - [x] Core module with DspCore and Foundation versions.
 
-## Proposed phases
+## Phase 1 - Numeric and buffer specification
+
+Status: implemented; validation recorded in docs/Design/NumericPolicyProposal.md.
+User authorized this phase after approving the architecture and legacy review.
+
+- [x] Review historical algorithms and document defects before migration.
+- [x] Specify sample precision, normalized ranges and PCM conversion semantics.
+- [x] Specify allocation, overflow, empty shapes, moves and overlap contracts.
+- [x] Include signal/system control and keep musical interpretation in MIDILAR.
+- [x] Publish Doxygen architecture and numeric/buffer topics.
+- [x] Add target-independent precision assertions to the library build.
+
+The built-in float/double types remain the scalar interface; no wrapper or
+fixed-point arithmetic type is introduced. Documentation requirements for
+future components do not claim those components are already implemented.
+
+## Phase 2 - Lookup table storage
+
+Status: complete. User authorized continuation after phase 1.
+
+- [x] Move-only LUT1D, LUT2D and LUT3D with common storage semantics.
+- [x] Checked dimension/byte products and non-throwing allocation failure.
+- [x] Reserve, zero-initialized growth, checked access and explicit release.
+- [x] Remove virtual generation and dangling-pointer behavior from LUT3D.
+- [x] Regression tests, forced allocation failure and installed-package consumer.
+- [x] Three shared Arduino/desktop examples and Doxygen topic.
+
+Validation and differences from the legacy API are in docs/Design/LutMigration.md.
+
+## Phase 3 - Interpolation and lookup boundaries
+
+Status: complete. User authorized continuation after phase 2.
+
+- [x] Float/double linear, bilinear and trilinear arithmetic without hidden clamp.
+- [x] Checked physical coordinates reject collapsed/non-finite/unrepresentable spans.
+- [x] Explicit Clamp/Wrap/Reject LUT lookup, singleton axes and periodic seams.
+- [x] Precision, asymmetric field, endpoint, invalid-input and narrowing tests.
+- [x] Two shared Arduino/desktop examples and Doxygen topic.
+- [x] Installed-package consumer and AddressSanitizer lookup probe.
+
+Validation and API semantics are in docs/Design/InterpolationMigration.md.
+
+## Phase 4 - Generators
+
+Status: complete. User authorized this phase with "next" after phase 3.
+
+- [x] Periodic sine/saw/square/triangle tables with documented historical phases.
+- [x] Atan/tanh raw, normalized and half curves; gamma and gamma morph.
+- [x] Linear/exp/log envelope segments with stable small-curve limits.
+- [x] Optional LUT-shaped segments with checked shape storage and constant singleton shapes.
+- [x] Explicit nonzero xorshift state and symmetric Hann/Hamming windows.
+- [x] Float/double, domain/range validation, no allocation and checked buffer sizes.
+- [x] Reference/regression tests, six Arduino/desktop examples and family topics.
+- [x] Installed-package consumer and AddressSanitizer buffer/canary probe.
+
+Semantics and validation are recorded in docs/Design/GeneratorsMigration.md.
+
+## Subsequent phases
 
 Each phase needs the user's approval before it starts.
 
-1. Numeric specification: sample types, fixed-point and floating-point
-   policy per target.
-2. Lookup tables (1D, then 2D and 3D).
-3. Interpolators (linear, bilinear, trilinear).
-4. Generators (periodic, shaping, envelopes, noise, windowing).
-5. Streaming filters.
-6. Transforms.
-7. MIDILAR integration and the first tagged release.
+5. Signal/system control (smoothing, ramps/slew, hysteresis/deadband,
+   parameter mapping, then PID with its own behavior specification).
+6. Streaming filters and analysis (peak, RMS, envelope followers).
+7. Transforms (DFT/IDFT, FFT/IFFT).
+8. MIDILAR integration and the first DSP feature release.

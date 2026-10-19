@@ -2,15 +2,21 @@
  * @mainpage DspCore
  *
  * DspCore is the signal-processing layer of the RoModular ecosystem: lookup
- * tables, interpolation, generators, filters and transforms for desktop and
+ * tables, interpolation, generators, filters, control and transforms for desktop and
  * embedded targets, built on Foundation.
  *
- * @note Version 0.1.1 is the scaffold; features arrive in the phases of
+ * @note Development includes LUT storage, interpolation and generators; further features follow
  * `ACTION_PLAN.md`.
  *
  * @section DspCoreMainModules Modules
  *
+ * - @ref DspCore_Generators "Generators": periodic, shaping, envelopes, noise and windows.
+ * - @ref DspCore_Interpolation "Interpolation": formulas and explicit LUT boundaries.
+ * - @ref DspCore_LUT "Lookup tables": 1D, 2D and 3D arithmetic storage.
  * - @ref DspCore_Core "Core": DspCore and Foundation version information.
+ *
+ * - @ref DspCore_Architecture "Architecture and planned content".
+ * - @ref DspCore_Numeric "Numeric and buffer contracts".
  *
  * @section DspCoreMainDependency Dependencies
  *

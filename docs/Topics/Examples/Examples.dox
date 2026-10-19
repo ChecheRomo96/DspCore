@@ -21,6 +21,17 @@
  * | Target | Shows |
  * | --- | --- |
  * | `DspCore_Core_Version` | DspCore and Foundation versions |
+ * | `DspCore_LUT_Line` | Reserve, normalized samples, shrink/regrowth |
+ * | `DspCore_LUT_Surface` | Row-major 2D access, bounds and reshape |
+ * | `DspCore_LUT_Volume` | 3D access, moves, overflow and release |
+ * | `DspCore_Interpolation_Linear` | Physical coordinates, extrapolation and invalid spans |
+ * | `DspCore_Interpolation_Lookup` | Closed/periodic boundaries and 2D/3D lookup |
+ * | `DspCore_Generators_Periodic` | Waveform reference samples and phase conventions |
+ * | `DspCore_Generators_Shaping` | Normalized sigmoid endpoints and gamma morph |
+ * | `DspCore_Generators_Envelopes` | Stable tiny curves and exponential/logarithmic reference values |
+ * | `DspCore_Generators_LUTEnvelope` | Normalized table mapping and constant singleton shapes |
+ * | `DspCore_Generators_Noise` | State continuity between blocks and zero-seed rejection |
+ * | `DspCore_Generators_Windows` | Symmetric Hann/Hamming coefficients and singleton windows |
  *
  * Build and run one on the desktop:
  *

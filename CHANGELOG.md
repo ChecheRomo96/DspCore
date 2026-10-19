@@ -3,6 +3,25 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## [Unreleased]
+
+### Added
+
+- Allocation-free float/double periodic tables, shaping curves, stable envelope
+  segments, explicit-state white noise and symmetric Hann/Hamming windows.
+- LUT-shaped envelopes with checked overlap and complete singleton-shape filling.
+- Generator reference/regression tests, six Arduino/desktop examples and family topics.
+- Float/double linear, bilinear and trilinear interpolation, checked physical
+  coordinates and explicit Clamp/Wrap/Reject LUT lookup.
+- Interpolation and boundary regression tests, two Arduino/desktop examples
+  and an API topic documenting corner order, periodic seams and precision.
+- Move-only LUT1D/2D/3D storage with checked sizes, zero-initialized growth,
+  reserve, checked access and explicit release.
+- LUT regression/failure tests and three Arduino/desktop examples.
+- Numeric/buffer specification and planned signal/system control architecture.
+- Compile-time float/double precision requirements for every library target.
+- Legacy DSP review documenting defects to resolve during migration.
+
 ## [0.1.3] - 2026-10-16
 
 ### Changed
