@@ -62,3 +62,8 @@
  * All examples share their logic between Arduino and desktop and print
  * actual values, expected values and an overall PASS/FAIL result.
  */
+
+/**
+ * @namespace DspCore::LUT
+ * @brief Owning arithmetic lookup-table storage in one, two and three dimensions.
+ */
