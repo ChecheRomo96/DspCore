@@ -4,7 +4,7 @@
 namespace DspCore { namespace Generators { namespace Envelopes {
 /// @cond DSPCORE_INTERNAL
 namespace Detail {
-enum class Curve { Linear, Exponential, Logarithmic };
+enum class Curve : unsigned char { Linear, Exponential, Logarithmic };
 template<typename Real>
 bool Segment(Real* out, Real start, Real end, Real curve, size_t total, size_t first, size_t last, Curve kind) noexcept {
     if (!Generators::Detail::Buffer(out,total) || !Generators::Detail::Finite(start) ||
@@ -50,3 +50,4 @@ bool LogSegment(Real* out, Real start, Real end, Real curve, size_t total,
 }
 }}}
 #endif
+

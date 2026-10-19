@@ -3,11 +3,12 @@
 
 // SPEC-NUM-1: compiled for each target, including source-only Arduino builds.
 static_assert(FLT_RADIX == 2, "DspCore requires binary floating-point");
-static_assert(FLT_MANT_DIG >= 24 && FLT_MAX_EXP >= 128 && FLT_MIN_EXP <= -125,
-              "DspCore requires at least binary32 float precision and range");
-static_assert(DBL_MANT_DIG >= FLT_MANT_DIG && DBL_MAX_EXP >= FLT_MAX_EXP &&
-              DBL_MIN_EXP <= FLT_MIN_EXP,
-              "DspCore double must preserve float precision and range");
+static_assert(FLT_MANT_DIG >= 24, "DspCore requires binary32 significand precision");
+static_assert(FLT_MAX_EXP >= 128, "DspCore requires binary32 upper exponent range");
+static_assert(FLT_MIN_EXP <= -125, "DspCore requires binary32 lower exponent range");
+static_assert(DBL_MANT_DIG >= FLT_MANT_DIG, "double must preserve float precision");
+static_assert(DBL_MAX_EXP >= FLT_MAX_EXP, "double must preserve float upper range");
+static_assert(DBL_MIN_EXP <= FLT_MIN_EXP, "double must preserve float lower range");
 
 // SPEC-EMB-1..2: size budgets and trivial copyability of DspCore value types
 // are checked here, when the library is built for every target, AVR and Arm

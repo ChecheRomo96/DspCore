@@ -4,7 +4,7 @@
 namespace DspCore { namespace Generators { namespace Periodic {
 /// @cond DSPCORE_INTERNAL
 namespace Detail {
-enum class Wave { Sine, Saw, Square, Triangle };
+enum class Wave : unsigned char { Sine, Saw, Square, Triangle };
 template<typename Real>
 bool Generate(Real* buffer, size_t count, Real amplitude, Real offset, Real phase, Wave wave) noexcept {
     if (!Generators::Detail::Buffer(buffer,count) || !Generators::Detail::Gain(amplitude,offset) ||
@@ -49,3 +49,4 @@ template<typename Real> bool Triangle(Real* out, size_t count, Real amplitude=Re
 }
 }}}
 #endif
+
