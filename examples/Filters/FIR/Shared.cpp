@@ -3,7 +3,7 @@
 #include <stdio.h>
 namespace DspCoreExamples { namespace Filters { namespace FIR {
 bool Run(void (*print)(const char*)) {
-    DspCore::Filters::FIR<float,4> filter;
+    DspCore::Filters::FIR<float> filter;
     const float taps[]={0.25f,0.25f,0.25f,0.25f};
     if(!filter.Configure(taps,4)) return false;
     float output=0; char text[96]; bool ok=true;

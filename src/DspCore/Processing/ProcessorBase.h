@@ -24,8 +24,8 @@ template<typename Real> struct InputBlock {
 /**
  * @brief A caller-owned output signal block.
  *
- * `capacity` is the writable capacity supplied by the caller. On success,
- * the processor sets `size` to the number of valid output values it wrote. A
+ * `capacity` is the writable capacity supplied by the caller. On return, a
+ * processor sets `size` to the number of valid output values it wrote. A
  * processor must call `CanWrite` before writing and must not exceed
  * `capacity`. It never frees, reallocates or retains `data`.
  */
@@ -76,10 +76,11 @@ public:
      * is nonzero. @p inputCount must equal @ref InputPorts and @p outputCount
      * must equal @ref OutputPorts. Each input must be valid and each output
      * must have enough capacity for the values the implementation intends to
-     * write. On success, every output's `size` is the number of
-     * valid values written. On failure, the implementation returns @c false,
-     * preserves its persistent state and leaves every output block and its
-     * `size` unchanged. Input and output storage may overlap
+     * write. Every output's `size` is the number of valid values written. On
+     * failure, an implementation may have processed a valid input prefix and
+     * reports its valid output extent through `size`; it documents whether state
+     * was committed. Calls with malformed ports, invalid block views or insufficient
+     * output capacity must be rejected before processing begins. Input and output storage may overlap
      * only when the derived processor explicitly documents support for it.
      */
     virtual bool Process(const InputBlock<Real>* inputs,size_t inputCount,
