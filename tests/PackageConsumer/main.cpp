@@ -70,11 +70,10 @@ int main() {
     DspCore::Filters::FIR<double> fir;
     const double taps[]={0.5,0.5};
     double filtered=0;
-    if(!fir.Configure(taps,2) || !fir.Process(1.,filtered) || filtered!=0.5) return 1;
+    if(!fir.Configure(taps,2)) return 1;
     auto coefficients=DspCore::Filters::Biquad::LowPass(48000.,1000.,0.707);
     DspCore::Filters::IIR<double> iir;
     if(!iir.Configure(coefficients)) return 1;
-    if(!iir.Process(1.,filtered)) return 1;
     DspCore::Processing::ProcessorBase<double>& filterNode=fir;
     const double filterInput[]={1.,0.}; double filterOutput[]={0.,0.};
     DspCore::Processing::InputBlock<double> filterInputBlock(filterInput,2);
@@ -82,6 +81,10 @@ int main() {
     fir.Reset();
     if(!filterNode.Process(&filterInputBlock,1,&filterOutputBlock,1) || filterOutputBlock.size!=2 ||
        filterOutput[0]!=0.5 || filterOutput[1]!=0.5) return 1;
+    double iirOutput[]={0.,0.};
+    DspCore::Processing::OutputBlock<double> iirOutputBlock(iirOutput,2);
+    if(!iir.Process(&filterInputBlock,1,&iirOutputBlock,1) || iirOutputBlock.size!=2 ||
+       iirOutput[0]<=0.) return 1;
     const double block[]={-3,4,0,0};
     if(!DspCore::Analysis::RMS(block,4,filtered) || filtered!=2.5) return 1;
     DspCore::Analysis::EnvelopeFollower<double> follower;

@@ -30,8 +30,29 @@ public:
         for(size_t i=0;i<history_.size();++i) history_[i]=T(0);
         next_=0;
     }
+    size_t InputPorts() const noexcept override { return 1; }
+    size_t OutputPorts() const noexcept override { return 1; }
+    /// Processes every input value and writes exactly one output value for each.
+    bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
+                 DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
+        if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
+           !outputs[0].CanWrite(inputs[0].size)) return false;
+        for(size_t i=0;i<inputs[0].size;++i)
+            if(!DspCore::Detail::Signal::Finite(inputs[0].data[i])) return false;
+        for(size_t i=0;i<inputs[0].size;++i) {
+            if(!ProcessSample(inputs[0].data[i],outputs[0].data[i])) {
+                outputs[0].size=i;
+                return false;
+            }
+        }
+        outputs[0].size=inputs[0].size;
+        return true;
+    }
+    size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
+    size_t Capacity() const noexcept { return coefficients_.capacity(); }
+private:
     /// Failure leaves delay history and output unchanged; no clipping is applied.
-    bool Process(T input,T& output) noexcept {
+    bool ProcessSample(T input,T& output) noexcept {
         if(!DspCore::Detail::Signal::Finite(input)) return false;
         if(coefficients_.empty()) { output=input; return true; }
         T sum=coefficients_[0]*input;
@@ -44,29 +65,9 @@ public:
         }
         history_[next_]=input;
         next_=next_==coefficients_.size()-1 ? 0 : next_+1;
-        output=sum; return true;
-    }
-    size_t InputPorts() const noexcept override { return 1; }
-    size_t OutputPorts() const noexcept override { return 1; }
-    /// Process one SISO block; direct sample processing remains available above.
-    bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
-                 DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
-        if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
-           !outputs[0].CanWrite(inputs[0].size)) return false;
-        for(size_t i=0;i<inputs[0].size;++i)
-            if(!DspCore::Detail::Signal::Finite(inputs[0].data[i])) return false;
-        for(size_t i=0;i<inputs[0].size;++i) {
-            if(!Process(inputs[0].data[i],outputs[0].data[i])) {
-                outputs[0].size=i;
-                return false;
-            }
-        }
-        outputs[0].size=inputs[0].size;
+        output=sum;
         return true;
     }
-    size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
-    size_t Capacity() const noexcept { return coefficients_.capacity(); }
-private:
     cpstd::vector<T> coefficients_;
     cpstd::vector<T> history_;
     size_t next_=0;

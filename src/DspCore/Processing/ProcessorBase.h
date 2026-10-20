@@ -56,8 +56,8 @@ template<typename Real> struct OutputBlock {
  * caller owns all supplied storage.
  * Implementations must not allocate, resize, free or retain the supplied block
  * storage during @ref Process. FIR and IIR are SISO implementations: each
- * reports one input port and one output port while retaining their direct
- * sample-processing API.
+ * reports one input port and one output port, consuming and producing equally
+ * sized signal blocks.
  *
  * @tparam Real Signal scalar type, normally @c float or @c double.
  */
