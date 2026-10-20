@@ -56,30 +56,9 @@ public:
         for(size_t i=0;i<inputHistory_.size();++i) inputHistory_[i]=T(0);
         for(size_t i=0;i<outputHistory_.size();++i) outputHistory_[i]=T(0);
     }
-    /// Direct-form I recurrence; no pole inference, clipping or allocation.
-    bool Process(T input,T& output) noexcept {
-        if(!DspCore::Detail::Signal::Finite(input)) return false;
-        if(numerator_.empty()) { output=input; return true; }
-        T sample=numerator_[0]*input;
-        if(!DspCore::Detail::Signal::Finite(sample)) return false;
-        for(size_t i=1;i<numerator_.size();++i) {
-            sample+=numerator_[i]*inputHistory_[i-1];
-            if(!DspCore::Detail::Signal::Finite(sample)) return false;
-        }
-        for(size_t i=1;i<denominator_.size();++i) {
-            sample-=denominator_[i]*outputHistory_[i-1];
-            if(!DspCore::Detail::Signal::Finite(sample)) return false;
-        }
-        for(size_t i=inputHistory_.size();i>1;--i) inputHistory_[i-1]=inputHistory_[i-2];
-        for(size_t i=outputHistory_.size();i>1;--i) outputHistory_[i-1]=outputHistory_[i-2];
-        if(!inputHistory_.empty()) inputHistory_[0]=input;
-        if(!outputHistory_.empty()) outputHistory_[0]=sample;
-        output=sample;
-        return true;
-    }
     size_t InputPorts() const noexcept override { return 1; }
     size_t OutputPorts() const noexcept override { return 1; }
-    /// Process one SISO block; direct sample processing remains available above.
+    /// Processes every input value and writes exactly one output value for each.
     bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
                  DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
         if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
@@ -87,7 +66,7 @@ public:
         for(size_t i=0;i<inputs[0].size;++i)
             if(!DspCore::Detail::Signal::Finite(inputs[0].data[i])) return false;
         for(size_t i=0;i<inputs[0].size;++i) {
-            if(!Process(inputs[0].data[i],outputs[0].data[i])) {
+            if(!ProcessSample(inputs[0].data[i],outputs[0].data[i])) {
                 outputs[0].size=i;
                 return false;
             }
@@ -120,6 +99,27 @@ public:
     size_t NumeratorCapacity() const noexcept { return numerator_.capacity(); }
     size_t DenominatorCapacity() const noexcept { return denominator_.capacity(); }
 private:
+    /// Direct-form I recurrence; no pole inference, clipping or allocation.
+    bool ProcessSample(T input,T& output) noexcept {
+        if(!DspCore::Detail::Signal::Finite(input)) return false;
+        if(numerator_.empty()) { output=input; return true; }
+        T sample=numerator_[0]*input;
+        if(!DspCore::Detail::Signal::Finite(sample)) return false;
+        for(size_t i=1;i<numerator_.size();++i) {
+            sample+=numerator_[i]*inputHistory_[i-1];
+            if(!DspCore::Detail::Signal::Finite(sample)) return false;
+        }
+        for(size_t i=1;i<denominator_.size();++i) {
+            sample-=denominator_[i]*outputHistory_[i-1];
+            if(!DspCore::Detail::Signal::Finite(sample)) return false;
+        }
+        for(size_t i=inputHistory_.size();i>1;--i) inputHistory_[i-1]=inputHistory_[i-2];
+        for(size_t i=outputHistory_.size();i>1;--i) outputHistory_[i-1]=outputHistory_[i-2];
+        if(!inputHistory_.empty()) inputHistory_[0]=input;
+        if(!outputHistory_.empty()) outputHistory_[0]=sample;
+        output=sample;
+        return true;
+    }
     cpstd::vector<T> numerator_;
     cpstd::vector<T> denominator_;
     cpstd::vector<T> inputHistory_;

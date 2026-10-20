@@ -120,9 +120,9 @@ Status: started. User authorized the base interface on 2026-10-20.
 - [x] Define ProcessorBase: a MIMO, block-oriented abstract interface with
   non-owning input/output buffers, synchronous n-to-n block cadence, and
   explicit failure, ownership and lifecycle contracts.
-- [x] Make FIR and IIR SISO ProcessorBase nodes while preserving their direct
-  sample-processing APIs, rejecting malformed blocks before processing and
-  reporting a valid prefix on finite arithmetic failure.
+- [x] Make FIR and IIR SISO ProcessorBase nodes with n-to-n block-processing
+  APIs, rejecting malformed blocks before processing
+  and reporting a valid prefix on finite arithmetic failure.
 - [ ] Define graph construction, port formats, scheduling, latency, buffer planning
   and audio/control/spectral adapters after concrete consumers are approved.
 

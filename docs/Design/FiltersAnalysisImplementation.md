@@ -1,7 +1,7 @@
 # Streaming filters and analysis
 
 Phase 5 adds generic DspCore::Filters processors and DspCore::Analysis.
-The user refined the architecture: only FIR and IIR process samples;
+The user refined the architecture: only FIR and IIR process signal blocks;
 Biquad groups the free coefficient calculators and the returned struct.
 Control systems, including Smoother, are outside DspCore.
 
