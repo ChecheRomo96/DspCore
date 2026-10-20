@@ -32,9 +32,9 @@
  * | `DspCore_Generators_LUTEnvelope` | Normalized table mapping and constant singleton shapes |
  * | `DspCore_Generators_Noise` | State continuity between blocks and zero-seed rejection |
  * | `DspCore_Generators_Windows` | Symmetric Hann/Hamming coefficients and singleton windows |
- * | `DspCore_Filters_FIR` | Impulse response, coefficient order and unity DC gain |
- * | `DspCore_Filters_Biquad` | By-value biquad calculators configuring a generic IIR |
- * | `DspCore_Filters_IIR` | Generic numerator/denominator lengths and a0 normalization |
+ * | `DspCore_Filters_FIR` | 33-tap moving-average low-pass: 300 Hz + 6 kHz signal |
+ * | `DspCore_Filters_Biquad` | 12 kHz low/high-pass response to a 100 Hz--20 kHz sweep |
+ * | `DspCore_Filters_IIR` | Generic numerator/denominator step-pulse response and a0 normalization |
  * | `DspCore_Analysis_Levels` | Block peak/RMS and overflow-safe scaling |
  * | `DspCore_Analysis_Envelope` | Rectification and distinct attack/release time constants |
  *
@@ -44,6 +44,49 @@
  * ./scripts/build.sh macos_arm64 --examples-on
  * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
  * @endcode
+ *
+ * The desktop filter examples write long, plot-ready CSV signals to
+ * `~/Documents/DspCoreExampleOutput/` by default. Pass `--output <directory>` to choose
+ * another location. Each CSV has `sample`, `time_seconds`, input and output
+ * columns plus title/sample-rate metadata. Plot it with Python (NumPy and
+ * Matplotlib) or MATLAB using the included helpers. The helpers are copied
+ * beside native build executables and shipped beside exported examples:
+ *
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Filters_FIR_d --output ./output
+ * ./build/macos_arm64/bin/Debug/render_signal.sh ./output/fir_moving_average.csv
+ * @endcode
+ *
+ * @code{.matlab}
+ * plot_signal("output/fir_moving_average.csv")
+ * @endcode
+ *
+ * @section DspCore_Examples_FilterPlots Filter example plots
+ *
+ * These versioned snapshots are generated from the desktop filter examples
+ * with the included plotting helper. They show the time-domain signals above
+ * and their normalized spectra below; regenerate the CSV data and PNGs when
+ * changing the example signal or filter configuration.
+ *
+ * @subsection DspCore_Examples_FIRPlot FIR moving-average low-pass
+ *
+ * The 33-tap moving average retains the 300 Hz component while substantially
+ * attenuating the 6 kHz component.
+ *
+ * \image html fir_moving_average.png "FIR moving-average example" width=900px
+ *
+ * @subsection DspCore_Examples_IIRPlot Generic IIR step-pulse response
+ *
+ * The generic IIR example makes its normalized a0=2 recurrence and its stateful
+ * response to the step pulse directly inspectable.
+ *
+ * \image html iir_step_pulse.png "Generic IIR step-pulse example" width=900px
+ *
+ * @subsection DspCore_Examples_BiquadPlot Biquad low-pass and high-pass sweep
+ *
+ * A logarithmic sine sweep contrasts the 12 kHz low-pass and high-pass outputs.
+ *
+ * \image html biquad_sweep.png "Biquad low-pass and high-pass sweep example" width=900px
  *
  * Enable and export Release examples with:
  *

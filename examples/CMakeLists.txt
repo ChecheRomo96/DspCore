@@ -29,6 +29,43 @@ endif()
 set(DSPCORE_EXAMPLES_LAUNCHER_DIRECTORY
     "${CMAKE_CURRENT_BINARY_DIR}/launchers")
 
+set(DSPCORE_EXAMPLES_PLOT_PYTHON
+    "${DSPCORE_ROOT_DIRECTORY}/examples/Tools/plot_signal.py")
+set(DSPCORE_EXAMPLES_PLOT_MATLAB
+    "${DSPCORE_ROOT_DIRECTORY}/examples/Tools/plot_signal.m")
+set(DSPCORE_EXAMPLES_RENDER_SHELL
+    "${DSPCORE_ROOT_DIRECTORY}/examples/Tools/render_signal.sh")
+set(DSPCORE_EXAMPLES_RENDER_POWERSHELL
+    "${DSPCORE_ROOT_DIRECTORY}/examples/Tools/render_signal.ps1")
+add_custom_target(DspCoreExamplePlotters ALL
+    COMMAND "${CMAKE_COMMAND}" -E make_directory
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${DSPCORE_EXAMPLES_PLOT_PYTHON}"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/plot_signal.py"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${DSPCORE_EXAMPLES_PLOT_MATLAB}"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/plot_signal.m"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${DSPCORE_EXAMPLES_RENDER_SHELL}"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/render_signal.sh"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        "${DSPCORE_EXAMPLES_RENDER_POWERSHELL}"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/render_signal.ps1")
+add_dependencies(DspCoreExamples DspCoreExamplePlotters)
+install(PROGRAMS "${DSPCORE_EXAMPLES_PLOT_PYTHON}"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}/examples"
+    CONFIGURATIONS Release COMPONENT Examples)
+install(FILES "${DSPCORE_EXAMPLES_PLOT_MATLAB}"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}/examples"
+    CONFIGURATIONS Release COMPONENT Examples)
+install(PROGRAMS "${DSPCORE_EXAMPLES_RENDER_SHELL}"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}/examples"
+    CONFIGURATIONS Release COMPONENT Examples)
+install(FILES "${DSPCORE_EXAMPLES_RENDER_POWERSHELL}"
+    DESTINATION "${CMAKE_INSTALL_BINDIR}/examples"
+    CONFIGURATIONS Release COMPONENT Examples)
+
 if(APPLE)
     set(DSPCORE_EXAMPLES_LAUNCHER
         "${DSPCORE_EXAMPLES_LAUNCHER_DIRECTORY}/DspCoreExamples.command")

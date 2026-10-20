@@ -2,9 +2,15 @@
 
 LAUNCHER_DIRECTORY=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
+dspcore_display_name() {
+    EXAMPLE_NAME=${1##*/}
+    EXAMPLE_NAME=${EXAMPLE_NAME#DspCore_}
+    printf '%s' "$EXAMPLE_NAME" | tr '_' ' '
+}
+
 dspcore_example_count() {
     EXAMPLE_COUNT=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_COUNT=$((EXAMPLE_COUNT + 1))
@@ -13,25 +19,25 @@ dspcore_example_count() {
 
 dspcore_print_menu() {
     EXAMPLE_INDEX=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))
-        printf '  %s) %s\n' "$EXAMPLE_INDEX" "${EXAMPLE_EXECUTABLE##*/}"
+        printf '  %s) %s\n' "$EXAMPLE_INDEX" "$(dspcore_display_name "$EXAMPLE_EXECUTABLE")"
     done
 }
 
 dspcore_run_example() {
     REQUESTED_INDEX=$1
     EXAMPLE_INDEX=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))
         [ "$EXAMPLE_INDEX" -ne "$REQUESTED_INDEX" ] || break
     done
 
-    printf '\nRunning %s...\n\n' "${EXAMPLE_EXECUTABLE##*/}"
+    printf '\nRunning %s...\n\n' "$(dspcore_display_name "$EXAMPLE_EXECUTABLE")"
     "$EXAMPLE_EXECUTABLE"
     EXAMPLE_STATUS=$?
     printf '\n----------------------------------------\n'

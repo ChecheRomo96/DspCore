@@ -8,6 +8,8 @@ if(DOXYGEN_FOUND)
         ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreFooter.html)
     set(DOXYGEN_HTML_EXTRA_FILES
         ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreDocs.js)
+    set(DOXYGEN_IMAGE_PATH
+        ${DSPCORE_ROOT_DIRECTORY}/docs/Topics/Examples/Images)
 
     add_subdirectory(${DSPCORE_ROOT_DIRECTORY}/docs)
 
