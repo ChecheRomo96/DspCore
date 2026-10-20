@@ -49,9 +49,11 @@ template<typename Real> struct OutputBlock {
  * another signal format.
  *
  * Implementations may support blocks of one value, so sample-wise processing is
- * a valid special case. They may also require particular block sizes or produce
- * a different number of values than they consume; those requirements belong in
- * each derived class's documentation. The caller owns all supplied storage.
+ * a valid special case. Every call is synchronous: all input blocks have the
+ * same length @c n and, on success, every output block contains exactly @c n
+ * values. A processor with accumulation, window overlap or intrinsic latency
+ * retains that state internally while preserving this n-to-n contract. The
+ * caller owns all supplied storage.
  * Implementations must not allocate, resize, free or retain the supplied block
  * storage during @ref Process. FIR and IIR are SISO implementations: each
  * reports one input port and one output port while retaining their direct
@@ -74,13 +76,14 @@ public:
      *
      * @p inputs and @p outputs must be non-null when their corresponding count
      * is nonzero. @p inputCount must equal @ref InputPorts and @p outputCount
-     * must equal @ref OutputPorts. Each input must be valid and each output
-     * must have enough capacity for the values the implementation intends to
-     * write. Every output's `size` is the number of valid values written. On
+     * must equal @ref OutputPorts. Each input must be valid and have the same
+     * length @c n. Each output must have capacity for @c n values. On a
+     * successful return, every output's `size` equals @c n. On
      * failure, an implementation may have processed a valid input prefix and
      * reports its valid output extent through `size`; it documents whether state
      * was committed. Calls with malformed ports, invalid block views or insufficient
-     * output capacity must be rejected before processing begins. Input and output storage may overlap
+     * output capacity or unequal input lengths must be rejected before processing
+     * begins. Input and output storage may overlap
      * only when the derived processor explicitly documents support for it.
      */
     virtual bool Process(const InputBlock<Real>* inputs,size_t inputCount,
