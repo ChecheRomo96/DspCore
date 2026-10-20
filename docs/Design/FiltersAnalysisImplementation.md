@@ -7,8 +7,9 @@ Control systems, including Smoother, are outside DspCore.
 
 ## Filter architecture
 
-- FIR<T,TapCount> owns fixed numerator/history arrays inline. Configure
-  validates exactly TapCount finite taps and resets history. Default is identity.
+- FIR<T,MaximumTapCount> owns fixed-capacity numerator/history arrays inline.
+  Configure accepts a positive runtime count up to MaximumTapCount, validates
+  that many finite taps and resets history. Default is one-tap identity.
 - IIR<T,NumeratorCount,DenominatorCount> independently sizes numerator and
   denominator arrays (defaults 3/3). It accepts raw arrays/counts, array references
   or a struct exposing those arrays. Counts must match; a0 must be finite/nonzero.

@@ -25,10 +25,18 @@ if(DSPCORE_FULL_BUILD)
     set(DSPCORE_GENERATORS ON CACHE BOOL "Enable DspCore::Generators" FORCE)
 endif()
 
+option(DSPCORE_PROCESSING "Enable DspCore::Processing" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_PROCESSING ON CACHE BOOL "Enable DspCore::Processing" FORCE)
+endif()
 
 option(DSPCORE_FILTERS "Enable DspCore::Filters" ON)
 if(DSPCORE_FULL_BUILD)
     set(DSPCORE_FILTERS ON CACHE BOOL "Enable DspCore::Filters" FORCE)
+endif()
+if(DSPCORE_FILTERS)
+    # FIR and IIR are SISO ProcessorBase implementations.
+    set(DSPCORE_PROCESSING ON CACHE BOOL "Enable DspCore::Processing" FORCE)
 endif()
 
 option(DSPCORE_ANALYSIS "Enable DspCore::Analysis" ON)

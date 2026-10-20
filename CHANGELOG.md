@@ -3,6 +3,21 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## Unreleased
+
+### Added
+
+- `DspCore::Processing::ProcessorBase`, a MIMO virtual block-processing
+  contract with non-owning input/output views and caller-controlled storage.
+- FIR and IIR implement `ProcessorBase` as SISO nodes while retaining their
+  direct `Process(sample, output)` APIs. FIR's active tap count now changes at
+  runtime up to its compile-time storage capacity.
+
+### Changed
+
+- FIR/IIR processor objects are polymorphic and retain explicit size budgets;
+  they are no longer trivially-copyable value types.
+
 ## [0.2.0] - 2026-10-19
 
 ### Fixed

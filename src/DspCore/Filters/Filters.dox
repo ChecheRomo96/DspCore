@@ -1,11 +1,14 @@
 /**
  * @defgroup DspCore_Filters Streaming filters
- * @brief Two generic processors: FIR and IIR, configured by their coefficients.
+ * @brief Two generic SISO ProcessorBase implementations, configured by coefficients.
  *
  * Include `<DspCore_Filters.h>` or FIR.h/IIR.h. Coefficient calculators are
  * functions in @ref DspCore_Filters_Biquad, not processing classes.
  * Process(input,output) advances one sample with inline persistent history.
- * No processing, configuration or reset allocates, schedules, clips or throws.
+ * Both filters also implement @ref DspCore::Processing::ProcessorBase with one
+ * input and one output port: block processing advances the same state once per
+ * input value and produces the same number of output values. No processing,
+ * configuration or reset allocates, schedules, clips or throws.
  *
  * @section DspCore_Filters_Contract Processing contracts
  *
@@ -13,10 +16,12 @@
  *   be finite. Invalid configuration/update leaves coefficients, history and
  *   output unchanged. A successful Configure resets delays. Scalar input and
  *   output may alias. Raw coefficient array extent is a caller precondition.
- * - **SPEC-FILT-2**: FIR<T,TapCount> stores numerator coefficients and input
- *   history inline. TapCount is positive and fixed at compile time. Configure
- *   requires exactly that many finite taps; b[0] multiplies the current input.
- *   Default configuration is identity. Equation: y[n]=sum(b[k]*x[n-k]).
+ * - **SPEC-FILT-2**: FIR<T,MaximumTapCount> stores numerator coefficients and
+ *   input history inline. MaximumTapCount is positive and fixes only capacity;
+ *   Configure accepts any positive finite tap count up to that capacity, resets
+ *   history and makes that count observable through Taps(). b[0] multiplies
+ *   the current input. Default configuration is one-tap identity. Equation:
+ *   y[n]=sum(b[k]*x[n-k]).
  * - **SPEC-FILT-3**: IIR<T,NumeratorCount,DenominatorCount> independently sizes
  *   its two coefficient arrays (both positive, default 3/3). Configure takes
  *   raw pointers/counts, array references, or a struct exposing numerator and
@@ -28,6 +33,11 @@
  *   Default configuration is identity. History and normalized coefficients are
  *   inline; copying a filter duplicates state. Configure resets history and
  *   may cause transients. No automatic coefficient smoothing is performed.
+ * - **SPEC-FILT-5**: The ProcessorBase block overload requires exactly one
+ *   valid input and one output with capacity for the complete input block.
+ *   It is transactional: an invalid block or an arithmetic failure preserves
+ *   filter state, output storage and OutputBlock::size. Successful blocks have
+ *   one output per input and no added windowing latency.
  *
  * Generic IIR validates representability, not arbitrary-order pole stability.
  * Callers supplying custom coefficients own their stability decisions. Biquad
