@@ -102,7 +102,8 @@ Status: implemented and validated. Control, including Smoother, is outside this 
 
 - [x] Runtime-tap FIR with CPSTL vector coefficients/history; Configure may
   resize, while Process does not allocate.
-- [x] Generic IIR recurrence with independent numerator/denominator lengths and a0 normalization.
+- [x] Runtime-order IIR with CPSTL vector coefficients/histories, independent
+  numerator/denominator lengths and a0 normalization.
 - [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
 - [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.
 - [x] Rectified one-pole follower with independent attack/release seconds.
@@ -120,7 +121,8 @@ Status: started. User authorized the base interface on 2026-10-20.
   non-owning input/output buffers and explicit failure, ownership and lifecycle
   contracts.
 - [x] Make FIR and IIR SISO ProcessorBase nodes while preserving their direct
-  sample-processing APIs and transactional block failure contract.
+  sample-processing APIs, rejecting malformed blocks before processing and
+  reporting a valid prefix on finite arithmetic failure.
 - [ ] Define graph construction, port formats, scheduling, latency, buffer planning
   and audio/control/spectral adapters after concrete consumers are approved.
 

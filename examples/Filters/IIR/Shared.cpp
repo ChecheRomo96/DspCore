@@ -3,7 +3,7 @@
 #include <stdio.h>
 namespace DspCoreExamples { namespace Filters { namespace IIR {
 bool Run(void (*print)(const char*)) {
-    DspCore::Filters::IIR<float,4,2> filter;
+    DspCore::Filters::IIR<float> filter;
     const float numerator[]={1,2,3,4},denominator[]={2,-1};
     if(!filter.Configure(numerator,denominator)) return false;
     const float expected[]={0.5f,1.25f,2.125f,3.0625f,1.53125f};

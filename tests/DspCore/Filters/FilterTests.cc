@@ -102,15 +102,21 @@ TEST(IIR, FirstOrderImpulseAndDefaultIdentity) {
     EXPECT_EQ(c.denominator[0],2.);
     filter.Reset();ASSERT_TRUE(filter.Process(1.,out));EXPECT_EQ(out,0.5);
 }
-TEST(IIR, ArbitraryNumeratorAndDenominatorCountsAreIndependentOfBiquad) {
-    IIR<double,4,2> filter;
+TEST(IIR, NumeratorAndDenominatorCountsChangeAtRuntimeWithVectorStorage) {
+    IIR<double> filter;
     const double b[]={1,2,3,4},a[]={2,-1};
     ASSERT_TRUE(filter.Configure(b,a));double out=0;
+    EXPECT_EQ(filter.NumeratorCount(),4U); EXPECT_EQ(filter.DenominatorCount(),2U);
+    EXPECT_GE(filter.NumeratorCapacity(),4U); EXPECT_GE(filter.DenominatorCapacity(),2U);
     const double expected[]={0.5,1.25,2.125,3.0625,1.53125};
     for(size_t i=0;i<5;++i) { ASSERT_TRUE(filter.Process(i==0 ? 1. : 0.,out));EXPECT_EQ(out,expected[i]); }
-    Biquad::Coefficients<double> wrongSize;
-    EXPECT_FALSE(filter.Configure(wrongSize));
-    IIR<double,1,1> gain;const double numerator[]={3.},denominator[]={2.};
+    const double fiveNumerator[]={1,2,3,4,5},fourDenominator[]={1,-0.1,0.2,-0.3};
+    ASSERT_TRUE(filter.Configure(fiveNumerator,fourDenominator));
+    EXPECT_EQ(filter.NumeratorCount(),5U); EXPECT_EQ(filter.DenominatorCount(),4U);
+    EXPECT_GE(filter.NumeratorCapacity(),5U); EXPECT_GE(filter.DenominatorCapacity(),4U);
+    EXPECT_FALSE(filter.Configure(fiveNumerator,5,0,4));
+    EXPECT_EQ(filter.NumeratorCount(),5U); EXPECT_EQ(filter.DenominatorCount(),4U);
+    IIR<double> gain;const double numerator[]={3.},denominator[]={2.};
     ASSERT_TRUE(gain.Configure(numerator,denominator));ASSERT_TRUE(gain.Process(2.,out));EXPECT_EQ(out,3.);
 }
 TEST(IIR, GenericRecurrenceMatchesIndependentDifferenceEquation) {
@@ -150,6 +156,17 @@ TEST(IIR, ImplementsSisoProcessorBaseWithOneOutputPerInput) {
     ASSERT_TRUE(processor.Process(inputs,1,outputs,1));
     EXPECT_EQ(outputs[0].size,3U); EXPECT_EQ(output[0],0.5);
     EXPECT_EQ(output[1],0.25); EXPECT_EQ(output[2],0.125);
+
+    const double invalid[]={0.,std::numeric_limits<double>::infinity()};
+    double unchanged[]={66.,55.};
+    DspCore::Processing::InputBlock<double> invalidInput(invalid,2);
+    DspCore::Processing::OutputBlock<double> unchangedOutput(unchanged,2); unchangedOutput.size=2;
+    IIR<double> reference=filter;
+    EXPECT_FALSE(processor.Process(&invalidInput,1,&unchangedOutput,1));
+    EXPECT_EQ(unchangedOutput.size,2U); EXPECT_EQ(unchanged[0],66.);
+    double actual=0,expected=0;
+    ASSERT_TRUE(filter.Process(0.,actual)); ASSERT_TRUE(reference.Process(0.,expected));
+    EXPECT_EQ(actual,expected);
 }
 TEST(BiquadCalculator, SixRawCoefficientsNormalizeToKnownButterworthValues) {
     const auto c=Biquad::LowPass(48000.,12000.,std::sqrt(0.5));
