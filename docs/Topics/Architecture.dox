@@ -5,13 +5,15 @@
  * belong to Foundation, music theory to MCC, and MIDI interpretation to
  * MIDILAR. DspCore processes signals independently.
  *
- * Content (Core/version, LUT storage, interpolation, generators, filters and analysis are implemented; transforms are planned):
+ * Content (Core/version, LUT storage, interpolation, generators, filters,
+ * analysis and processing interfaces are implemented; transforms are planned):
  * - Numeric: scalar precision, ranges and explicit conversion policy.
  * - LUT: 1D, 2D and 3D storage, independent of generators.
  * - Interpolation: linear, bilinear and trilinear.
  * - Generators: periodic tables, noise, envelopes, shaping and windows.
  * - Filters: generic FIR/IIR processing; Biquad free coefficient calculators.
  * - Analysis: peak, RMS and envelope followers.
+ * - Processing: MIMO block ProcessorBase contracts; FIR/IIR are SISO nodes.
  * - Transforms: DFT, IDFT, FFT and IFFT.
  *
  * MIDILAR's musical control layer interprets notes, pedals, RPN/NRPN,

@@ -25,6 +25,10 @@ if(DSPCORE_ANALYSIS)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Analysis.h")
 endif()
 
+if(DSPCORE_PROCESSING)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Processing.h")
+endif()
+
 target_sources(DspCore PRIVATE ${DSPCORE_MODULE_HEADERS})
 dspcore_stage_headers(${DSPCORE_MODULE_HEADERS})
 dspcore_add_dox(${DSPCORE_MODULE_HEADERS})
@@ -58,6 +62,10 @@ endif()
 
 if(DSPCORE_ANALYSIS)
     add_subdirectory(Analysis)
+endif()
+
+if(DSPCORE_PROCESSING)
+    add_subdirectory(Processing)
 endif()
 
 

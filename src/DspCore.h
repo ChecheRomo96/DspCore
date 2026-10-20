@@ -28,4 +28,8 @@
     #include <DspCore_Analysis.h>
 #endif
 
+#if __has_include(<DspCore_Processing.h>)
+    #include <DspCore_Processing.h>
+#endif
+
 #endif // DSPCORE_H

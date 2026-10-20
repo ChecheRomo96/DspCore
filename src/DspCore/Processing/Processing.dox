@@ -1,0 +1,36 @@
+/**
+ * @defgroup DspCore_Processing Processing interfaces
+ * @brief MIMO, block-oriented contracts for composing signal processors.
+ *
+ * Include `<DspCore_Processing.h>` or `<DspCore/Processing.h>`.
+ *
+ * A @ref DspCore::Processing::ProcessorBase receives one input block per ordered
+ * input port and writes one output block per ordered output port. It supports
+ * one-value blocks as the sample-by-sample case without introducing a separate
+ * sample interface. It does not own those blocks: callers choose external
+ * storage, while a future graph may manage its own private working storage.
+ *
+ * This module deliberately does not define a graph, port-format taxonomy,
+ * latency policy, audio device, scheduler, plugin ABI or allocator. Those
+ * policies require a concrete consumer. DSP Designer may consume this
+ * interface, but it is an independent application and is not a DspCore
+ * dependency.
+ *
+ * @section DspCore_Processing_Contracts Contracts
+ *
+ * - **SPEC-PROC-1**: A processor declares its current ordered input/output port
+ *   counts. Calls provide exactly that many block views.
+ * - **SPEC-PROC-2**: Input storage is readable and output storage is writable
+ *   only for the call. Neither is retained or owned by the processor.
+ * - **SPEC-PROC-3**: Each successful call declares the valid output extent in
+ *   `OutputBlock::size`. Failure changes neither persistent state nor outputs.
+ * - **SPEC-PROC-4**: A processor documents its accepted block sizes, output
+ *   cadence, aliasing support and intrinsic latency. The base interface makes
+ *   none of these assumptions.
+ * - **SPEC-PROC-5**: Reset restores documented signal state but preserves
+ *   configuration, ports and caller-owned buffers.
+ *
+ * FIR and IIR are SISO implementations of @ref DspCore::Processing::ProcessorBase.
+ * They accept a block of any length, preserve their filter state between calls
+ * and produce one output value per input value without windowing latency.
+ */

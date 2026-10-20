@@ -24,19 +24,67 @@ TEST(FIR, DefaultIdentityAndDcGain) {
     for(int i=0;i<10;++i) { ASSERT_TRUE(average.Process(1.,out)); }
     EXPECT_EQ(out,1.); EXPECT_EQ(average.Taps(),3U);
 }
+TEST(FIR, ActiveTapCountChangesAtRuntimeWithinFixedCapacity) {
+    FIR<double,4> filter; double output=0;
+    const double twoTaps[]={0.5,0.5};
+    ASSERT_TRUE(filter.Configure(twoTaps,2));
+    EXPECT_EQ(filter.Taps(),2U); EXPECT_EQ(filter.MaximumTaps(),4U);
+    ASSERT_TRUE(filter.Process(1.,output)); EXPECT_EQ(output,0.5);
+    ASSERT_TRUE(filter.Process(0.,output)); EXPECT_EQ(output,0.5);
+
+    const double threeTaps[]={0.25,0.5,0.25};
+    ASSERT_TRUE(filter.Configure(threeTaps,3));
+    EXPECT_EQ(filter.Taps(),3U);
+    ASSERT_TRUE(filter.Process(1.,output)); EXPECT_EQ(output,0.25);
+    ASSERT_TRUE(filter.Process(0.,output)); EXPECT_EQ(output,0.5);
+    EXPECT_FALSE(filter.Configure(threeTaps,0));
+    EXPECT_FALSE(filter.Configure(threeTaps,5));
+    EXPECT_EQ(filter.Taps(),3U);
+}
 TEST(FIR, FailurePreservesHistoryCoefficientsAndCallerOutput) {
     FIR<float,2> fir; const float taps[]={0.5f,0.5f};
     ASSERT_TRUE(fir.Configure(taps,2)); float out=0;
     ASSERT_TRUE(fir.Process(1.f,out));
     auto copy=fir;
     const float bad[]={1,std::numeric_limits<float>::quiet_NaN()};
-    EXPECT_FALSE(fir.Configure(bad,2)); EXPECT_FALSE(fir.Configure(taps,1));
+    EXPECT_FALSE(fir.Configure(bad,2)); EXPECT_FALSE(fir.Configure(taps,3));
     out=99; EXPECT_FALSE(fir.Process(std::numeric_limits<float>::infinity(),out)); EXPECT_EQ(out,99);
     float reference=0; ASSERT_TRUE(fir.Process(0.f,out)); ASSERT_TRUE(copy.Process(0.f,reference)); EXPECT_EQ(out,reference);
     const float huge[]={std::numeric_limits<float>::max(),1};
     ASSERT_TRUE(fir.Configure(huge,2)); out=99;
     EXPECT_FALSE(fir.Process(2.f,out)); EXPECT_EQ(out,99);
     ASSERT_TRUE(fir.Process(0.f,out)); EXPECT_EQ(out,0);
+}
+TEST(FIR, ImplementsSisoProcessorBaseWithTransactionalBlocks) {
+    FIR<float,2> fir; const float taps[]={0.5f,0.5f};
+    ASSERT_TRUE(fir.Configure(taps,2));
+    DspCore::Processing::ProcessorBase<float>& processor=fir;
+    const float input[]={1.f,0.f,0.f}; float output[]={99.f,99.f,99.f};
+    DspCore::Processing::InputBlock<float> inputs[]={DspCore::Processing::InputBlock<float>(input,3)};
+    DspCore::Processing::OutputBlock<float> outputs[]={DspCore::Processing::OutputBlock<float>(output,3)};
+    EXPECT_EQ(processor.InputPorts(),1U); EXPECT_EQ(processor.OutputPorts(),1U);
+    ASSERT_TRUE(processor.Process(inputs,1,outputs,1));
+    EXPECT_EQ(outputs[0].size,3U); EXPECT_FLOAT_EQ(output[0],0.5f);
+    EXPECT_FLOAT_EQ(output[1],0.5f); EXPECT_FLOAT_EQ(output[2],0.f);
+
+    FIR<float,2> reference=fir;
+    float tooSmall[]={77.f,88.f};
+    DspCore::Processing::OutputBlock<float> shortOutput(tooSmall,2); shortOutput.size=2;
+    EXPECT_FALSE(processor.Process(inputs,1,&shortOutput,1));
+    EXPECT_EQ(shortOutput.size,2U); EXPECT_FLOAT_EQ(tooSmall[0],77.f);
+    float actual=0,expected=0;
+    ASSERT_TRUE(fir.Process(0.f,actual)); ASSERT_TRUE(reference.Process(0.f,expected));
+    EXPECT_FLOAT_EQ(actual,expected);
+
+    const float invalid[]={0.f,std::numeric_limits<float>::infinity()};
+    float unchanged[]={66.f,55.f};
+    DspCore::Processing::InputBlock<float> invalidInput(invalid,2);
+    DspCore::Processing::OutputBlock<float> unchangedOutput(unchanged,2); unchangedOutput.size=2;
+    reference=fir;
+    EXPECT_FALSE(processor.Process(&invalidInput,1,&unchangedOutput,1));
+    EXPECT_EQ(unchangedOutput.size,2U); EXPECT_FLOAT_EQ(unchanged[0],66.f);
+    ASSERT_TRUE(fir.Process(0.f,actual)); ASSERT_TRUE(reference.Process(0.f,expected));
+    EXPECT_FLOAT_EQ(actual,expected);
 }
 
 TEST(IIR, FirstOrderImpulseAndDefaultIdentity) {
@@ -88,6 +136,18 @@ TEST(IIR, InvalidNormalizationAndOverflowPreserveConfigurationAndHistory) {
     c=Biquad::Coefficients<double>{};c.numerator[0]=std::numeric_limits<double>::max();
     ASSERT_TRUE(filter.Configure(c));out=99;EXPECT_FALSE(filter.Process(2.,out));EXPECT_EQ(out,99.);
     ASSERT_TRUE(filter.Process(0.,out));EXPECT_EQ(out,0.);
+}
+TEST(IIR, ImplementsSisoProcessorBaseWithOneOutputPerInput) {
+    IIR<double> filter; Biquad::Coefficients<double> c;
+    c.numerator[0]=1.; c.denominator[0]=2.; c.denominator[1]=-1.;
+    ASSERT_TRUE(filter.Configure(c));
+    DspCore::Processing::ProcessorBase<double>& processor=filter;
+    const double input[]={1.,0.,0.}; double output[]={0.,0.,0.};
+    DspCore::Processing::InputBlock<double> inputs[]={DspCore::Processing::InputBlock<double>(input,3)};
+    DspCore::Processing::OutputBlock<double> outputs[]={DspCore::Processing::OutputBlock<double>(output,3)};
+    ASSERT_TRUE(processor.Process(inputs,1,outputs,1));
+    EXPECT_EQ(outputs[0].size,3U); EXPECT_EQ(output[0],0.5);
+    EXPECT_EQ(output[1],0.25); EXPECT_EQ(output[2],0.125);
 }
 TEST(BiquadCalculator, SixRawCoefficientsNormalizeToKnownButterworthValues) {
     const auto c=Biquad::LowPass(48000.,12000.,std::sqrt(0.5));

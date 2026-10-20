@@ -26,7 +26,8 @@ is design input only; nothing is copied without review and tests.
 - General utilities (buffers, time, scheduling, flash data) come from
   Foundation; MIDI stays in MIDILAR and music theory in MCC.
 - Value types are trivially copyable, `constexpr` where practical, with
-  compile-time size budgets for every target.
+  compile-time size budgets for every target. Polymorphic processor nodes have
+  separate size budgets and are intentionally not value types.
 - Sample buffers are caller-provided.
 
 ## Phase 0 - Baseline
@@ -99,20 +100,36 @@ Semantics and validation are recorded in docs/Design/GeneratorsMigration.md.
 
 Status: implemented and validated. Control, including Smoother, is outside this repository.
 
-- [x] Fixed-tap FIR with inline coefficients/history and transactional updates.
+- [x] Runtime-tap FIR with fixed-capacity inline coefficients/history and
+  transactional updates.
 - [x] Generic IIR recurrence with independent numerator/denominator lengths and a0 normalization.
 - [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
 - [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.
 - [x] Rectified one-pole follower with independent attack/release seconds.
-- [x] Size/copyability checks, reference/response tests and five portable examples.
+- [x] Size budgets, reference/response tests and five portable examples.
 - [x] Package consumer, Arduino compilation, Doxygen and AddressSanitizer probe.
 
 See docs/Design/FiltersAnalysisImplementation.md for contracts and evidence.
 
 
+## Phase 6 - Processing interfaces
+
+Status: started. User authorized the base interface on 2026-10-20.
+
+- [x] Define ProcessorBase: a MIMO, block-oriented abstract interface with
+  non-owning input/output buffers and explicit failure, ownership and lifecycle
+  contracts.
+- [x] Make FIR and IIR SISO ProcessorBase nodes while preserving their direct
+  sample-processing APIs and transactional block failure contract.
+- [ ] Define graph construction, port formats, scheduling, latency, buffer planning
+  and audio/control/spectral adapters after concrete consumers are approved.
+
+This phase intentionally does not add a graph, an audio backend, DSP Designer
+or implicit allocation. Those remain independent consumers of DspCore.
+
 ## Subsequent phases
 
 Each phase needs the user's approval before it starts.
 
-6. Transforms (DFT/IDFT, FFT/IFFT).
-7. MIDILAR integration and the first DSP feature release.
+7. Transforms (DFT/IDFT, FFT/IFFT).
+8. MIDILAR integration and the first DSP feature release.
