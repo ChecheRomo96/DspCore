@@ -100,8 +100,8 @@ Semantics and validation are recorded in docs/Design/GeneratorsMigration.md.
 
 Status: implemented and validated. Control, including Smoother, is outside this repository.
 
-- [x] Runtime-tap FIR with fixed-capacity inline coefficients/history and
-  transactional updates.
+- [x] Runtime-tap FIR with CPSTL vector coefficients/history; Configure may
+  resize, while Process does not allocate.
 - [x] Generic IIR recurrence with independent numerator/denominator lengths and a0 normalization.
 - [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
 - [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.

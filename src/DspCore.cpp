@@ -31,13 +31,13 @@ constexpr size_t AlignedSizeBudget(size_t bytes,size_t alignment) noexcept {
     return ((bytes+alignment-1)/alignment)*alignment;
 }
 }
-using DspCoreFirFloatBudget=DspCore::Filters::FIR<float,8>;
-using DspCoreFirDoubleBudget=DspCore::Filters::FIR<double,8>;
+using DspCoreFirFloatBudget=DspCore::Filters::FIR<float>;
+using DspCoreFirDoubleBudget=DspCore::Filters::FIR<double>;
 static_assert(sizeof(DspCoreFirFloatBudget)<=
-    AlignedSizeBudget(16*sizeof(float)+2*sizeof(size_t)+sizeof(void*),alignof(DspCoreFirFloatBudget)),
+    AlignedSizeBudget(8*sizeof(void*)+2*sizeof(size_t),alignof(DspCoreFirFloatBudget)),
     "DspCoreFirFloatBudget exceeds its size budget");
 static_assert(sizeof(DspCoreFirDoubleBudget)<=
-    AlignedSizeBudget(16*sizeof(double)+2*sizeof(size_t)+sizeof(void*),alignof(DspCoreFirDoubleBudget)),
+    AlignedSizeBudget(8*sizeof(void*)+2*sizeof(size_t),alignof(DspCoreFirDoubleBudget)),
     "DspCoreFirDoubleBudget exceeds its size budget");
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<float>, 6*sizeof(float));
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<double>, 6*sizeof(double));

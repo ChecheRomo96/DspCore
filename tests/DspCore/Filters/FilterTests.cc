@@ -8,7 +8,7 @@
 using namespace DspCore::Filters;
 
 TEST(FIR, ImpulseMatchesAsymmetricTapOrderAndHistoryReset) {
-    FIR<double,3> fir; const double taps[]={0.25,0.5,-0.125};
+    FIR<double> fir; const double taps[]={0.25,0.5,-0.125};
     ASSERT_TRUE(fir.Configure(taps,3)); double output=0;
     ASSERT_TRUE(fir.Process(1.,output)); EXPECT_EQ(output,0.25);
     ASSERT_TRUE(fir.Process(0.,output)); EXPECT_EQ(output,0.5);
@@ -17,37 +17,39 @@ TEST(FIR, ImpulseMatchesAsymmetricTapOrderAndHistoryReset) {
     fir.Reset(); ASSERT_TRUE(fir.Process(1.,output)); EXPECT_EQ(output,0.25);
 }
 TEST(FIR, DefaultIdentityAndDcGain) {
-    FIR<double,1> identity; double out=0;
+    FIR<double> identity; double out=0;
     ASSERT_TRUE(identity.Process(0.123,out)); EXPECT_EQ(out,0.123);
-    FIR<double,3> average; const double taps[]={0.25,0.5,0.25};
+    FIR<double> average; const double taps[]={0.25,0.5,0.25};
     ASSERT_TRUE(average.Configure(taps,3));
     for(int i=0;i<10;++i) { ASSERT_TRUE(average.Process(1.,out)); }
     EXPECT_EQ(out,1.); EXPECT_EQ(average.Taps(),3U);
 }
-TEST(FIR, ActiveTapCountChangesAtRuntimeWithinFixedCapacity) {
-    FIR<double,4> filter; double output=0;
+TEST(FIR, ActiveTapCountChangesAtRuntimeWithVectorStorage) {
+    FIR<double> filter; double output=0;
     const double twoTaps[]={0.5,0.5};
     ASSERT_TRUE(filter.Configure(twoTaps,2));
-    EXPECT_EQ(filter.Taps(),2U); EXPECT_EQ(filter.MaximumTaps(),4U);
+    EXPECT_EQ(filter.Taps(),2U); EXPECT_GE(filter.Capacity(),2U);
     ASSERT_TRUE(filter.Process(1.,output)); EXPECT_EQ(output,0.5);
     ASSERT_TRUE(filter.Process(0.,output)); EXPECT_EQ(output,0.5);
 
     const double threeTaps[]={0.25,0.5,0.25};
     ASSERT_TRUE(filter.Configure(threeTaps,3));
-    EXPECT_EQ(filter.Taps(),3U);
+    EXPECT_EQ(filter.Taps(),3U); EXPECT_GE(filter.Capacity(),3U);
     ASSERT_TRUE(filter.Process(1.,output)); EXPECT_EQ(output,0.25);
     ASSERT_TRUE(filter.Process(0.,output)); EXPECT_EQ(output,0.5);
-    EXPECT_FALSE(filter.Configure(threeTaps,0));
-    EXPECT_FALSE(filter.Configure(threeTaps,5));
-    EXPECT_EQ(filter.Taps(),3U);
+    const double fiveTaps[]={0.1,0.2,0.3,0.2,0.1};
+    ASSERT_TRUE(filter.Configure(fiveTaps,5));
+    EXPECT_EQ(filter.Taps(),5U); EXPECT_GE(filter.Capacity(),5U);
+    EXPECT_FALSE(filter.Configure(fiveTaps,0));
+    EXPECT_EQ(filter.Taps(),5U);
 }
 TEST(FIR, FailurePreservesHistoryCoefficientsAndCallerOutput) {
-    FIR<float,2> fir; const float taps[]={0.5f,0.5f};
+    FIR<float> fir; const float taps[]={0.5f,0.5f};
     ASSERT_TRUE(fir.Configure(taps,2)); float out=0;
     ASSERT_TRUE(fir.Process(1.f,out));
     auto copy=fir;
     const float bad[]={1,std::numeric_limits<float>::quiet_NaN()};
-    EXPECT_FALSE(fir.Configure(bad,2)); EXPECT_FALSE(fir.Configure(taps,3));
+    EXPECT_FALSE(fir.Configure(bad,2)); EXPECT_FALSE(fir.Configure(0,2));
     out=99; EXPECT_FALSE(fir.Process(std::numeric_limits<float>::infinity(),out)); EXPECT_EQ(out,99);
     float reference=0; ASSERT_TRUE(fir.Process(0.f,out)); ASSERT_TRUE(copy.Process(0.f,reference)); EXPECT_EQ(out,reference);
     const float huge[]={std::numeric_limits<float>::max(),1};
@@ -55,8 +57,8 @@ TEST(FIR, FailurePreservesHistoryCoefficientsAndCallerOutput) {
     EXPECT_FALSE(fir.Process(2.f,out)); EXPECT_EQ(out,99);
     ASSERT_TRUE(fir.Process(0.f,out)); EXPECT_EQ(out,0);
 }
-TEST(FIR, ImplementsSisoProcessorBaseWithTransactionalBlocks) {
-    FIR<float,2> fir; const float taps[]={0.5f,0.5f};
+TEST(FIR, ImplementsSisoProcessorBaseAndRejectsInvalidBlocksBeforeProcessing) {
+    FIR<float> fir; const float taps[]={0.5f,0.5f};
     ASSERT_TRUE(fir.Configure(taps,2));
     DspCore::Processing::ProcessorBase<float>& processor=fir;
     const float input[]={1.f,0.f,0.f}; float output[]={99.f,99.f,99.f};
@@ -67,7 +69,7 @@ TEST(FIR, ImplementsSisoProcessorBaseWithTransactionalBlocks) {
     EXPECT_EQ(outputs[0].size,3U); EXPECT_FLOAT_EQ(output[0],0.5f);
     EXPECT_FLOAT_EQ(output[1],0.5f); EXPECT_FLOAT_EQ(output[2],0.f);
 
-    FIR<float,2> reference=fir;
+    FIR<float> reference=fir;
     float tooSmall[]={77.f,88.f};
     DspCore::Processing::OutputBlock<float> shortOutput(tooSmall,2); shortOutput.size=2;
     EXPECT_FALSE(processor.Process(inputs,1,&shortOutput,1));

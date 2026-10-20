@@ -67,7 +67,7 @@ int main() {
     std::cout << "Installed generators and LUT-shaped envelope: PASS\n";
 
 
-    DspCore::Filters::FIR<double,2> fir;
+    DspCore::Filters::FIR<double> fir;
     const double taps[]={0.5,0.5};
     double filtered=0;
     if(!fir.Configure(taps,2) || !fir.Process(1.,filtered) || filtered!=0.5) return 1;

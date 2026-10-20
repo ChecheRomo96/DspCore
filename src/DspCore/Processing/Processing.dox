@@ -22,8 +22,11 @@
  *   counts. Calls provide exactly that many block views.
  * - **SPEC-PROC-2**: Input storage is readable and output storage is writable
  *   only for the call. Neither is retained or owned by the processor.
- * - **SPEC-PROC-3**: Each successful call declares the valid output extent in
- *   `OutputBlock::size`. Failure changes neither persistent state nor outputs.
+ * - **SPEC-PROC-3**: Each call declares its valid output extent in
+ *   `OutputBlock::size`. A failed calculation may commit and report a valid
+ *   prefix; each derived processor documents that behavior. Malformed ports,
+ *   invalid views and insufficient output capacity are rejected before
+ *   processing begins.
  * - **SPEC-PROC-4**: A processor documents its accepted block sizes, output
  *   cadence, aliasing support and intrinsic latency. The base interface makes
  *   none of these assumptions.

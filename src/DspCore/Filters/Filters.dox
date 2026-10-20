@@ -16,11 +16,11 @@
  *   be finite. Invalid configuration/update leaves coefficients, history and
  *   output unchanged. A successful Configure resets delays. Scalar input and
  *   output may alias. Raw coefficient array extent is a caller precondition.
- * - **SPEC-FILT-2**: FIR<T,MaximumTapCount> stores numerator coefficients and
- *   input history inline. MaximumTapCount is positive and fixes only capacity;
- *   Configure accepts any positive finite tap count up to that capacity, resets
- *   history and makes that count observable through Taps(). b[0] multiplies
- *   the current input. Default configuration is one-tap identity. Equation:
+ * - **SPEC-FILT-2**: FIR<T> owns numerator coefficients and input history in
+ *   cpstd::vector storage. Configure accepts any positive finite runtime tap
+ *   count, reallocates only there, resets history and makes that count
+ *   observable through Taps(). b[0] multiplies the current input. Default
+ *   configuration is one-tap identity. Equation:
  *   y[n]=sum(b[k]*x[n-k]).
  * - **SPEC-FILT-3**: IIR<T,NumeratorCount,DenominatorCount> independently sizes
  *   its two coefficient arrays (both positive, default 3/3). Configure takes
@@ -34,10 +34,11 @@
  *   inline; copying a filter duplicates state. Configure resets history and
  *   may cause transients. No automatic coefficient smoothing is performed.
  * - **SPEC-FILT-5**: The ProcessorBase block overload requires exactly one
- *   valid input and one output with capacity for the complete input block.
- *   It is transactional: an invalid block or an arithmetic failure preserves
- *   filter state, output storage and OutputBlock::size. Successful blocks have
- *   one output per input and no added windowing latency.
+ *   valid finite input and one output with capacity for the complete input
+ *   block. Invalid views and non-finite input are rejected before processing.
+ *   On a finite arithmetic failure, OutputBlock::size reports the valid prefix
+ *   already committed. Successful blocks have one output per input and no
+ *   added windowing latency.
  *
  * Generic IIR validates representability, not arbitrary-order pole stability.
  * Callers supplying custom coefficients own their stability decisions. Biquad
