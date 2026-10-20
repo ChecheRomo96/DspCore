@@ -12,6 +12,8 @@ This file records user-visible changes to DspCore. Release dates use the
 - FIR and IIR implement `ProcessorBase` as SISO nodes: every public process
   call consumes and produces equally sized blocks. Their CPSTL vector-backed
   coefficients and histories resize at runtime through Configure.
+- FIR and IIR now expose `Process(input, output, sampleCount)`; their MIMO
+  port adapters remain private implementation details for `ProcessorBase`.
 - `ProcessorBase` now defines a synchronous block contract: all MIMO inputs use
   one shared `n`, and every output yields exactly `n` values on success.
 

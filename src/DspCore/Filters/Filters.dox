@@ -55,9 +55,7 @@
  * if (!filter.Configure(coefficients)) { return; }
  * const float input[]={1.f,0.f};
  * float output[2]={};
- * DspCore::Processing::InputBlock<float> inputs(input,2);
- * DspCore::Processing::OutputBlock<float> outputs(output,2);
- * bool ok=filter.Process(&inputs,1,&outputs,1) && outputs.size==2;
+ * bool ok=filter.Process(input,output,2);
  * @endcode
  *
  * Configure IIR with other coefficient counts for higher/lower-order recurrences;

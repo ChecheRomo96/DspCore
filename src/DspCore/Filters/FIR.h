@@ -36,7 +36,23 @@ private:
     /** @brief Always returns one: FIR has exactly one signal output. */
     size_t OutputPorts() const noexcept override { return 1; }
 public:
-    /// Processes every input value and writes exactly one output value for each.
+    /**
+     * @brief Processes @p sampleCount input values into equally sized output storage.
+     *
+     * Both pointers may be null only for a zero-length block. On success every
+     * output value is valid. Invalid views or non-finite input leave state and
+     * output unchanged. A finite arithmetic failure may commit an output
+     * prefix before returning @c false.
+     */
+    bool Process(const T* input,T* output,size_t sampleCount) noexcept {
+        DspCore::Processing::InputBlock<T> inputs(input,sampleCount);
+        DspCore::Processing::OutputBlock<T> outputs(output,sampleCount);
+        return Process(&inputs,1,&outputs,1) && outputs.size==sampleCount;
+    }
+    size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
+    size_t Capacity() const noexcept { return coefficients_.capacity(); }
+private:
+    /// SISO adapter used only by ProcessorBase graphs.
     bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
                  DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
         if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
@@ -52,9 +68,6 @@ public:
         outputs[0].size=inputs[0].size;
         return true;
     }
-    size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
-    size_t Capacity() const noexcept { return coefficients_.capacity(); }
-private:
     /// Failure leaves delay history and output unchanged; no clipping is applied.
     bool ProcessSample(T input,T& output) noexcept {
         if(!DspCore::Detail::Signal::Finite(input)) return false;

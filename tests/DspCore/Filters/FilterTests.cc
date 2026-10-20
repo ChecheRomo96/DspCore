@@ -8,9 +8,7 @@
 using namespace DspCore::Filters;
 
 template<typename Processor,typename T> bool ProcessSample(Processor& processor,T input,T& output) {
-    DspCore::Processing::InputBlock<T> inputBlock(&input,1);
-    DspCore::Processing::OutputBlock<T> outputBlock(&output,1);
-    return processor.Process(&inputBlock,1,&outputBlock,1) && outputBlock.size==1;
+    return processor.Process(&input,&output,1);
 }
 
 TEST(FIR, ImpulseMatchesAsymmetricTapOrderAndHistoryReset) {
@@ -25,6 +23,9 @@ TEST(FIR, ImpulseMatchesAsymmetricTapOrderAndHistoryReset) {
 TEST(FIR, DefaultIdentityAndDcGain) {
     FIR<double> identity; double out=0;
     ASSERT_TRUE(ProcessSample(identity,0.123,out)); EXPECT_EQ(out,0.123);
+    const double block[]={0.25,0.5,0.75}; double blockOutput[3]={};
+    ASSERT_TRUE(identity.Process(block,blockOutput,3));
+    EXPECT_EQ(blockOutput[0],0.25); EXPECT_EQ(blockOutput[2],0.75);
     FIR<double> average; const double taps[]={0.25,0.5,0.25};
     ASSERT_TRUE(average.Configure(taps,3));
     for(int i=0;i<10;++i) { ASSERT_TRUE(ProcessSample(average,1.,out)); }
@@ -98,6 +99,9 @@ TEST(FIR, ImplementsSisoProcessorBaseAndRejectsInvalidBlocksBeforeProcessing) {
 TEST(IIR, FirstOrderImpulseAndDefaultIdentity) {
     IIR<double> filter;double out=0;
     ASSERT_TRUE(ProcessSample(filter,0.25,out));EXPECT_EQ(out,0.25);
+    const double identityBlock[]={0.5,0.75}; double identityOutput[2]={};
+    ASSERT_TRUE(filter.Process(identityBlock,identityOutput,2));
+    EXPECT_EQ(identityOutput[0],0.5); EXPECT_EQ(identityOutput[1],0.75);
     Biquad::Coefficients<double> c;c.numerator[0]=1;c.denominator[0]=2;c.denominator[1]=-1;
     ASSERT_TRUE(filter.Configure(c));
     ASSERT_TRUE(ProcessSample(filter,1.,out));EXPECT_EQ(out,0.5);

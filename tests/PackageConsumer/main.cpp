@@ -82,9 +82,7 @@ int main() {
     if(!filterNode.Process(&filterInputBlock,1,&filterOutputBlock,1) || filterOutputBlock.size!=2 ||
        filterOutput[0]!=0.5 || filterOutput[1]!=0.5) return 1;
     double iirOutput[]={0.,0.};
-    DspCore::Processing::OutputBlock<double> iirOutputBlock(iirOutput,2);
-    if(!iir.Process(&filterInputBlock,1,&iirOutputBlock,1) || iirOutputBlock.size!=2 ||
-       iirOutput[0]<=0.) return 1;
+    if(!iir.Process(filterInput,iirOutput,2) || iirOutput[0]<=0.) return 1;
     const double block[]={-3,4,0,0};
     if(!DspCore::Analysis::RMS(block,4,filtered) || filtered!=2.5) return 1;
     DspCore::Analysis::EnvelopeFollower<double> follower;
