@@ -56,10 +56,12 @@ public:
         for(size_t i=0;i<inputHistory_.size();++i) inputHistory_[i]=T(0);
         for(size_t i=0;i<outputHistory_.size();++i) outputHistory_[i]=T(0);
     }
+private:
     /** @brief Always returns one: IIR has exactly one signal input. */
     size_t InputPorts() const noexcept override { return 1; }
     /** @brief Always returns one: IIR has exactly one signal output. */
     size_t OutputPorts() const noexcept override { return 1; }
+public:
     /// Processes every input value and writes exactly one output value for each.
     bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
                  DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
