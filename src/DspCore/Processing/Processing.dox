@@ -5,9 +5,10 @@
  * Include `<DspCore_Processing.h>` or `<DspCore/Processing.h>`.
  *
  * A @ref DspCore::Processing::ProcessorBase receives one input block per ordered
- * input port and writes one output block per ordered output port. It supports
- * one-value blocks as the sample-by-sample case without introducing a separate
- * sample interface. It does not own those blocks: callers choose external
+ * input port and writes one output block per ordered output port. Every call is
+ * synchronous: all inputs hold @c n values and every output holds exactly @c n
+ * values on success. It supports one-value blocks as the sample-by-sample case
+ * without introducing a separate sample interface. It does not own those blocks: callers choose external
  * storage, while a future graph may manage its own private working storage.
  *
  * This module deliberately does not define a graph, port-format taxonomy,
@@ -19,17 +20,18 @@
  * @section DspCore_Processing_Contracts Contracts
  *
  * - **SPEC-PROC-1**: A processor declares its current ordered input/output port
- *   counts. Calls provide exactly that many block views.
+ *   counts. Calls provide exactly that many block views. Every input view in a
+ *   call has the same length @c n.
  * - **SPEC-PROC-2**: Input storage is readable and output storage is writable
  *   only for the call. Neither is retained or owned by the processor.
- * - **SPEC-PROC-3**: Each call declares its valid output extent in
- *   `OutputBlock::size`. A failed calculation may commit and report a valid
- *   prefix; each derived processor documents that behavior. Malformed ports,
- *   invalid views and insufficient output capacity are rejected before
- *   processing begins.
- * - **SPEC-PROC-4**: A processor documents its accepted block sizes, output
- *   cadence, aliasing support and intrinsic latency. The base interface makes
- *   none of these assumptions.
+ * - **SPEC-PROC-3**: A successful call writes exactly @c n values to every
+ *   output and declares each valid extent as `OutputBlock::size == n`. A failed
+ *   calculation may commit and report a valid prefix; each derived processor
+ *   documents that behavior. Malformed ports, invalid views, unequal input
+ *   lengths and insufficient output capacity are rejected before processing begins.
+ * - **SPEC-PROC-4**: A processor documents accepted block sizes, aliasing
+ *   support and intrinsic latency. Windowing, overlap, buffering and delayed
+ *   output are internal details; they do not change the n-to-n block cadence.
  * - **SPEC-PROC-5**: Reset restores documented signal state but preserves
  *   configuration, ports and caller-owned buffers.
  *
