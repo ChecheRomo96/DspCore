@@ -30,7 +30,9 @@ public:
         for(size_t i=0;i<history_.size();++i) history_[i]=T(0);
         next_=0;
     }
+    /** @brief Always returns one: FIR has exactly one signal input. */
     size_t InputPorts() const noexcept override { return 1; }
+    /** @brief Always returns one: FIR has exactly one signal output. */
     size_t OutputPorts() const noexcept override { return 1; }
     /// Processes every input value and writes exactly one output value for each.
     bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
