@@ -10,10 +10,11 @@ Control systems, including Smoother, are outside DspCore.
 - FIR<T> owns growable numerator/history cpstd::vector storage. Configure
   accepts a positive runtime count, validates that many finite taps, resizes
   outside Process and resets history. Default is one-tap identity.
-- IIR<T,NumeratorCount,DenominatorCount> independently sizes numerator and
-  denominator arrays (defaults 3/3). It accepts raw arrays/counts, array references
-  or a struct exposing those arrays. Counts must match; a0 must be finite/nonzero.
-  All coefficients are normalized by a0 and checked before state is committed.
+- IIR<T> owns growable numerator, denominator and history cpstd::vector storage.
+  It accepts independently sized positive raw arrays/counts, array references or a
+  struct exposing those arrays. a0 must be finite/nonzero. All coefficients are
+  normalized by a0 and checked before state is committed; Configure may resize and
+  reset histories while Process never allocates.
 - The generic direct-form I recurrence handles arbitrary configured counts,
   independent of any calculator. Successful Configure resets histories;
   invalid normalization/configuration or sample arithmetic preserves all state
@@ -29,10 +30,9 @@ Control systems, including Smoother, are outside DspCore.
 - Low/high-pass calculations follow the W3C Audio EQ Cookbook's RBJ equations,
   with half-angle numerator identities. Near-marginal designs that cannot be
   represented stably in the chosen precision are rejected.
-- Both processors store state inline, allocate nothing and are trivially copyable.
-  Size budgets cover float/double default IIR, six-coefficient values and a
-  representative eight-tap FIR. Coefficient changes may cause transients;
-  no automatic interpolation or clipping is introduced.
+- Both processors own their dynamic state through CPSTL vectors. Size budgets cover
+  their processor objects and six-coefficient values. Coefficient changes may cause
+  transients; no automatic interpolation or clipping is introduced.
 
 ## Analysis
 

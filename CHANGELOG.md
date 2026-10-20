@@ -10,8 +10,8 @@ This file records user-visible changes to DspCore. Release dates use the
 - `DspCore::Processing::ProcessorBase`, a MIMO virtual block-processing
   contract with non-owning input/output views and caller-controlled storage.
 - FIR and IIR implement `ProcessorBase` as SISO nodes while retaining their
-  direct `Process(sample, output)` APIs. FIR's active tap count and CPSTL
-  vector storage now resize at runtime through Configure.
+  direct `Process(sample, output)` APIs. Their CPSTL vector-backed coefficients
+  and histories now resize at runtime through Configure.
 
 ### Changed
 

@@ -41,12 +41,14 @@ static_assert(sizeof(DspCoreFirDoubleBudget)<=
     "DspCoreFirDoubleBudget exceeds its size budget");
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<float>, 6*sizeof(float));
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<double>, 6*sizeof(double));
-static_assert(sizeof(DspCore::Filters::IIR<float>)<=
-    AlignedSizeBudget(10*sizeof(float)+sizeof(void*),alignof(DspCore::Filters::IIR<float>)),
-    "DspCore::Filters::IIR<float> exceeds its size budget");
-static_assert(sizeof(DspCore::Filters::IIR<double>)<=
-    AlignedSizeBudget(10*sizeof(double)+sizeof(void*),alignof(DspCore::Filters::IIR<double>)),
-    "DspCore::Filters::IIR<double> exceeds its size budget");
+using DspCoreIirFloatBudget=DspCore::Filters::IIR<float>;
+using DspCoreIirDoubleBudget=DspCore::Filters::IIR<double>;
+static_assert(sizeof(DspCoreIirFloatBudget)<=
+    AlignedSizeBudget(16*sizeof(void*)+4*sizeof(size_t),alignof(DspCoreIirFloatBudget)),
+    "DspCoreIirFloatBudget exceeds its size budget");
+static_assert(sizeof(DspCoreIirDoubleBudget)<=
+    AlignedSizeBudget(16*sizeof(void*)+4*sizeof(size_t),alignof(DspCoreIirDoubleBudget)),
+    "DspCoreIirDoubleBudget exceeds its size budget");
 #endif
 #if defined(DSPCORE_ANALYSIS)
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Analysis::EnvelopeFollower<float>, 3*sizeof(float));
