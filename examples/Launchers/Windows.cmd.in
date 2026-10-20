@@ -12,7 +12,11 @@ for %%F in ("%~dp0DspCore_*.exe") do (
     if exist "%%~fF" (
         set /a DSPCORE_EXAMPLE_COUNT+=1
         set "DSPCORE_EXAMPLE[!DSPCORE_EXAMPLE_COUNT!]=%%~fF"
-        echo   !DSPCORE_EXAMPLE_COUNT!^) %%~nF
+        set "DSPCORE_EXAMPLE_LABEL=%%~nF"
+        set "DSPCORE_EXAMPLE_LABEL=!DSPCORE_EXAMPLE_LABEL:DspCore_=!"
+        set "DSPCORE_EXAMPLE_LABEL=!DSPCORE_EXAMPLE_LABEL:_= !"
+        set "DSPCORE_EXAMPLE_LABEL[!DSPCORE_EXAMPLE_COUNT!]=!DSPCORE_EXAMPLE_LABEL!"
+        echo   !DSPCORE_EXAMPLE_COUNT!^) !DSPCORE_EXAMPLE_LABEL!
     )
 )
 
@@ -29,14 +33,16 @@ if !DSPCORE_SELECTION! LSS 1 goto invalid_selection
 if !DSPCORE_SELECTION! GTR !DSPCORE_EXAMPLE_COUNT! goto invalid_selection
 
 set "DSPCORE_SELECTED_EXAMPLE="
+set "DSPCORE_SELECTED_LABEL="
 for /L %%I in (1,1,!DSPCORE_EXAMPLE_COUNT!) do (
     if "!DSPCORE_SELECTION!"=="%%I" (
         set "DSPCORE_SELECTED_EXAMPLE=!DSPCORE_EXAMPLE[%%I]!"
+        set "DSPCORE_SELECTED_LABEL=!DSPCORE_EXAMPLE_LABEL[%%I]!"
     )
 )
 
 echo.
-echo Running !DSPCORE_SELECTED_EXAMPLE!...
+echo Running !DSPCORE_SELECTED_LABEL!...
 echo.
 
 "!DSPCORE_SELECTED_EXAMPLE!"

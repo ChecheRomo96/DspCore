@@ -7,6 +7,11 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ### Added
 
+- Desktop FIR, IIR and Biquad examples now generate long, metadata-bearing
+  CSV signal captures by default. Companion Python/Matplotlib and MATLAB
+  plotters show their time-domain and frequency-domain responses; shell and
+  PowerShell helpers render each CSV directly to a sibling PNG. The Examples
+  documentation includes versioned FIR, IIR and Biquad plot snapshots.
 - `DspCore::Processing::ProcessorBase`, a MIMO virtual block-processing
   contract with non-owning input/output views and caller-controlled storage.
 - FIR and IIR implement `ProcessorBase` as SISO nodes: every public process
