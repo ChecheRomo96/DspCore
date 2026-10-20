@@ -45,6 +45,31 @@
  * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
  * @endcode
  *
+ * @section DspCore_Examples_DesktopTools Desktop output and plotting tools
+ *
+ * `examples/Tools/` contains host-side convenience tools for the native filter
+ * demonstrations. It is not part of the DspCore library, is not compiled into
+ * an Arduino sketch, and is not required by an embedded consumer:
+ *
+ * | File | Purpose |
+ * | --- | --- |
+ * | `plot_signal.py` | Reads a signal CSV and writes a time-domain/spectrum PNG using NumPy and Matplotlib. |
+ * | `plot_signal.m` | MATLAB equivalent of the Python plotter. |
+ * | `render_signal.sh` | macOS/Linux wrapper that finds Python and runs `plot_signal.py`. |
+ * | `render_signal.ps1` | Windows PowerShell equivalent of the shell wrapper. |
+ *
+ * `examples/Tools/` intentionally has no `CMakeLists.txt`: these are scripts,
+ * not build targets. `examples/CMakeLists.txt` names them so that a native
+ * `--examples-on` build copies them beside its executables and an exported
+ * Release examples package installs them beside its launcher. A normal DspCore
+ * library build without examples does not include or distribute these tools.
+ *
+ * The documentation integration has a separate purpose. `cmake/BuildDocs.cmake`
+ * supplies `docs/Topics/Examples/Images/` as Doxygen's image search path, and
+ * `docs/Doxyfile` consumes that value through `IMAGE_PATH`. Doxygen then copies
+ * the versioned PNG snapshots into its HTML output; no Python or MATLAB is
+ * needed merely to read the published documentation.
+ *
  * The desktop filter examples write long, plot-ready CSV signals to
  * `~/Documents/DspCoreExampleOutput/` by default. Pass `--output <directory>` to choose
  * another location. Each CSV has `sample`, `time_seconds`, input and output
