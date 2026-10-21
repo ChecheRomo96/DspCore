@@ -11,9 +11,9 @@ int main(int argc,char* argv[]) {
     constexpr float sampleRate=48000.f;
     std::array<float,sampleCount> input={};
     std::array<float,sampleCount> output={};
-    for(size_t sample=256;sample<2048;++sample) input[sample]=1.f;
-    const float numerator[]={1.f,2.f,3.f,4.f};
-    const float denominator[]={2.f,-1.f};
+    for(size_t sample=256;sample<1024;++sample) input[sample]=1.f;
+    const float numerator[]={0.001f,0.002f,0.003f,0.004f};
+    const float denominator[]={2.f,-1.99f};
 
     DspCore::Filters::IIR<float> filter;
     if(!filter.Configure(numerator,denominator) ||
@@ -22,8 +22,8 @@ int main(int argc,char* argv[]) {
         {"input",input.data()}, {"generic_iir",output.data()}};
     std::filesystem::path outputPath;
     if(!DspCoreExamples::Desktop::WriteSignalCsv(outputDirectory,"iir_step_pulse.csv",
-        "Generic IIR step-pulse response","4 numerator and 2 denominator coefficients; a0 normalized from 2",
-        sampleRate,columns,2,sampleCount,outputPath)) {
+        "Generic IIR step-pulse response","4-by-2 coefficient IIR; a0=2, pole=0.995, unity DC gain",
+        "time",sampleRate,columns,2,sampleCount,outputPath)) {
         std::fputs("Could not write CSV. Use --output <writable directory>.\n",stderr);
         return 1;
     }
