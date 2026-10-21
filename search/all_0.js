@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['access_20and_20invalidation_0',['Access and invalidation',['../group__DspCore__LUT.html#DspCore_LUT_Access',1,'']]],
+  ['adapters_1',['Adapters',['../group__DspCore__Workflows__SharedInfrastructure.html#DspCoreSharedInfrastructureAdapters',1,'']]],
+  ['allocation_2',['Ownership and allocation',['../group__DspCore__LUT.html#DspCore_LUT_Ownership',1,'']]],
+  ['analysis_3',['Signal analysis',['../group__DspCore__Analysis.html',1,'']]],
+  ['and_20allocation_4',['Ownership and allocation',['../group__DspCore__LUT.html#DspCore_LUT_Ownership',1,'']]],
+  ['and_20arithmetic_5',['Samples and arithmetic',['../DspCore_Numeric.html#DspCore_Numeric_Types',1,'']]],
+  ['and_20boundaries_6',['Coordinates and boundaries',['../DspCore_Numeric.html#DspCore_Numeric_Boundaries',1,'']]],
+  ['and_20buffer_20contracts_7',['Numeric and buffer contracts',['../DspCore_Numeric.html',1,'']]],
+  ['and_20failure_8',['and failure',['../group__DspCore__Generators.html#DspCore_Generators_Contract',1,'Buffers and failure'],['../DspCore_Numeric.html#DspCore_Numeric_Buffers',1,'Storage and failure']]],
+  ['and_20high_20pass_20sweep_9',['Biquad low-pass and high-pass sweep',['../group__DspCore__Examples.html#DspCore_Examples_BiquadPlot',1,'']]],
+  ['and_20initialization_10',['Dimensions and initialization',['../group__DspCore__LUT.html#DspCore_LUT_Resize',1,'']]],
+  ['and_20invalidation_11',['Access and invalidation',['../group__DspCore__LUT.html#DspCore_LUT_Access',1,'']]],
+  ['and_20lookup_12',['Interpolation and lookup',['../group__DspCore__Interpolation.html',1,'']]],
+  ['and_20planned_20content_13',['Architecture and planned content',['../DspCore_Architecture.html',1,'']]],
+  ['and_20plotting_20tools_14',['Desktop output and plotting tools',['../group__DspCore__Examples.html#DspCore_Examples_DesktopTools',1,'']]],
+  ['and_20test_15',['Build and test',['../md_README.html#autotoc_md2',1,'']]],
+  ['architecture_20and_20planned_20content_16',['Architecture and planned content',['../DspCore_Architecture.html',1,'']]],
+  ['arduino_17',['Arduino',['../md_README.html#autotoc_md3',1,'']]],
+  ['arithmetic_18',['Arithmetic',['../group__DspCore__Interpolation.html#DspCore_Interpolation_Formulas',1,'']]],
+  ['arithmetic_19',['Samples and arithmetic',['../DspCore_Numeric.html#DspCore_Numeric_Types',1,'']]],
+  ['atan_20',['Atan',['../group__DspCore__Generators__Shaping.html#ga120a6bad997f90056f311a2a1eed6a23',1,'DspCore::Generators::Shaping']]],
+  ['atanhalf_21',['AtanHalf',['../group__DspCore__Generators__Shaping.html#ga3fa412ccaaad7d877367cc92cee6b1c6',1,'DspCore::Generators::Shaping']]],
+  ['atanhalfnorm_22',['AtanHalfNorm',['../group__DspCore__Generators__Shaping.html#gababb44449ded5cae1323bc93d3f5fa11',1,'DspCore::Generators::Shaping']]],
+  ['atannorm_23',['AtanNorm',['../group__DspCore__Generators__Shaping.html#gaaa75b37387a101d5ff15bb1aa65056cf',1,'DspCore::Generators::Shaping']]],
+  ['average_20low_20pass_24',['FIR moving-average low-pass',['../group__DspCore__Examples.html#DspCore_Examples_FIRPlot',1,'']]]
+];
