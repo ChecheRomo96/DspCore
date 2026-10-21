@@ -73,7 +73,7 @@
  * The desktop filter examples write long, plot-ready CSV signals to
  * `~/Documents/DspCoreExampleOutput/` by default. Pass `--output <directory>` to choose
  * another location. Each CSV has `sample`, `time_seconds`, input and output
- * columns plus title/sample-rate metadata. Plot it with Python (NumPy and
+ * columns plus title, sample-rate and plot-mode metadata. Plot it with Python (NumPy and
  * Matplotlib) or MATLAB using the included helpers. The helpers are copied
  * beside native build executables and shipped beside exported examples:
  *
@@ -102,8 +102,9 @@
  *
  * @subsection DspCore_Examples_IIRPlot Generic IIR step-pulse response
  *
- * The generic IIR example makes its normalized a0=2 recurrence and its stateful
- * response to the step pulse directly inspectable.
+ * The generic IIR example makes its normalized a0=2 recurrence, unity DC gain
+ * and stateful response to the step pulse directly inspectable. Its CSV selects
+ * a time-only plot because an FFT of a step pulse is not a filter response plot.
  *
  * \image html iir_step_pulse.png "Generic IIR step-pulse example" width=900px
  *

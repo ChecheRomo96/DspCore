@@ -27,7 +27,8 @@ int main(int argc,char* argv[]) {
         {"input",input.data()}, {"moving_average_33",output.data()}};
     std::filesystem::path outputPath;
     if(!DspCoreExamples::Desktop::WriteSignalCsv(outputDirectory,"fir_moving_average.csv",
-        "FIR moving-average low-pass","300 Hz + 6 kHz input; 33-tap moving average",sampleRate,
+        "FIR moving-average low-pass","300 Hz + 6 kHz input; 33-tap moving average",
+        "time_and_spectrum",sampleRate,
         columns,2,sampleCount,outputPath)) {
         std::fputs("Could not write CSV. Use --output <writable directory>.\n",stderr);
         return 1;

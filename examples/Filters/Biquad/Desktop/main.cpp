@@ -33,7 +33,7 @@ int main(int argc,char* argv[]) {
     std::filesystem::path outputPath;
     if(!DspCoreExamples::Desktop::WriteSignalCsv(outputDirectory,"biquad_sweep.csv",
         "Biquad low-pass and high-pass sweep","100 Hz to 20 kHz sine sweep; 12 kHz cutoff, Q=0.7071",
-        sampleRate,columns,3,sampleCount,outputPath)) {
+        "time_and_spectrum",sampleRate,columns,3,sampleCount,outputPath)) {
         std::fputs("Could not write CSV. Use --output <writable directory>.\n",stderr);
         return 1;
     }

@@ -39,10 +39,10 @@ inline bool ParseOutputDirectory(int argc,char* argv[],std::filesystem::path& di
 }
 
 inline bool WriteSignalCsv(const std::filesystem::path& directory,const char* fileName,
-                           const char* title,const char* description,float sampleRate,
+                           const char* title,const char* description,const char* plotMode,float sampleRate,
                            const SignalColumn* columns,size_t columnCount,size_t sampleCount,
                            std::filesystem::path& outputPath) {
-    if(directory.empty() || !fileName || !title || !description || sampleRate<=0.f ||
+    if(directory.empty() || !fileName || !title || !description || !plotMode || sampleRate<=0.f ||
        !columns || columnCount==0 || sampleCount==0) return false;
     for(size_t column=0;column<columnCount;++column)
         if(!columns[column].name || !columns[column].samples) return false;
@@ -56,6 +56,7 @@ inline bool WriteSignalCsv(const std::filesystem::path& directory,const char* fi
     if(!file.is_open()) return false;
     file << "# title=" << title << '\n';
     file << "# description=" << description << '\n';
+    file << "# plot_mode=" << plotMode << '\n';
     file << "# sample_rate_hz=" << sampleRate << '\n';
     file << "sample,time_seconds";
     for(size_t column=0;column<columnCount;++column) file << ',' << columns[column].name;

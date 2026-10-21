@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot a DspCore desktop-example CSV in time and frequency."""
+"""Plot a DspCore desktop-example CSV according to its declared plot mode."""
 
 import argparse
 import csv
@@ -49,24 +49,32 @@ def main():
     sample_rate = float(metadata["sample_rate_hz"])
     visible = time <= time[0] + arguments.seconds
 
-    figure, (time_axes, spectrum_axes) = plot.subplots(2, 1, figsize=(11, 8), layout="constrained")
+    plot_mode = metadata.get("plot_mode", "time_and_spectrum")
+    if plot_mode == "time":
+        figure, time_axes = plot.subplots(figsize=(11, 4.8), layout="constrained")
+        spectrum_axes = None
+    elif plot_mode == "time_and_spectrum":
+        figure, (time_axes, spectrum_axes) = plot.subplots(2, 1, figsize=(11, 8), layout="constrained")
+    else:
+        raise ValueError(f"unsupported DspCore plot mode: {plot_mode}")
     for name in channels:
         time_axes.plot(time[visible], data[name][visible], label=name)
     time_axes.set(title=metadata.get("title", arguments.csv.stem), xlabel="time (s)", ylabel="amplitude")
     time_axes.grid(True, alpha=0.3)
     time_axes.legend()
 
-    window = numpy.hanning(len(time))
-    frequencies = numpy.fft.rfftfreq(len(time), d=1.0 / sample_rate)
-    for name in channels:
-        magnitude = numpy.abs(numpy.fft.rfft(data[name] * window))
-        reference = max(float(numpy.max(magnitude)), numpy.finfo(float).tiny)
-        magnitude_db = 20.0 * numpy.log10(numpy.maximum(magnitude / reference, 1e-8))
-        spectrum_axes.plot(frequencies, magnitude_db, label=name)
-    spectrum_axes.set(xlabel="frequency (Hz)", ylabel="magnitude (dB, normalized)", ylim=(-80, 3),
-                      xlim=(0, sample_rate / 2.0))
-    spectrum_axes.grid(True, alpha=0.3)
-    spectrum_axes.legend()
+    if spectrum_axes is not None:
+        window = numpy.hanning(len(time))
+        frequencies = numpy.fft.rfftfreq(len(time), d=1.0 / sample_rate)
+        for name in channels:
+            magnitude = numpy.abs(numpy.fft.rfft(data[name] * window))
+            reference = max(float(numpy.max(magnitude)), numpy.finfo(float).tiny)
+            magnitude_db = 20.0 * numpy.log10(numpy.maximum(magnitude / reference, 1e-8))
+            spectrum_axes.plot(frequencies, magnitude_db, label=name)
+        spectrum_axes.set(xlabel="frequency (Hz)", ylabel="magnitude (dB, normalized)", ylim=(-80, 3),
+                          xlim=(0, sample_rate / 2.0))
+        spectrum_axes.grid(True, alpha=0.3)
+        spectrum_axes.legend()
     figure.suptitle(metadata.get("description", "DspCore signal"))
 
     if arguments.save:
