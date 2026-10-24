@@ -11,14 +11,45 @@ namespace DspCore::Filters {
 /**
  * @brief Runtime-tap finite impulse response SISO processor.
  *
+ * @par Mathematical model
+ * For @f$N@f$ taps @f$b_0, \ldots, b_{N-1}@f$, FIR evaluates the causal
+ * discrete-time convolution
+ * @f[
+ * y[n] = \sum_{k=0}^{N-1} b_k x[n-k].
+ * @f]
+ * Its transfer function therefore contains no feedback terms:
+ * @f[
+ * H(z) = \sum_{k=0}^{N-1} b_k z^{-k}.
+ * @f]
+ * The caller supplies @f$b_k@f$ as Coefficients::taps, usually from a filter
+ * design method such as a windowed-sinc, least-squares, or measured impulse
+ * response. This class implements that recurrence; it does not choose the
+ * taps or infer a filter shape.
+ *
+ * @par From the equation to one output sample
+ * Process does not evaluate a memoryless @f$Y(x)@f$. Each current input
+ * @f$x[n]@f$ produces the next output @f$y[n]@f$ using the current sample and
+ * the stored input history. Internally, processSample starts with
+ * @f$b_0x[n]@f$, walks the circular delay line to add
+ * @f$b_kx[n-k]@f$, then writes @f$x[n]@f$ into that line for the next call.
+ * The delay line is zero after construction or Reset, which gives the usual
+ * zero initial conditions.
+ *
  * SampleType is the stream representation. CoefficientType controls the tap
  * representation, while StateType controls the multiply-accumulate and delay
- * line precision.
+ * line precision. The accumulated @f$y[n]@f$ is converted to SampleType only
+ * at the processor boundary.
  */
 template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
 class FIR final : public Processing::ProcessorBase<SampleType> {
 public:
-    /** @brief Owns a runtime-length FIR tap configuration outside the audio path. */
+    /**
+     * @brief Owns the @f$b_0 \ldots b_{N-1}@f$ vector of the FIR equation.
+     *
+     * Assign copies a caller's designed taps while outside the processing path.
+     * A successful Configure copies that value into the processor and clears
+     * its delay line, so the first output uses zero initial conditions.
+     */
     struct Coefficients {
         cpstd::vector<CoefficientType> taps;
 
@@ -42,7 +73,13 @@ public:
         }
     };
 
-    /** @brief Sets `b[0]...b[N-1]`; successful configuration clears delay state. */
+    /**
+     * @brief Sets @f$b_0 \ldots b_{N-1}@f$; successful configuration clears delay state.
+     *
+     * `coefficients[k]` maps directly to @f$b_k@f$ in
+     * @f$y[n] = \sum b_kx[n-k]@f$. No normalization occurs because there is
+     * no denominator polynomial in an FIR filter.
+     */
     bool Configure(const CoefficientType* coefficients, const cpstd::size_t count) noexcept {
         if (coefficients == nullptr || count == 0U) {
             return false;

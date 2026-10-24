@@ -16,6 +16,29 @@
  * Biquad::HasParameter(Type, Parameter) expose allocation-free metadata for
  * controls required by each design. The metadata remains in program memory on
  * AVR and is copied into a caller-owned value on access.
+ *
+ * @section DspCore_Filters_Equations Difference equations and coefficients
+ * Both processors apply a discrete-time difference equation one sample at a
+ * time. In this documentation @f$x[n]@f$ is the input sample at index @f$n@f$
+ * and @f$y[n]@f$ is the corresponding output sample. `Process` visits a block
+ * in increasing @f$n@f$ order; it is not a vectorized evaluation of a
+ * memoryless function @f$Y(x)@f$.
+ *
+ * FIR accepts taps @f$b_k@f$ and performs convolution:
+ * @f[
+ * y[n] = \sum_{k=0}^{N-1}b_kx[n-k], \qquad
+ * H(z) = \sum_{k=0}^{N-1}b_kz^{-k}.
+ * @f]
+ * The class stores only earlier input samples. IIR accepts numerator @f$b_k@f$
+ * and denominator @f$a_k@f$ coefficients:
+ * @f[
+ * \sum_{k=0}^{N}a_ky[n-k] = \sum_{k=0}^{M}b_kx[n-k], \qquad
+ * H(z) = \frac{\sum b_kz^{-k}}{\sum a_kz^{-k}}.
+ * @f]
+ * It stores earlier inputs and outputs. IIR::Configure divides all
+ * coefficients by @f$a_0@f$, after which the code computes the feed-forward
+ * sum and subtracts the feedback sum. See FIR and IIR for the exact mapping
+ * from these equations to their delay lines and arithmetic types.
  */
 
 /**
