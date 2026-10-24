@@ -11,13 +11,52 @@ namespace DspCore::Filters {
 /**
  * @brief Runtime-order direct-form-I infinite impulse response SISO processor.
  *
+ * @par Mathematical model
+ * Given numerator coefficients @f$b_0 \ldots b_M@f$ and denominator
+ * coefficients @f$a_0 \ldots a_N@f$, the processor represents
+ * @f[
+ * \sum_{k=0}^{N} a_k y[n-k] = \sum_{k=0}^{M} b_k x[n-k].
+ * @f]
+ * Its transfer function is
+ * @f[
+ * H(z) = \frac{Y(z)}{X(z)} =
+ * \frac{\sum_{k=0}^{M} b_kz^{-k}}{\sum_{k=0}^{N} a_kz^{-k}}.
+ * @f]
+ * Configure divides both polynomials by @f$a_0@f$. The recurrence executed
+ * for each sample is consequently
+ * @f[
+ * y[n] = \sum_{k=0}^{M}\frac{b_k}{a_0}x[n-k]
+ *        - \sum_{k=1}^{N}\frac{a_k}{a_0}y[n-k].
+ * @f]
+ *
+ * @par From the equation to one output sample
+ * There is no stateless @f$Y(x)@f$ for an IIR filter: @f$y[n]@f$ depends on
+ * the current input plus previous @f$x@f$ and @f$y@f$ values. processSample
+ * computes the first summation from `numerator_` and `inputHistory_`, subtracts
+ * the feedback summation from `denominator_` and `outputHistory_`, then shifts
+ * both histories. Reset establishes zero initial conditions. This is direct
+ * form I, expressed with separate input and output delay lines.
+ *
+ * Coefficients can come from any valid discrete-time design method. For
+ * example, Biquad returns a normalized second-order numerator and denominator
+ * that Configure can consume directly; a bilinear transform or a measured
+ * model can supply higher-order coefficients in the same convention.
+ *
  * The stream's SampleType is intentionally independent from both coefficient
  * storage and recurrence StateType. StateType defaults to CoefficientType.
+ * Arithmetic for the recurrence occurs in StateType, followed by conversion to
+ * SampleType at the output boundary.
  */
 template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
 class IIR final : public Processing::ProcessorBase<SampleType> {
 public:
-    /** @brief Owns numerator and denominator arrays for a generic IIR recurrence. */
+    /**
+     * @brief Owns the @f$b@f$ numerator and @f$a@f$ denominator polynomials.
+     *
+     * `numerator[k]` is @f$b_k@f$ and `denominator[k]` is @f$a_k@f$ in the
+     * unnormalized difference equation. Assign only copies and validates these
+     * design values; Configure owns the normalization by @f$a_0@f$.
+     */
     struct Coefficients {
         cpstd::vector<CoefficientType> numerator;
         cpstd::vector<CoefficientType> denominator;
@@ -53,7 +92,15 @@ public:
         }
     };
 
-    /** @brief Copies and normalizes raw `b[]` and `a[]` coefficients by `a[0]`. */
+    /**
+     * @brief Copies @f$b[]@f$ and @f$a[]@f$, normalizing both by @f$a_0@f$.
+     *
+     * The caller supplies the coefficient convention
+     * @f$\sum a_ky[n-k] = \sum b_kx[n-k]@f$. `denominator[0]` must be finite
+     * and nonzero. After configuration the stored leading denominator term is
+     * one, allowing processSample to implement the normalized recurrence with
+     * explicit subtraction of the feedback terms.
+     */
     bool Configure(const CoefficientType* numerator, const cpstd::size_t numeratorCount,
         const CoefficientType* denominator, const cpstd::size_t denominatorCount) noexcept {
         if (numerator == nullptr || denominator == nullptr || numeratorCount == 0U || denominatorCount == 0U ||

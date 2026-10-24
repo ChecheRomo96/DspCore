@@ -59,6 +59,8 @@ struct ParameterInfo {
 
 namespace Detail {
 
+/** @cond INTERNAL */
+
 /** @brief Flash-resident table descriptor for one biquad design. */
 struct ParameterTable {
     const ParameterInfo* data{};
@@ -109,6 +111,8 @@ inline bool ReadParameterTable(const Type type, ParameterTable& result) noexcept
     }
     return false;
 }
+
+/** @endcond */
 
 } // namespace Detail
 
