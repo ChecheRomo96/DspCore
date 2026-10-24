@@ -5,7 +5,11 @@ option(DSPCORE_FULL_BUILD "Enable every DspCore module" OFF)
 option(DSPCORE_COVERAGE "Enable coverage instrumentation" OFF)
 
 option(DSPCORE_CORE "Enable DspCore::Core" ON)
+option(DSPCORE_PROCESSING "Enable DspCore::Processing" ON)
+option(DSPCORE_FILTERS "Enable DspCore::Filters" ON)
 
 if(DSPCORE_FULL_BUILD)
     set(DSPCORE_CORE ON CACHE BOOL "Enable DspCore::Core" FORCE)
+    set(DSPCORE_PROCESSING ON CACHE BOOL "Enable DspCore::Processing" FORCE)
+    set(DSPCORE_FILTERS ON CACHE BOOL "Enable DspCore::Filters" FORCE)
 endif()
