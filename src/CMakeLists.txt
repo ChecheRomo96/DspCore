@@ -32,6 +32,16 @@ if(DSPCORE_CORE)
         "${CMAKE_CURRENT_LIST_DIR}/DspCore_Core.h")
 endif()
 
+if(DSPCORE_PROCESSING)
+    list(APPEND DSPCORE_TOP_LEVEL_HEADERS
+        "${CMAKE_CURRENT_LIST_DIR}/DspCore_Processing.h")
+endif()
+
+if(DSPCORE_FILTERS)
+    list(APPEND DSPCORE_TOP_LEVEL_HEADERS
+        "${CMAKE_CURRENT_LIST_DIR}/DspCore_Filters.h")
+endif()
+
 target_sources(DspCore PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/DspCore.cpp"
     ${DSPCORE_TOP_LEVEL_HEADERS})
@@ -50,7 +60,15 @@ if(DSPCORE_CORE)
     dspcore_add_macro(PUBLIC DSPCORE_CORE)
 endif()
 
-if(DSPCORE_CORE)
+if(DSPCORE_PROCESSING)
+    dspcore_add_macro(PUBLIC DSPCORE_PROCESSING)
+endif()
+
+if(DSPCORE_FILTERS)
+    dspcore_add_macro(PUBLIC DSPCORE_FILTERS)
+endif()
+
+if(DSPCORE_CORE OR DSPCORE_PROCESSING OR DSPCORE_FILTERS)
     add_subdirectory(DspCore)
 endif()
 

@@ -1,0 +1,25 @@
+/**
+ * @defgroup DspCore_Filters Filters
+ * @ingroup DspCore
+ * @brief Portable runtime-order FIR and IIR filters and coefficient designers.
+ *
+ * FIR<SampleType, CoefficientType, StateType> and
+ * IIR<SampleType, CoefficientType, StateType> own their coefficient and delay
+ * storage. SampleType is the external stream type; CoefficientType defaults to
+ * float and StateType defaults to CoefficientType. Configure may resize storage
+ * outside the processing path; Process never allocates. Both accept
+ * caller-owned blocks through Processing::ProcessorBase. Biquad functions are
+ * stateless coefficient designers: each returns a coefficient value accepted by
+ * IIR::Configure. Use Biquad::Design<CoefficientType> to choose coefficient
+ * precision explicitly; it defaults to float. Biquad::ParameterCount(Type),
+ * Biquad::ParameterAt(Type, cpstd::size_t, ParameterInfo&) and
+ * Biquad::HasParameter(Type, Parameter) expose allocation-free metadata for
+ * controls required by each design. The metadata remains in program memory on
+ * AVR and is copied into a caller-owned value on access.
+ */
+
+/**
+ * @namespace DspCore::Filters
+ * @ingroup DspCore_Filters
+ * @brief Streaming processors and coefficient-design namespaces.
+ */

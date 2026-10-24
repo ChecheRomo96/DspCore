@@ -7,4 +7,12 @@
     #include <DspCore_Core.h>
 #endif
 
+#if __has_include(<DspCore_Processing.h>)
+    #include <DspCore_Processing.h>
+#endif
+
+#if __has_include(<DspCore_Filters.h>)
+    #include <DspCore_Filters.h>
+#endif
+
 #endif // DSPCORE_H
