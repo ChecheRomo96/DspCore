@@ -37,7 +37,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz cmake ninja-build texlive-latex-base \
-            texlive-latex-recommended ghostscript
+            texlive-latex-recommended texlive-fonts-recommended ghostscript
 
           archive="$RUNNER_TEMP/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
           curl --fail --location --silent --show-error \
@@ -63,6 +63,12 @@ jobs:
           mkdir -p build/ci-logs
           bash ./scripts/docs.sh --fresh 2>&1 | tee build/ci-logs/documentation.log
 
+      - name: Print formula diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          find build/documentation -type f -name "_formulas*.log" -print -exec cat {} \; || true
+
       - name: Reject Doxygen warnings
         shell: bash
         run: |
@@ -81,6 +87,8 @@ jobs:
             build/documentation/CMakeCache.txt
             build/documentation/CMakeFiles/CMakeConfigureLog.yaml
             build/documentation/docs/Doxyfile
+            build/documentation/docs/html/_formulas.tex
+            build/documentation/docs/html/_formulas.log
           if-no-files-found: warn
           retention-days: 14
 
