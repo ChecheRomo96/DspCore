@@ -21,6 +21,10 @@ namespace DspCore::Filters {
  * @f[
  * H(z) = \sum_{k=0}^{N-1} b_k z^{-k}.
  * @f]
+ * Written term by term, the same transfer function is
+ * @f[
+ * H(z) = b_0 z^0 + b_1 z^{-1} + \cdots + b_{N-1} z^{-(N-1)}.
+ * @f]
  * The caller supplies @f$b_k@f$ as Coefficients::taps, usually from a filter
  * design method such as a windowed-sinc, least-squares, or measured impulse
  * response. This class implements that recurrence; it does not choose the
