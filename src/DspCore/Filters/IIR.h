@@ -166,9 +166,19 @@ public:
     cpstd::size_t NumeratorCount() const noexcept { return numerator_.empty() ? 1U : numerator_.size(); }
     cpstd::size_t DenominatorCount() const noexcept { return denominator_.empty() ? 1U : denominator_.size(); }
 
+    /** @brief Reports the one input stream accepted by this SISO filter.
+     * @return Always 1.
+     */
     cpstd::size_t inputPorts() const noexcept override { return 1U; }
+
+    /** @brief Reports the one filtered stream produced by this SISO filter.
+     * @return Always 1.
+     */
     cpstd::size_t outputPorts() const noexcept override { return 1U; }
 
+    /** @brief Clears delayed input and output samples, restoring zero initial conditions.
+     * Configured numerator and denominator coefficients remain unchanged.
+     */
     void reset() noexcept override {
         for (cpstd::size_t index = 0U; index < inputHistory_.size(); ++index) {
             inputHistory_[index] = StateType{};

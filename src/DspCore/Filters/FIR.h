@@ -128,9 +128,19 @@ public:
     void Reset() noexcept { reset(); }
     cpstd::size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
 
+    /** @brief Reports the one input stream accepted by this SISO filter.
+     * @return Always 1.
+     */
     cpstd::size_t inputPorts() const noexcept override { return 1U; }
+
+    /** @brief Reports the one filtered stream produced by this SISO filter.
+     * @return Always 1.
+     */
     cpstd::size_t outputPorts() const noexcept override { return 1U; }
 
+    /** @brief Clears the delayed input samples and restores zero initial conditions.
+     * Configured taps remain unchanged.
+     */
     void reset() noexcept override {
         for (cpstd::size_t index = 0U; index < history_.size(); ++index) {
             history_[index] = StateType{};
