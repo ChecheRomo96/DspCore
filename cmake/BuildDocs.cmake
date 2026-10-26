@@ -6,6 +6,8 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/docs/Doxyfile)
     set(DOXYGEN_HTML_FOOTER
         ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreFooter.html)
+    set(DOXYGEN_HTML_EXTRA_STYLESHEET
+        ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreDocs.css)
     set(DOXYGEN_HTML_EXTRA_FILES
         ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreDocs.js)
 
