@@ -6,6 +6,15 @@ embedded targets. It is built on Foundation, has no MIDI or music-theory
 dependencies. It never throws exceptions, and memory use is the
 implementer's choice.
 
+The processing API is zero-copy by design: the host owns the sample memory,
+binds typed `SignalBlock<T>` views in a `SignalManager`, and passes ordered
+input/output managers to a `ProcessorBase`. This supports heterogeneous port
+types without a global type registry. FIR and IIR retain only their own
+coefficients and delay state; they never own the host's audio buffers. The
+generated documentation explains ownership, port enums, output commits, and
+the boundary between synchronous block processing and future FIFO/resampling
+layers.
+
 > **Status: early development.** Version 0.1.0 is the scaffold: build,
 > packaging, CI and version information only. Features arrive in the phases of
 > `ACTION_PLAN.md`.

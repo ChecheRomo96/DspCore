@@ -4,7 +4,7 @@ LAUNCHER_DIRECTORY=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 dspcore_example_count() {
     EXAMPLE_COUNT=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_COUNT=$((EXAMPLE_COUNT + 1))
@@ -13,7 +13,7 @@ dspcore_example_count() {
 
 dspcore_print_menu() {
     EXAMPLE_INDEX=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))
@@ -24,7 +24,7 @@ dspcore_print_menu() {
 dspcore_run_example() {
     REQUESTED_INDEX=$1
     EXAMPLE_INDEX=0
-    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DSPCORE_*; do
+    for EXAMPLE_EXECUTABLE in "$LAUNCHER_DIRECTORY"/DspCore_*; do
         [ -f "$EXAMPLE_EXECUTABLE" ] || continue
         [ -x "$EXAMPLE_EXECUTABLE" ] || continue
         EXAMPLE_INDEX=$((EXAMPLE_INDEX + 1))

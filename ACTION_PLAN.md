@@ -46,7 +46,9 @@ Each phase needs the user's approval before it starts.
 2. Lookup tables (1D, then 2D and 3D).
 3. Interpolators (linear, bilinear, trilinear).
 4. Generators (periodic, shaping, envelopes, noise, windowing).
-5. Streaming filters. **In progress:** runtime-order
+5. Streaming filters. **In progress:** `Processing::SignalBlock<T>` and
+   `SignalManager` provide non-owning heterogeneous signal bindings independent
+   of processors; runtime-order
    `FIR<SampleType, CoefficientType, StateType>` and
    `IIR<SampleType, CoefficientType, StateType>` processors, plus coefficient
    designers such as `Biquad`. Desktop audio testbenches live outside DspCore

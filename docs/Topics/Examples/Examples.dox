@@ -21,12 +21,13 @@
  * | Target | Shows |
  * | --- | --- |
  * | `DspCore_Core_Version` | DspCore and Foundation versions |
+ * | `DspCore_Processing_SignalManager` | Ordered heterogeneous input and output blocks |
  *
  * Build and run one on the desktop:
  *
  * @code{.bash}
  * ./scripts/build.sh macos_arm64 --examples-on
- * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
+ * ./build/macos_arm64/bin/Debug/DspCore_Processing_SignalManager_d
  * @endcode
  *
  * Enable and export Release examples with:
