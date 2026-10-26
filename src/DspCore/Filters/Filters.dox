@@ -8,7 +8,10 @@
  * storage. SampleType is the external stream type; CoefficientType defaults to
  * float and StateType defaults to CoefficientType. Configure may resize storage
  * outside the processing path; Process never allocates. Both accept
- * caller-owned blocks through Processing::ProcessorBase. Biquad functions are
+ * caller-owned heterogeneous MIMO buffer descriptors through
+ * Processing::ProcessorBase. FIR and IIR expose one input and one output port
+ * of their SampleType, while other processors may expose an independently tagged type
+ * at each port. Biquad functions are
  * stateless coefficient designers: each returns a coefficient value accepted by
  * IIR::Configure. Use Biquad::Design<CoefficientType> to choose coefficient
  * precision explicitly; it defaults to float. Biquad::ParameterCount(Type),
