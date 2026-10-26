@@ -1,0 +1,5 @@
+/* The title already states the template parameters. Do not repeat the fully
+ * qualified declaration above a class description. */
+.textblock > .compoundTemplParams {
+    display: none;
+}
