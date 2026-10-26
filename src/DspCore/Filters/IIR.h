@@ -45,10 +45,12 @@ namespace DspCore::Filters {
  * The stream's SampleType is intentionally independent from both coefficient
  * storage and recurrence StateType. StateType defaults to CoefficientType.
  * Arithmetic for the recurrence occurs in StateType, followed by conversion to
- * SampleType at the output boundary.
+ * SampleType at the output boundary. In a Processing::ProcessorBase graph this
+ * is a SISO node: inputSampleType(0) and outputSampleType(0) both report
+ * Processing::SampleTypeIdentifier<SampleType>().
  */
 template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
-class IIR final : public Processing::ProcessorBase<SampleType> {
+class IIR final : public Processing::ProcessorBase {
 public:
     /**
      * @brief Owns the @f$b@f$ numerator and @f$a@f$ denominator polynomials.
@@ -157,9 +159,11 @@ public:
     }
 
     bool Process(const SampleType* input, SampleType* output, const cpstd::size_t sampleCount) noexcept {
-        Processing::InputBlock<SampleType> inputs(input, sampleCount);
-        Processing::OutputBlock<SampleType> outputs(output, sampleCount);
-        return process(&inputs, 1U, &outputs, 1U) && outputs.size == sampleCount;
+        const Processing::InputBuffer inputBuffer = Processing::MakeInputBuffer(input, sampleCount);
+        Processing::OutputBuffer outputBuffer = Processing::MakeOutputBuffer(output, sampleCount);
+        const Processing::InputBuffer* inputBuffers[] = {&inputBuffer};
+        Processing::OutputBuffer* outputBuffers[] = {&outputBuffer};
+        return process(inputBuffers, 1U, outputBuffers, 1U) && outputBuffer.size == sampleCount;
     }
 
     void Reset() noexcept { reset(); }
@@ -176,6 +180,11 @@ public:
      */
     cpstd::size_t inputPorts() const noexcept override { return 1U; }
 
+    /** @brief Returns SampleType's implicit type identity for input port zero. */
+    Processing::SampleTypeId inputSampleType(const cpstd::size_t port) const noexcept override {
+        return port == 0U ? Processing::SampleTypeIdentifier<SampleType>() : nullptr;
+    }
+
     /**
      * @brief Returns the number of signal streams produced by this IIR filter.
      *
@@ -185,6 +194,11 @@ public:
      * @return 1, the single @f$y[n]@f$ output stream.
      */
     cpstd::size_t outputPorts() const noexcept override { return 1U; }
+
+    /** @brief Returns SampleType's implicit type identity for output port zero. */
+    Processing::SampleTypeId outputSampleType(const cpstd::size_t port) const noexcept override {
+        return port == 0U ? Processing::SampleTypeIdentifier<SampleType>() : nullptr;
+    }
 
     /**
      * @brief Restarts the recurrence with zero input and output histories.
@@ -202,25 +216,31 @@ public:
         }
     }
 
-    bool process(const Processing::InputBlock<SampleType>* inputs, const cpstd::size_t inputCount,
-        Processing::OutputBlock<SampleType>* outputs, const cpstd::size_t outputCount) noexcept override {
-        if (inputCount != 1U || outputCount != 1U || inputs == nullptr || outputs == nullptr ||
-            !inputs[0].isValid() || !outputs[0].canWrite(inputs[0].size)) {
+    bool process(const Processing::InputBuffer* const* inputBuffers, const cpstd::size_t inputCount,
+        Processing::OutputBuffer* const* outputBuffers, const cpstd::size_t outputCount) noexcept override {
+        if (inputCount != 1U || outputCount != 1U || inputBuffers == nullptr || outputBuffers == nullptr ||
+            inputBuffers[0] == nullptr || outputBuffers[0] == nullptr || !inputBuffers[0]->isValid() ||
+            inputBuffers[0]->sampleType != inputSampleType(0U) ||
+            outputBuffers[0]->sampleType != outputSampleType(0U) ||
+            !outputBuffers[0]->canWrite(inputBuffers[0]->size)) {
             return false;
         }
 
-        for (cpstd::size_t index = 0U; index < inputs[0].size; ++index) {
-            if (!DspCore::Detail::Signal::Finite(inputs[0].data[index])) {
+        const auto* input = static_cast<const SampleType*>(inputBuffers[0]->data);
+        auto* output = static_cast<SampleType*>(outputBuffers[0]->data);
+
+        for (cpstd::size_t index = 0U; index < inputBuffers[0]->size; ++index) {
+            if (!DspCore::Detail::Signal::Finite(input[index])) {
                 return false;
             }
         }
-        for (cpstd::size_t index = 0U; index < inputs[0].size; ++index) {
-            if (!processSample(inputs[0].data[index], outputs[0].data[index])) {
-                outputs[0].size = index;
+        for (cpstd::size_t index = 0U; index < inputBuffers[0]->size; ++index) {
+            if (!processSample(input[index], output[index])) {
+                outputBuffers[0]->size = index;
                 return false;
             }
         }
-        outputs[0].size = inputs[0].size;
+        outputBuffers[0]->size = inputBuffers[0]->size;
         return true;
     }
 
