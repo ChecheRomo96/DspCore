@@ -11,6 +11,8 @@
  * @section DspCoreMainModules Modules
  *
  * - @ref DspCore_Core "Core": DspCore and Foundation version information.
+ * - @ref DspCore_Processing "Processing": zero-copy SignalBlock bindings,
+ *   heterogeneous SignalManager port collections, and ProcessorBase.
  * - @ref DspCore_Filters "Filters": runtime-order FIR and IIR processors,
  *   configured by portable coefficient values and Biquad designers.
  *

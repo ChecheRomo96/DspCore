@@ -1,0 +1,109 @@
+/**
+ * @defgroup DspCore_Processing Processing
+ * @ingroup DspCore
+ * @brief Zero-copy signal-memory bindings and processor contracts.
+ *
+ * @section DspCore_Processing_Model Ownership and processing model
+ * DspCore separates signal memory from signal processing:
+ *
+ * @code
+ * Host, JUCE callback, or future SignalGraph
+ *     owns sample memory and SignalBlock objects
+ *                 |
+ *                 v
+ * Input SignalManager  --->  ProcessorBase  --->  Output SignalManager
+ *                 |                                  |
+ *                 v                                  v
+ *        SignalBlock<const T>                  SignalBlock<T>
+ * @endcode
+ *
+ * A SignalBlock is a small, non-owning view over externally owned contiguous
+ * samples. It never allocates, copies, frees, queues, resamples, or schedules
+ * samples. SignalManager is likewise non-owning: it stores ordered pointers to
+ * blocks for one side of a process call. The host must keep the blocks and
+ * their sample memory alive for that call. The manager also does not own the
+ * small pointer array used to bind the blocks.
+ *
+ * A ProcessorBase owns no external input or output block. It may own internal
+ * algorithm state: FIR owns taps and delay history, IIR owns numerator,
+ * denominator, and delay histories. This makes an in-place JUCE callback or a
+ * microcontroller DMA buffer usable without an intermediate copy.
+ *
+ * @section DspCore_Processing_Typed Typed blocks and heterogeneous managers
+ * Construct an input block from read-only memory and output storage from
+ * writable memory:
+ * @code{.cpp}
+ * const float audio[] = { 1.0F, 0.0F };
+ * short control[] = { 2, -1 };
+ * float result[2]{};
+ *
+ * auto audioBlock = MakeInputSignalBlock(audio, 2U);
+ * auto controlBlock = MakeInputSignalBlock(control, 2U);
+ * auto resultBlock = MakeOutputSignalBlock(result, 2U);
+ * @endcode
+ * `SignalBlock<const float>` and `SignalBlock<short>` may appear in one input
+ * manager. A processor asks for its expected type at a named port. The manager
+ * validates that request internally; users do not assign type IDs, register
+ * types, or maintain a list of supported sample formats. Any user-defined T
+ * can be represented by SignalBlock<T>. A particular DSP processor can still
+ * impose its own requirements; FIR and IIR require arithmetic sample types.
+ *
+ * SignalBlockBase is the private type-erasure seam that makes the collection
+ * possible. It is visible only because a host creates the ordered pointer
+ * array passed to SignalManager. Application and processor code should create
+ * and use SignalBlock<T>; it must never cast a SignalBlockBase pointer. The
+ * manager performs the safe checked conversion after Read<T> or Write<T>.
+ *
+ * @section DspCore_Processing_PortOrder Port order and named enums
+ * The manager preserves block order. A processor gives that order meaning with
+ * enums rather than magic numeric literals:
+ * @code{.cpp}
+ * class GainAndOffset final : public ProcessorBase {
+ * public:
+ *     enum Input : cpstd::size_t { Audio = 0U, Offset = 1U };
+ *     enum Output : cpstd::size_t { ProcessedAudio = 0U };
+ *
+ *     bool process(const SignalManager& inputs, SignalManager& outputs) noexcept override {
+ *         const auto* audio = inputs.Read<float>(Audio);
+ *         const auto* offset = inputs.Read<short>(Offset);
+ *         auto* result = outputs.Write<float>(ProcessedAudio);
+ *         if (audio == nullptr || offset == nullptr || result == nullptr ||
+ *             audio->Size() != offset->Size() || result->Capacity() < audio->Size()) {
+ *             return false;
+ *         }
+ *         for (cpstd::size_t i = 0U; i < audio->Size(); ++i) {
+ *             result->Data()[i] = audio->Data()[i] + static_cast<float>(offset->Data()[i]);
+ *         }
+ *         return outputs.Commit(ProcessedAudio, audio->Size());
+ *     }
+ *     void reset() noexcept override {}
+ * };
+ * @endcode
+ *
+ * Inputs contain their valid Size at binding time. Outputs begin with Size()==0
+ * and expose Capacity. A successful processor calls SignalManager::Commit to
+ * record how many output samples it produced. Commit rejects sizes greater than
+ * Capacity and preserves the earlier output size on failure.
+ *
+ * @section DspCore_Processing_Access Access and failure rules
+ * Read<T> succeeds only for an in-range read-only SignalBlock<const T>.
+ * Write<T> succeeds only for an in-range writable SignalBlock<T>. A mismatched
+ * type, access direction, invalid index, or invalid bound block returns
+ * `nullptr`; no conversion, allocation, or implicit buffer is created. A
+ * processor should validate the resulting pointers and its expected manager
+ * counts before writing. This lets the host retain ownership while the
+ * processor makes all algorithm-specific topology requirements explicit.
+ *
+ * @section DspCore_Processing_WhatThisIsNot What processing does not provide
+ * SignalManager is not a graph owner, stream clock, sample-rate converter,
+ * thread synchronizer, or FIFO. Within a synchronous audio callback, managers
+ * bind caller-owned blocks directly for zero-copy processing. A future graph
+ * or runtime layer may add queues and resamplers only at an actual asynchronous
+ * or differing-sample-rate boundary.
+ */
+
+/**
+ * @namespace DspCore::Processing
+ * @ingroup DspCore_Processing
+ * @brief Non-owning blocks, ordered managers, and processor contracts.
+ */

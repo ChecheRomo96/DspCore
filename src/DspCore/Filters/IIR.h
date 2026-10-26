@@ -46,8 +46,8 @@ namespace DspCore::Filters {
  * storage and recurrence StateType. StateType defaults to CoefficientType.
  * Arithmetic for the recurrence occurs in StateType, followed by conversion to
  * SampleType at the output boundary. In a Processing::ProcessorBase graph this
- * is a SISO node: inputSampleType(0) and outputSampleType(0) both report
- * Processing::SampleTypeIdentifier<SampleType>().
+ * is a SISO node. Input::Signal binds a SignalBlock<const SampleType>; output
+ * Output::FilteredSignal binds writable SignalBlock<SampleType> storage.
  */
 template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
 class IIR final : public Processing::ProcessorBase {
@@ -159,46 +159,24 @@ public:
     }
 
     bool Process(const SampleType* input, SampleType* output, const cpstd::size_t sampleCount) noexcept {
-        const Processing::InputBuffer inputBuffer = Processing::MakeInputBuffer(input, sampleCount);
-        Processing::OutputBuffer outputBuffer = Processing::MakeOutputBuffer(output, sampleCount);
-        const Processing::InputBuffer* inputBuffers[] = {&inputBuffer};
-        Processing::OutputBuffer* outputBuffers[] = {&outputBuffer};
-        return process(inputBuffers, 1U, outputBuffers, 1U) && outputBuffer.size == sampleCount;
+        auto inputBlock = Processing::MakeInputSignalBlock(input, sampleCount);
+        auto outputBlock = Processing::MakeOutputSignalBlock(output, sampleCount);
+        Processing::SignalBlockBase* inputBlocks[] = {&inputBlock};
+        Processing::SignalBlockBase* outputBlocks[] = {&outputBlock};
+        const Processing::SignalManager inputs{inputBlocks, 1U};
+        Processing::SignalManager outputs{outputBlocks, 1U};
+        return process(inputs, outputs) && outputBlock.Size() == sampleCount;
     }
 
     void Reset() noexcept { reset(); }
     cpstd::size_t NumeratorCount() const noexcept { return numerator_.empty() ? 1U : numerator_.size(); }
     cpstd::size_t DenominatorCount() const noexcept { return denominator_.empty() ? 1U : denominator_.size(); }
 
-    /**
-     * @brief Returns the number of signal streams required by this IIR filter.
-     *
-     * IIR is single-input/single-output: its one input port carries the
-     * ordered stream @f$x[n]@f$ used by the feed-forward recurrence.
-     *
-     * @return 1, the single @f$x[n]@f$ input stream.
-     */
-    cpstd::size_t inputPorts() const noexcept override { return 1U; }
+    /** @brief Named SISO input order used when obtaining this filter's SignalManager block. */
+    enum Input : cpstd::size_t { Signal = 0U };
 
-    /** @brief Returns SampleType's implicit type identity for input port zero. */
-    Processing::SampleTypeId inputSampleType(const cpstd::size_t port) const noexcept override {
-        return port == 0U ? Processing::SampleTypeIdentifier<SampleType>() : nullptr;
-    }
-
-    /**
-     * @brief Returns the number of signal streams produced by this IIR filter.
-     *
-     * IIR is single-input/single-output: its one output port carries the
-     * recursive filtered stream @f$y[n]@f$.
-     *
-     * @return 1, the single @f$y[n]@f$ output stream.
-     */
-    cpstd::size_t outputPorts() const noexcept override { return 1U; }
-
-    /** @brief Returns SampleType's implicit type identity for output port zero. */
-    Processing::SampleTypeId outputSampleType(const cpstd::size_t port) const noexcept override {
-        return port == 0U ? Processing::SampleTypeIdentifier<SampleType>() : nullptr;
-    }
+    /** @brief Named SISO output order used when obtaining this filter's SignalManager block. */
+    enum Output : cpstd::size_t { FilteredSignal = 0U };
 
     /**
      * @brief Restarts the recurrence with zero input and output histories.
@@ -216,32 +194,26 @@ public:
         }
     }
 
-    bool process(const Processing::InputBuffer* const* inputBuffers, const cpstd::size_t inputCount,
-        Processing::OutputBuffer* const* outputBuffers, const cpstd::size_t outputCount) noexcept override {
-        if (inputCount != 1U || outputCount != 1U || inputBuffers == nullptr || outputBuffers == nullptr ||
-            inputBuffers[0] == nullptr || outputBuffers[0] == nullptr || !inputBuffers[0]->isValid() ||
-            inputBuffers[0]->sampleType != inputSampleType(0U) ||
-            outputBuffers[0]->sampleType != outputSampleType(0U) ||
-            !outputBuffers[0]->canWrite(inputBuffers[0]->size)) {
+    bool process(const Processing::SignalManager& inputs, Processing::SignalManager& outputs) noexcept override {
+        const auto* input = inputs.Read<SampleType>(Input::Signal);
+        auto* output = outputs.Write<SampleType>(Output::FilteredSignal);
+        if (inputs.Count() != 1U || outputs.Count() != 1U || !inputs.IsValid() || !outputs.IsValid() ||
+            input == nullptr || output == nullptr || output->Capacity() < input->Size()) {
             return false;
         }
 
-        const auto* input = static_cast<const SampleType*>(inputBuffers[0]->data);
-        auto* output = static_cast<SampleType*>(outputBuffers[0]->data);
-
-        for (cpstd::size_t index = 0U; index < inputBuffers[0]->size; ++index) {
-            if (!DspCore::Detail::Signal::Finite(input[index])) {
+        for (cpstd::size_t index = 0U; index < input->Size(); ++index) {
+            if (!DspCore::Detail::Signal::Finite(input->Data()[index])) {
                 return false;
             }
         }
-        for (cpstd::size_t index = 0U; index < inputBuffers[0]->size; ++index) {
-            if (!processSample(input[index], output[index])) {
-                outputBuffers[0]->size = index;
+        for (cpstd::size_t index = 0U; index < input->Size(); ++index) {
+            if (!processSample(input->Data()[index], output->Data()[index])) {
+                outputs.Commit(Output::FilteredSignal, index);
                 return false;
             }
         }
-        outputBuffers[0]->size = inputBuffers[0]->size;
-        return true;
+        return outputs.Commit(Output::FilteredSignal, input->Size());
     }
 
 private:

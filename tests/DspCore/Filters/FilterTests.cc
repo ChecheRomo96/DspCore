@@ -14,34 +14,24 @@ bool processSample(Filter& filter, const SampleType input, SampleType& output) {
 
 class HeterogeneousMimoProbe final : public DspCore::Processing::ProcessorBase {
 public:
-    cpstd::size_t inputPorts() const noexcept override { return 2U; }
-    DspCore::Processing::SampleTypeId inputSampleType(const cpstd::size_t port) const noexcept override {
-        return port == 0U ? DspCore::Processing::SampleTypeIdentifier<float>()
-                          : (port == 1U ? DspCore::Processing::SampleTypeIdentifier<short>() : nullptr);
-    }
-    cpstd::size_t outputPorts() const noexcept override { return 1U; }
-    DspCore::Processing::SampleTypeId outputSampleType(const cpstd::size_t port) const noexcept override {
-        return port == 0U ? DspCore::Processing::SampleTypeIdentifier<float>() : nullptr;
-    }
-    bool process(const DspCore::Processing::InputBuffer* const* inputs, const cpstd::size_t inputCount,
-        DspCore::Processing::OutputBuffer* const* outputs, const cpstd::size_t outputCount) noexcept override {
-        if (inputCount != 2U || outputCount != 1U || inputs == nullptr || outputs == nullptr ||
-            inputs[0] == nullptr || inputs[1] == nullptr || outputs[0] == nullptr || !inputs[0]->isValid() ||
-            !inputs[1]->isValid() || inputs[0]->sampleType != inputSampleType(0U) ||
-            inputs[1]->sampleType != inputSampleType(1U) || outputs[0]->sampleType != outputSampleType(0U) ||
-            inputs[0]->size != inputs[1]->size ||
-            !outputs[0]->canWrite(inputs[0]->size)) {
+    enum Input : cpstd::size_t { Audio = 0U, Control = 1U };
+    enum Output : cpstd::size_t { Mixed = 0U };
+
+    bool process(const DspCore::Processing::SignalManager& inputs,
+        DspCore::Processing::SignalManager& outputs) noexcept override {
+        const auto* audio = inputs.Read<float>(Audio);
+        const auto* control = inputs.Read<short>(Control);
+        auto* output = outputs.Write<float>(Mixed);
+        if (inputs.Count() != 2U || outputs.Count() != 1U || !inputs.IsValid() || !outputs.IsValid() ||
+            audio == nullptr || control == nullptr || output == nullptr || audio->Size() != control->Size() ||
+            output->Capacity() < audio->Size()) {
             return false;
         }
 
-        const auto* audio = static_cast<const float*>(inputs[0]->data);
-        const auto* control = static_cast<const short*>(inputs[1]->data);
-        auto* output = static_cast<float*>(outputs[0]->data);
-        for (cpstd::size_t index = 0U; index < inputs[0]->size; ++index) {
-            output[index] = audio[index] + static_cast<float>(control[index]);
+        for (cpstd::size_t index = 0U; index < audio->Size(); ++index) {
+            output->Data()[index] = audio->Data()[index] + static_cast<float>(control->Data()[index]);
         }
-        outputs[0]->size = inputs[0]->size;
-        return true;
+        return outputs.Commit(Mixed, audio->Size());
     }
     void reset() noexcept override {}
 };
@@ -50,15 +40,17 @@ TEST(ProcessorBase, SupportsHeterogeneousMimoPorts) {
     const float audio[] = {0.5F, 1.5F};
     const short control[] = {2, -1};
     float output[2]{};
-    const auto audioBuffer = DspCore::Processing::MakeInputBuffer(audio, 2U);
-    const auto controlBuffer = DspCore::Processing::MakeInputBuffer(control, 2U);
-    auto outputBuffer = DspCore::Processing::MakeOutputBuffer(output, 2U);
-    const DspCore::Processing::InputBuffer* inputs[] = {&audioBuffer, &controlBuffer};
-    DspCore::Processing::OutputBuffer* outputs[] = {&outputBuffer};
+    auto audioBlock = DspCore::Processing::MakeInputSignalBlock(audio, 2U);
+    auto controlBlock = DspCore::Processing::MakeInputSignalBlock(control, 2U);
+    auto outputBlock = DspCore::Processing::MakeOutputSignalBlock(output, 2U);
+    DspCore::Processing::SignalBlockBase* inputBlocks[] = {&audioBlock, &controlBlock};
+    DspCore::Processing::SignalBlockBase* outputBlocks[] = {&outputBlock};
+    const DspCore::Processing::SignalManager inputs{inputBlocks, 2U};
+    DspCore::Processing::SignalManager outputs{outputBlocks, 1U};
 
     HeterogeneousMimoProbe processor;
-    ASSERT_TRUE(processor.process(inputs, 2U, outputs, 1U));
-    EXPECT_EQ(outputBuffer.size, 2U);
+    ASSERT_TRUE(processor.process(inputs, outputs));
+    EXPECT_EQ(outputBlock.Size(), 2U);
     EXPECT_FLOAT_EQ(output[0], 2.5F);
     EXPECT_FLOAT_EQ(output[1], 0.5F);
 }

@@ -19,6 +19,13 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ### Added
 
+- `DspCore::Processing::SignalBlock<T>` and `SignalManager`, non-owning
+  zero-copy signal-memory views and ordered heterogeneous port bindings.
+  Processors receive `SignalManager` input and output collections, while hosts
+  retain ownership of all signal memory and processors retain only algorithm
+  state. `SignalManager` accepts user-defined sample types without a registry.
+- A desktop `DspCore_Processing_SignalManager` example and a corrected macOS
+  example launcher, which now discovers the installed `DspCore_*` targets.
 - `DspCore::Filters::FIR<SampleType, CoefficientType, StateType>` and
   `IIR<SampleType, CoefficientType, StateType>`, runtime-order SISO processors
   with independent stream, coefficient and recurrence-state representations.
