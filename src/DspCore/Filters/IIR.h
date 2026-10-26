@@ -166,18 +166,32 @@ public:
     cpstd::size_t NumeratorCount() const noexcept { return numerator_.empty() ? 1U : numerator_.size(); }
     cpstd::size_t DenominatorCount() const noexcept { return denominator_.empty() ? 1U : denominator_.size(); }
 
-    /** @brief Reports the one input stream accepted by this SISO filter.
-     * @return Always 1.
+    /**
+     * @brief Returns the number of signal streams required by this IIR filter.
+     *
+     * IIR is single-input/single-output: its one input port carries the
+     * ordered stream @f$x[n]@f$ used by the feed-forward recurrence.
+     *
+     * @return 1, the single @f$x[n]@f$ input stream.
      */
     cpstd::size_t inputPorts() const noexcept override { return 1U; }
 
-    /** @brief Reports the one filtered stream produced by this SISO filter.
-     * @return Always 1.
+    /**
+     * @brief Returns the number of signal streams produced by this IIR filter.
+     *
+     * IIR is single-input/single-output: its one output port carries the
+     * recursive filtered stream @f$y[n]@f$.
+     *
+     * @return 1, the single @f$y[n]@f$ output stream.
      */
     cpstd::size_t outputPorts() const noexcept override { return 1U; }
 
-    /** @brief Clears delayed input and output samples, restoring zero initial conditions.
-     * Configured numerator and denominator coefficients remain unchanged.
+    /**
+     * @brief Restarts the recurrence with zero input and output histories.
+     *
+     * The feed-forward @f$x[n-k]@f$ and feedback @f$y[n-k]@f$ delay lines are
+     * cleared, so the next block starts with zero initial conditions. The
+     * configured numerator and denominator polynomials are not changed.
      */
     void reset() noexcept override {
         for (cpstd::size_t index = 0U; index < inputHistory_.size(); ++index) {

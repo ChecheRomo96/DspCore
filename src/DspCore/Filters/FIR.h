@@ -128,18 +128,32 @@ public:
     void Reset() noexcept { reset(); }
     cpstd::size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
 
-    /** @brief Reports the one input stream accepted by this SISO filter.
-     * @return Always 1.
+    /**
+     * @brief Returns the number of signal streams required by this FIR filter.
+     *
+     * FIR is single-input/single-output: its one input port carries the
+     * ordered stream @f$x[n]@f$ used by the convolution.
+     *
+     * @return 1, the single @f$x[n]@f$ input stream.
      */
     cpstd::size_t inputPorts() const noexcept override { return 1U; }
 
-    /** @brief Reports the one filtered stream produced by this SISO filter.
-     * @return Always 1.
+    /**
+     * @brief Returns the number of signal streams produced by this FIR filter.
+     *
+     * FIR is single-input/single-output: its one output port carries the
+     * filtered stream @f$y[n]@f$.
+     *
+     * @return 1, the single @f$y[n]@f$ output stream.
      */
     cpstd::size_t outputPorts() const noexcept override { return 1U; }
 
-    /** @brief Clears the delayed input samples and restores zero initial conditions.
-     * Configured taps remain unchanged.
+    /**
+     * @brief Restarts the convolution with zero input history.
+     *
+     * The delay line holding prior @f$x[n-k]@f$ samples is cleared, so the
+     * next output is evaluated with zero initial conditions. The configured
+     * tap vector @f$b_0 ldots b_{N-1}@f$ is not changed.
      */
     void reset() noexcept override {
         for (cpstd::size_t index = 0U; index < history_.size(); ++index) {
