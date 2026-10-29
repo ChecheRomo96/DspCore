@@ -5,6 +5,8 @@
 #include <DspCore/Detail/SignalMath.h>
 #include <DspCore/Filters/IIR.h>
 
+#include <stdint.h>
+
 namespace DspCore::Filters::Biquad {
 
 /** @brief The result type of every biquad designer: directly consumable by IIR::Configure. */
@@ -12,7 +14,7 @@ template <typename CoefficientType = float>
 using Coefficients = typename IIR<float, CoefficientType>::Coefficients;
 
 /** @brief RBJ biquad designs supported by this namespace. */
-enum class Type {
+enum class Type : uint8_t {
     LowPass,
     HighPass,
     BandPass,
@@ -24,7 +26,7 @@ enum class Type {
 };
 
 /** @brief Named controls that a biquad design can expose. */
-enum class Parameter {
+enum class Parameter : uint8_t {
     SampleRate,
     Cutoff,
     Quality,
@@ -33,7 +35,7 @@ enum class Parameter {
 };
 
 /** @brief UI-independent label identity for a Biquad::Parameter. */
-enum class ParameterLabel {
+enum class ParameterLabel : uint8_t {
     SampleRate,
     Cutoff,
     CenterFrequency,
@@ -44,7 +46,7 @@ enum class ParameterLabel {
 };
 
 /** @brief Unit identity for a Biquad::Parameter. */
-enum class Unit {
+enum class Unit : uint8_t {
     None,
     Hertz,
     Decibels
