@@ -179,7 +179,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ChecheRomo96/Foundation
-          ref: v2.0.8
+          ref: v2.0.10
           path: foundation-source
 
       # Foundation 2.0.0 depends on CPSTL; keep in step with Foundation's
