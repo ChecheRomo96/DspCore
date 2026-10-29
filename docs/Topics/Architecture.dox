@@ -13,7 +13,7 @@
  * - Generators: periodic tables, noise, envelopes, shaping and windows.
  * - Filters: generic FIR/IIR processing; Biquad free coefficient calculators.
  * - Analysis: peak, RMS and envelope followers.
- * - Processing: MIMO block ProcessorBase contracts; FIR/IIR are SISO nodes.
+ * - Processing: typed, non-owning fixed-size sample-block views for algorithms.
  * - Transforms: DFT, IDFT, FFT and IFFT.
  *
  * MIDILAR's musical control layer interprets notes, pedals, RPN/NRPN,
@@ -27,4 +27,9 @@
  *
  * @ref DspCore_Numeric defines the numerical and buffer requirements for
  * migration. Further implementation follows ACTION_PLAN.md phase by phase.
+ *
+ * DspCore deliberately does not own data streams. A future runtime library
+ * will provide audio, MIDI, envelope and event transport, FIFOs, clocks,
+ * routing, MIMO graphs and adapters. That layer will pass caller-owned memory
+ * to DspCore algorithms through Processing::SampleBlock at its boundary.
  */

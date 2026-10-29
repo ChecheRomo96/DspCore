@@ -1,94 +1,50 @@
 /**
- * @defgroup DspCore_Filters Streaming filters
- * @brief Two generic SISO ProcessorBase implementations, configured by coefficients.
+ * @defgroup DspCore_Filters Filters
+ * @ingroup DspCore
+ * @brief Portable runtime-order FIR and IIR filters and coefficient designers.
  *
- * Include `<DspCore_Filters.h>` or FIR.h/IIR.h. Coefficient calculators are
- * functions in @ref DspCore_Filters_Biquad, not processing classes.
- * Process advances one complete input block with processor-owned persistent history.
- * Both filters also implement @ref DspCore::Processing::ProcessorBase with one
- * input and one output port: block processing advances the same state once per
- * input value and produces the same number of output values. No processing,
- * Process and Reset do not allocate, schedule, clip or throw. Configure may
- * resize processor-owned CPSTL storage.
+ * FIR<SampleType, CoefficientType, StateType> and
+ * IIR<SampleType, CoefficientType, StateType> own their coefficient and delay
+ * storage. SampleType is the external stream type; CoefficientType defaults to
+ * float and StateType defaults to CoefficientType. Configure may resize storage
+ * outside the processing path; Process never allocates. Both accept direct,
+ * caller-owned `Processing::SampleBlock<const SampleType>` input and
+ * `Processing::SampleBlock<SampleType>` output views with the same fixed
+ * extent. Biquad functions are
+ * stateless coefficient designers: each returns a coefficient value accepted by
+ * IIR::Configure. Use Biquad::Design<CoefficientType> to choose coefficient
+ * precision explicitly; it defaults to float. Biquad::ParameterCount(Type),
+ * Biquad::ParameterAt(Type, cpstd::size_t, ParameterInfo&) and
+ * Biquad::HasParameter(Type, Parameter) expose allocation-free metadata for
+ * controls required by each design. The metadata remains in program memory on
+ * AVR and is copied into a caller-owned value on access.
  *
- * @section DspCore_Filters_Contract Processing contracts
+ * @section DspCore_Filters_Equations Difference equations and coefficients
+ * Both processors apply a discrete-time difference equation one sample at a
+ * time. In this documentation @f$x[n]@f$ is the input sample at index @f$n@f$
+ * and @f$y[n]@f$ is the corresponding output sample. `Process` visits a block
+ * in increasing @f$n@f$ order; it is not a vectorized evaluation of a
+ * memoryless function @f$Y(x)@f$.
  *
- * - **SPEC-FILT-1**: Float/double samples, coefficients and computed state must
- *   be finite. Invalid configuration/update leaves coefficients, history and
- *   output unchanged. A successful Configure resets delays. Scalar input and
- *   output may alias. Raw coefficient array extent is a caller precondition.
- * - **SPEC-FILT-2**: FIR<T> owns numerator coefficients and input history in
- *   cpstd::vector storage. Configure accepts any positive finite runtime tap
- *   count, reallocates only there, resets history and makes that count
- *   observable through Taps(). b[0] multiplies the current input. Default
- *   configuration is one-tap identity. Equation:
- *   y[n]=sum(b[k]*x[n-k]).
- * - **SPEC-FILT-3**: IIR<T> owns numerator, denominator and their delay
- *   histories in cpstd::vector storage. Configure accepts independently sized,
- *   positive runtime counts through raw pointers/counts, array references, or
- *   a struct exposing numerator and denominator arrays. All values must be
- *   finite and a0 nonzero. Normalize every coefficient by a0 and validate the
- *   result before committing. Negative a0 is supported. Source arrays/structs
- *   are unchanged.
- * - **SPEC-FILT-4**: IIR uses the generic direct-form I recurrence:
- *   y[n]=sum(b[k]/a0*x[n-k])-sum(a[k]/a0*y[n-k], k>=1).
- *   Default configuration is identity. History and normalized coefficients are
- *   processor-owned; copying a filter duplicates state. Configure resets history,
- *   may resize storage and may cause transients. No automatic coefficient
- *   smoothing is performed.
- * - **SPEC-FILT-5**: The ProcessorBase block overload requires exactly one
- *   valid finite input and one output with capacity for the complete input
- *   block. Invalid views and non-finite input are rejected before processing.
- *   On a finite arithmetic failure, OutputBlock::size reports the valid prefix
- *   already committed. Successful blocks have one output per input and no
- *   added windowing latency.
- *
- * Generic IIR validates representability, not arbitrary-order pole stability.
- * Callers supplying custom coefficients own their stability decisions. Biquad
- * calculators check strict second-order stability before returning a design.
- * A finite configuration does not guarantee finite results for every input;
- * overflow rejects that sample without consuming it or clipping it.
- *
- * @code{.cpp}
- * auto coefficients = DspCore::Filters::Biquad::LowPass(48000.f,1000.f,0.707f);
- * DspCore::Filters::IIR<float> filter;
- * if (!filter.Configure(coefficients)) { return; }
- * const float input[]={1.f,0.f};
- * float output[2]={};
- * bool ok=filter.Process(input,output,2);
- * @endcode
- *
- * Configure IIR with other coefficient counts for higher/lower-order recurrences;
- * the processor does not depend on the Biquad header or a particular calculator.
- * Examples: Filters/FIR, Filters/IIR and Filters/Biquad.
+ * FIR accepts taps @f$b_k@f$ and performs convolution:
+ * @f[
+ * y[n] = \sum_{k=0}^{N-1}b_kx[n-k], \qquad
+ * H(z) = \sum_{k=0}^{N-1}b_kz^{-k}.
+ * @f]
+ * The class stores only earlier input samples. IIR accepts numerator @f$b_k@f$
+ * and denominator @f$a_k@f$ coefficients:
+ * @f[
+ * \sum_{k=0}^{N}a_ky[n-k] = \sum_{k=0}^{M}b_kx[n-k], \qquad
+ * H(z) = \frac{\sum b_kz^{-k}}{\sum a_kz^{-k}}.
+ * @f]
+ * It stores earlier inputs and outputs. IIR::Configure divides all
+ * coefficients by @f$a_0@f$, after which the code computes the feed-forward
+ * sum and subtracts the feedback sum. See FIR and IIR for the exact mapping
+ * from these equations to their delay lines and arithmetic types.
  */
+
 /**
- * @defgroup DspCore_Filters_Biquad Biquad coefficient calculators
+ * @namespace DspCore::Filters
  * @ingroup DspCore_Filters
- * @brief Free functions returning six-coefficient second-order descriptions.
- *
- * Namespace DspCore::Filters::Biquad contains Coefficients<T>, LowPass,
- * HighPass and IsStable. There is no Biquad processing class or Design
- * namespace. Coefficients<T> contains only numerator[3] (b0,b1,b2) and
- * denominator[3] (a0,a1,a2), with identity defaults. It is trivially copyable
- * and occupies six scalars. One value can configure independent IIR instances.
- *
- * LowPass(sampleRate,cutoff,Q) and HighPass(...) return this struct by value,
- * including raw a0; IIR performs normalization. Require finite positive
- * sample rate/Q and 0<cutoff<sampleRate/2. Invalid or numerically unrepresentable
- * designs return denominator[0]==0 so IIR::Configure rejects them, preserving
- * its previous configuration/history. No exception or hidden identity fallback.
- *
- * Calculations follow the [W3C Audio EQ Cookbook](https://www.w3.org/TR/audio-eq-cookbook/)
- * (Robert Bristow-Johnson), with half-angle numerator identities. IsStable
- * validates finite/normalizable coefficients and strict normalized pole bounds:
- * -1<a2/a0<1 and -(1+a2/a0)<a1/a0<(1+a2/a0). Boundary poles are rejected.
- * This optional check belongs to the coefficient calculation, not the generic
- * IIR recurrence. No hidden cutoff/Q clamps or processing state are involved.
- */
-/** @namespace DspCore::Filters
- * @brief Generic FIR/IIR processing and coefficient calculation namespaces.
- */
-/** @namespace DspCore::Filters::Biquad
- * @brief Free second-order coefficient calculators and Coefficients<T> values.
+ * @brief Block processors and coefficient-design namespaces.
  */
