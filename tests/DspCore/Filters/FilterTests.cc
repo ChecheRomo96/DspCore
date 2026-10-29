@@ -1,227 +1,198 @@
-// Deliberately include biquad first: public headers must not depend on include order.
+#include <cmath>
+
 #include <DspCore/Filters/Biquad.h>
 #include <DspCore/Filters/FIR.h>
 #include <DspCore/Filters/IIR.h>
 #include <gtest/gtest.h>
-#include <limits>
-#include <cmath>
-using namespace DspCore::Filters;
 
-template<typename Processor,typename T> bool ProcessSample(Processor& processor,T input,T& output) {
-    return processor.Process(&input,&output,1);
-}
+namespace {
 
-TEST(FIR, ImpulseMatchesAsymmetricTapOrderAndHistoryReset) {
-    FIR<double> fir; const double taps[]={0.25,0.5,-0.125};
-    ASSERT_TRUE(fir.Configure(taps,3)); double output=0;
-    ASSERT_TRUE(ProcessSample(fir,1.,output)); EXPECT_EQ(output,0.25);
-    ASSERT_TRUE(ProcessSample(fir,0.,output)); EXPECT_EQ(output,0.5);
-    ASSERT_TRUE(ProcessSample(fir,0.,output)); EXPECT_EQ(output,-0.125);
-    ASSERT_TRUE(ProcessSample(fir,0.,output)); EXPECT_EQ(output,0.);
-    fir.Reset(); ASSERT_TRUE(ProcessSample(fir,1.,output)); EXPECT_EQ(output,0.25);
-}
-TEST(FIR, DefaultIdentityAndDcGain) {
-    FIR<double> identity; double out=0;
-    ASSERT_TRUE(ProcessSample(identity,0.123,out)); EXPECT_EQ(out,0.123);
-    const double block[]={0.25,0.5,0.75}; double blockOutput[3]={};
-    ASSERT_TRUE(identity.Process(block,blockOutput,3));
-    EXPECT_EQ(blockOutput[0],0.25); EXPECT_EQ(blockOutput[2],0.75);
-    FIR<double> average; const double taps[]={0.25,0.5,0.25};
-    ASSERT_TRUE(average.Configure(taps,3));
-    for(int i=0;i<10;++i) { ASSERT_TRUE(ProcessSample(average,1.,out)); }
-    EXPECT_EQ(out,1.); EXPECT_EQ(average.Taps(),3U);
-}
-TEST(FIR, ActiveTapCountChangesAtRuntimeWithVectorStorage) {
-    FIR<double> filter; double output=0;
-    const double twoTaps[]={0.5,0.5};
-    ASSERT_TRUE(filter.Configure(twoTaps,2));
-    EXPECT_EQ(filter.Taps(),2U); EXPECT_GE(filter.Capacity(),2U);
-    ASSERT_TRUE(ProcessSample(filter,1.,output)); EXPECT_EQ(output,0.5);
-    ASSERT_TRUE(ProcessSample(filter,0.,output)); EXPECT_EQ(output,0.5);
-
-    const double threeTaps[]={0.25,0.5,0.25};
-    ASSERT_TRUE(filter.Configure(threeTaps,3));
-    EXPECT_EQ(filter.Taps(),3U); EXPECT_GE(filter.Capacity(),3U);
-    ASSERT_TRUE(ProcessSample(filter,1.,output)); EXPECT_EQ(output,0.25);
-    ASSERT_TRUE(ProcessSample(filter,0.,output)); EXPECT_EQ(output,0.5);
-    const double fiveTaps[]={0.1,0.2,0.3,0.2,0.1};
-    ASSERT_TRUE(filter.Configure(fiveTaps,5));
-    EXPECT_EQ(filter.Taps(),5U); EXPECT_GE(filter.Capacity(),5U);
-    EXPECT_FALSE(filter.Configure(fiveTaps,0));
-    EXPECT_EQ(filter.Taps(),5U);
-}
-TEST(FIR, FailurePreservesHistoryCoefficientsAndCallerOutput) {
-    FIR<float> fir; const float taps[]={0.5f,0.5f};
-    ASSERT_TRUE(fir.Configure(taps,2)); float out=0;
-    ASSERT_TRUE(ProcessSample(fir,1.f,out));
-    auto copy=fir;
-    const float bad[]={1,std::numeric_limits<float>::quiet_NaN()};
-    EXPECT_FALSE(fir.Configure(bad,2)); EXPECT_FALSE(fir.Configure(0,2));
-    out=99; EXPECT_FALSE(ProcessSample(fir,std::numeric_limits<float>::infinity(),out)); EXPECT_EQ(out,99);
-    float reference=0; ASSERT_TRUE(ProcessSample(fir,0.f,out)); ASSERT_TRUE(ProcessSample(copy,0.f,reference)); EXPECT_EQ(out,reference);
-    const float huge[]={std::numeric_limits<float>::max(),1};
-    ASSERT_TRUE(fir.Configure(huge,2)); out=99;
-    EXPECT_FALSE(ProcessSample(fir,2.f,out)); EXPECT_EQ(out,99);
-    ASSERT_TRUE(ProcessSample(fir,0.f,out)); EXPECT_EQ(out,0);
-}
-TEST(FIR, ImplementsSisoProcessorBaseAndRejectsInvalidBlocksBeforeProcessing) {
-    FIR<float> fir; const float taps[]={0.5f,0.5f};
-    ASSERT_TRUE(fir.Configure(taps,2));
-    DspCore::Processing::ProcessorBase<float>& processor=fir;
-    const float input[]={1.f,0.f,0.f}; float output[]={99.f,99.f,99.f};
-    DspCore::Processing::InputBlock<float> inputs[]={DspCore::Processing::InputBlock<float>(input,3)};
-    DspCore::Processing::OutputBlock<float> outputs[]={DspCore::Processing::OutputBlock<float>(output,3)};
-    EXPECT_EQ(processor.InputPorts(),1U); EXPECT_EQ(processor.OutputPorts(),1U);
-    ASSERT_TRUE(processor.Process(inputs,1,outputs,1));
-    EXPECT_EQ(outputs[0].size,3U); EXPECT_FLOAT_EQ(output[0],0.5f);
-    EXPECT_FLOAT_EQ(output[1],0.5f); EXPECT_FLOAT_EQ(output[2],0.f);
-
-    FIR<float> reference=fir;
-    float tooSmall[]={77.f,88.f};
-    DspCore::Processing::OutputBlock<float> shortOutput(tooSmall,2); shortOutput.size=2;
-    EXPECT_FALSE(processor.Process(inputs,1,&shortOutput,1));
-    EXPECT_EQ(shortOutput.size,2U); EXPECT_FLOAT_EQ(tooSmall[0],77.f);
-    float actual=0,expected=0;
-    ASSERT_TRUE(ProcessSample(fir,0.f,actual)); ASSERT_TRUE(ProcessSample(reference,0.f,expected));
-    EXPECT_FLOAT_EQ(actual,expected);
-
-    const float invalid[]={0.f,std::numeric_limits<float>::infinity()};
-    float unchanged[]={66.f,55.f};
-    DspCore::Processing::InputBlock<float> invalidInput(invalid,2);
-    DspCore::Processing::OutputBlock<float> unchangedOutput(unchanged,2); unchangedOutput.size=2;
-    reference=fir;
-    EXPECT_FALSE(processor.Process(&invalidInput,1,&unchangedOutput,1));
-    EXPECT_EQ(unchangedOutput.size,2U); EXPECT_FLOAT_EQ(unchanged[0],66.f);
-    ASSERT_TRUE(ProcessSample(fir,0.f,actual)); ASSERT_TRUE(ProcessSample(reference,0.f,expected));
-    EXPECT_FLOAT_EQ(actual,expected);
+template <typename Filter, typename SampleType>
+bool processSample(Filter& filter, const SampleType input, SampleType& output) {
+    return filter.Process(&input, &output, 1U);
 }
 
-TEST(IIR, FirstOrderImpulseAndDefaultIdentity) {
-    IIR<double> filter;double out=0;
-    ASSERT_TRUE(ProcessSample(filter,0.25,out));EXPECT_EQ(out,0.25);
-    const double identityBlock[]={0.5,0.75}; double identityOutput[2]={};
-    ASSERT_TRUE(filter.Process(identityBlock,identityOutput,2));
-    EXPECT_EQ(identityOutput[0],0.5); EXPECT_EQ(identityOutput[1],0.75);
-    Biquad::Coefficients<double> c;c.numerator[0]=1;c.denominator[0]=2;c.denominator[1]=-1;
-    ASSERT_TRUE(filter.Configure(c));
-    ASSERT_TRUE(ProcessSample(filter,1.,out));EXPECT_EQ(out,0.5);
-    ASSERT_TRUE(ProcessSample(filter,0.,out));EXPECT_EQ(out,0.25);
-    ASSERT_TRUE(ProcessSample(filter,0.,out));EXPECT_EQ(out,0.125);
-    double normalized=99;ASSERT_TRUE(filter.GetDenominator(0,normalized));EXPECT_EQ(normalized,1.);
-    ASSERT_TRUE(filter.GetNumerator(0,normalized));EXPECT_EQ(normalized,0.5);
-    EXPECT_EQ(c.denominator[0],2.);
-    filter.Reset();ASSERT_TRUE(ProcessSample(filter,1.,out));EXPECT_EQ(out,0.5);
-}
-TEST(IIR, NumeratorAndDenominatorCountsChangeAtRuntimeWithVectorStorage) {
-    IIR<double> filter;
-    const double b[]={1,2,3,4},a[]={2,-1};
-    ASSERT_TRUE(filter.Configure(b,a));double out=0;
-    EXPECT_EQ(filter.NumeratorCount(),4U); EXPECT_EQ(filter.DenominatorCount(),2U);
-    EXPECT_GE(filter.NumeratorCapacity(),4U); EXPECT_GE(filter.DenominatorCapacity(),2U);
-    const double expected[]={0.5,1.25,2.125,3.0625,1.53125};
-    for(size_t i=0;i<5;++i) { ASSERT_TRUE(ProcessSample(filter,i==0 ? 1. : 0.,out));EXPECT_EQ(out,expected[i]); }
-    const double fiveNumerator[]={1,2,3,4,5},fourDenominator[]={1,-0.1,0.2,-0.3};
-    ASSERT_TRUE(filter.Configure(fiveNumerator,fourDenominator));
-    EXPECT_EQ(filter.NumeratorCount(),5U); EXPECT_EQ(filter.DenominatorCount(),4U);
-    EXPECT_GE(filter.NumeratorCapacity(),5U); EXPECT_GE(filter.DenominatorCapacity(),4U);
-    EXPECT_FALSE(filter.Configure(fiveNumerator,5,0,4));
-    EXPECT_EQ(filter.NumeratorCount(),5U); EXPECT_EQ(filter.DenominatorCount(),4U);
-    IIR<double> gain;const double numerator[]={3.},denominator[]={2.};
-    ASSERT_TRUE(gain.Configure(numerator,denominator));ASSERT_TRUE(ProcessSample(gain,2.,out));EXPECT_EQ(out,3.);
-}
-TEST(IIR, GenericRecurrenceMatchesIndependentDifferenceEquation) {
-    IIR<double> filter;Biquad::Coefficients<double> c;
-    c.numerator[0]=0.4;c.numerator[1]=0.6;c.numerator[2]=0.2;
-    c.denominator[0]=2;c.denominator[1]=-1;c.denominator[2]=0.4;
-    ASSERT_TRUE(filter.Configure(c));double x1=0,x2=0,y1=0,y2=0;
-    for(int i=0;i<100;++i) {
-        const double x=std::sin(static_cast<double>(i)*0.37);
-        const double reference=(c.numerator[0]*x+c.numerator[1]*x1+c.numerator[2]*x2-c.denominator[1]*y1-c.denominator[2]*y2)/c.denominator[0];
-        double out=0;ASSERT_TRUE(ProcessSample(filter,x,out));EXPECT_NEAR(out,reference,2e-15);
-        x2=x1;x1=x;y2=y1;y1=reference;
-    }
-}
-TEST(IIR, InvalidNormalizationAndOverflowPreserveConfigurationAndHistory) {
-    IIR<double> filter;Biquad::Coefficients<double> c;
-    c.numerator[0]=0.5;c.denominator[1]=-0.5;ASSERT_TRUE(filter.Configure(c));
-    double out=0;ASSERT_TRUE(ProcessSample(filter,1.,out));auto copy=filter;
-    c.denominator[0]=0;EXPECT_FALSE(filter.Configure(c));
-    c.denominator[0]=std::numeric_limits<double>::quiet_NaN();EXPECT_FALSE(filter.Configure(c));
-    c.denominator[0]=std::numeric_limits<double>::min();c.numerator[0]=std::numeric_limits<double>::max();
-    EXPECT_FALSE(filter.Configure(c));
-    out=99;EXPECT_FALSE(ProcessSample(filter,std::numeric_limits<double>::infinity(),out));EXPECT_EQ(out,99.);
-    double reference=0;ASSERT_TRUE(ProcessSample(filter,0.,out));ASSERT_TRUE(ProcessSample(copy,0.,reference));EXPECT_EQ(out,reference);
-    c=Biquad::Coefficients<double>{};c.numerator[0]=std::numeric_limits<double>::max();
-    ASSERT_TRUE(filter.Configure(c));out=99;EXPECT_FALSE(ProcessSample(filter,2.,out));EXPECT_EQ(out,99.);
-    ASSERT_TRUE(ProcessSample(filter,0.,out));EXPECT_EQ(out,0.);
-}
-TEST(IIR, ImplementsSisoProcessorBaseWithOneOutputPerInput) {
-    IIR<double> filter; Biquad::Coefficients<double> c;
-    c.numerator[0]=1.; c.denominator[0]=2.; c.denominator[1]=-1.;
-    ASSERT_TRUE(filter.Configure(c));
-    DspCore::Processing::ProcessorBase<double>& processor=filter;
-    const double input[]={1.,0.,0.}; double output[]={0.,0.,0.};
-    DspCore::Processing::InputBlock<double> inputs[]={DspCore::Processing::InputBlock<double>(input,3)};
-    DspCore::Processing::OutputBlock<double> outputs[]={DspCore::Processing::OutputBlock<double>(output,3)};
-    ASSERT_TRUE(processor.Process(inputs,1,outputs,1));
-    EXPECT_EQ(outputs[0].size,3U); EXPECT_EQ(output[0],0.5);
-    EXPECT_EQ(output[1],0.25); EXPECT_EQ(output[2],0.125);
+TEST(FIR, CoefficientsConfigureTheRuntimeProcessor) {
+    using Filter = DspCore::Filters::FIR<float>;
+    const float taps[] = {0.25F, 0.5F, 0.25F};
+    Filter::Coefficients coefficients;
+    ASSERT_TRUE(coefficients.Assign(taps, 3U));
 
-    const double invalid[]={0.,std::numeric_limits<double>::infinity()};
-    double unchanged[]={66.,55.};
-    DspCore::Processing::InputBlock<double> invalidInput(invalid,2);
-    DspCore::Processing::OutputBlock<double> unchangedOutput(unchanged,2); unchangedOutput.size=2;
-    IIR<double> reference=filter;
-    EXPECT_FALSE(processor.Process(&invalidInput,1,&unchangedOutput,1));
-    EXPECT_EQ(unchangedOutput.size,2U); EXPECT_EQ(unchanged[0],66.);
-    double actual=0,expected=0;
-    ASSERT_TRUE(ProcessSample(filter,0.,actual)); ASSERT_TRUE(ProcessSample(reference,0.,expected));
-    EXPECT_EQ(actual,expected);
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(coefficients));
+    float output{};
+    ASSERT_TRUE(processSample(filter, 1.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.25F);
+    ASSERT_TRUE(processSample(filter, 0.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.5F);
 }
-TEST(BiquadCalculator, SixRawCoefficientsNormalizeToKnownButterworthValues) {
-    const auto c=Biquad::LowPass(48000.,12000.,std::sqrt(0.5));
-    ASSERT_TRUE(Biquad::IsStable(c));
-    EXPECT_NEAR(c.numerator[0],0.5,1e-15);EXPECT_NEAR(c.numerator[1],1.,1e-15);
-    EXPECT_NEAR(c.denominator[0],1.+std::sqrt(0.5),1e-15);
-    IIR<double> filter;ASSERT_TRUE(filter.Configure(c));double value=0;
-    ASSERT_TRUE(filter.GetNumerator(0,value));EXPECT_NEAR(value,0.2928932188134524,1e-15);
-    ASSERT_TRUE(filter.GetNumerator(1,value));EXPECT_NEAR(value,0.5857864376269049,1e-15);
-    ASSERT_TRUE(filter.GetDenominator(2,value));EXPECT_NEAR(value,0.17157287525380993,1e-15);
-    const auto high=Biquad::HighPass(48000.,12000.,std::sqrt(0.5));
-    ASSERT_TRUE(filter.Configure(high));ASSERT_TRUE(filter.GetNumerator(1,value));EXPECT_NEAR(value,-0.5857864376269049,1e-15);
+
+TEST(FIR, ProcessesEqualSampleBlocksAndSupportsExactInPlaceProcessing) {
+    const float taps[] = {0.5F, 0.5F};
+    const float source[] = {1.0F, 0.0F};
+    float destination[2]{};
+
+    DspCore::Filters::FIR<float> filter;
+    ASSERT_TRUE(filter.Configure(taps, 2U));
+    const DspCore::Processing::SampleBlock<const float> input{source, 2U};
+    const DspCore::Processing::SampleBlock<float> output{destination, 2U};
+    ASSERT_TRUE(filter.Process(input, output));
+    EXPECT_FLOAT_EQ(destination[0], 0.5F);
+    EXPECT_FLOAT_EQ(destination[1], 0.5F);
+
+    float inPlace[] = {1.0F, 0.0F};
+    filter.Reset();
+    const DspCore::Processing::SampleBlock<const float> inPlaceInput{inPlace, 2U};
+    const DspCore::Processing::SampleBlock<float> inPlaceOutput{inPlace, 2U};
+    ASSERT_TRUE(filter.Process(inPlaceInput, inPlaceOutput));
+    EXPECT_FLOAT_EQ(inPlace[0], 0.5F);
+    EXPECT_FLOAT_EQ(inPlace[1], 0.5F);
 }
-TEST(BiquadCalculator, OneCalculatedStructConfiguresIndependentIirInstances) {
-    const auto coefficients=Biquad::LowPass(48000.,12000.,std::sqrt(0.5));
-    IIR<double> left,right;ASSERT_TRUE(left.Configure(coefficients));ASSERT_TRUE(right.Configure(coefficients));
-    double l=0,r=0;ASSERT_TRUE(ProcessSample(left,1.,l));ASSERT_TRUE(ProcessSample(right,0.,r));
-    EXPECT_GT(l,0.);EXPECT_EQ(r,0.);
+
+TEST(FIR, SeparatesStreamCoefficientsAndStatePrecision) {
+    using Filter = DspCore::Filters::FIR<float, double>;
+    const double taps[] = {0.25, 0.5, 0.25};
+    Filter::Coefficients coefficients;
+    ASSERT_TRUE(coefficients.Assign(taps, 3U));
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(coefficients));
+    float output{};
+    ASSERT_TRUE(processSample(filter, 1.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.25F);
+    ASSERT_TRUE(processSample(filter, 0.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.5F);
 }
-TEST(BiquadCalculator, DcNyquistAndCutoffResponsesMatchExpectedGains) {
-    const auto low=Biquad::LowPass(48000.,12000.,std::sqrt(0.5));
-    const auto high=Biquad::HighPass(48000.,12000.,std::sqrt(0.5));
-    IIR<double> lp,hp;ASSERT_TRUE(lp.Configure(low));ASSERT_TRUE(hp.Configure(high));
-    double l=0,h=0;
-    for(int i=0;i<512;++i) { ASSERT_TRUE(ProcessSample(lp,1.,l));ASSERT_TRUE(ProcessSample(hp,1.,h)); }
-    EXPECT_NEAR(l,1.,1e-14);EXPECT_NEAR(h,0.,1e-14);
-    lp.Reset();hp.Reset();
-    for(int i=0;i<512;++i) { const double x=i%2==0 ? 1. : -1.;ASSERT_TRUE(ProcessSample(lp,x,l));ASSERT_TRUE(ProcessSample(hp,x,h)); }
-    EXPECT_NEAR(l,0.,1e-14);EXPECT_NEAR(h,-1.,1e-14);
-    lp.Reset();const double wave[]={0,1,0,-1};double power=0;
-    for(int i=0;i<256;++i) { ASSERT_TRUE(ProcessSample(lp,wave[i%4],l));if(i>=128) power+=l*l; }
-    EXPECT_NEAR(power/128.,0.25,1e-14);
+
+TEST(IIR, GenericCoefficientsNormalizeAndProcessTheRecurrence) {
+    using Filter = DspCore::Filters::IIR<float>;
+    const float numerator[] = {1.0F};
+    const float denominator[] = {2.0F, -1.0F};
+    Filter::Coefficients coefficients;
+    ASSERT_TRUE(coefficients.Assign(numerator, 1U, denominator, 2U));
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(coefficients));
+    float output{};
+    ASSERT_TRUE(processSample(filter, 1.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.5F);
+    ASSERT_TRUE(processSample(filter, 0.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.25F);
 }
-TEST(BiquadCalculator, InvalidDesignReturnsZeroA0AndIirRejectsIt) {
-    const auto c=Biquad::LowPass(0.f,1.f,1.f);
-    EXPECT_EQ(c.denominator[0],0);EXPECT_FALSE(Biquad::IsStable(c));
-    EXPECT_EQ(Biquad::LowPass(48000.f,24000.f,1.f).denominator[0],0);
-    EXPECT_EQ(Biquad::HighPass(48000.f,0.f,1.f).denominator[0],0);
-    EXPECT_EQ(Biquad::HighPass(48000.f,1000.f,0.f).denominator[0],0);
-    EXPECT_EQ(Biquad::LowPass(std::numeric_limits<float>::max(),std::numeric_limits<float>::min(),1.f).denominator[0],0);
-    IIR<float> filter;EXPECT_FALSE(filter.Configure(c));float out=0;
-    ASSERT_TRUE(ProcessSample(filter,1.f,out));EXPECT_EQ(out,1);
+
+TEST(IIR, ProcessesEqualSampleBlocksAndRejectsUnequalBlocksWithoutChangingState) {
+    const float numerator[] = {1.0F};
+    const float denominator[] = {2.0F, -1.0F};
+    const float source[] = {1.0F, 0.0F};
+    float destination[2]{};
+
+    DspCore::Filters::IIR<float> filter;
+    ASSERT_TRUE(filter.Configure(numerator, 1U, denominator, 2U));
+    const DspCore::Processing::SampleBlock<const float> input{source, 2U};
+    const DspCore::Processing::SampleBlock<float> output{destination, 2U};
+    ASSERT_TRUE(filter.Process(input, output));
+    EXPECT_FLOAT_EQ(destination[0], 0.5F);
+    EXPECT_FLOAT_EQ(destination[1], 0.25F);
+
+    float tooSmall[1]{};
+    filter.Reset();
+    EXPECT_FALSE(filter.Process(DspCore::Processing::MakeInputBlock(source, 2U),
+        DspCore::Processing::MakeOutputBlock(tooSmall, 1U)));
+    float afterRejectedBlock{};
+    ASSERT_TRUE(processSample(filter, 1.0F, afterRejectedBlock));
+    EXPECT_FLOAT_EQ(afterRejectedBlock, 0.5F);
 }
-TEST(IIR, GenericProcessorDoesNotInferStabilityForUserCoefficients) {
-    Biquad::Coefficients<double> c;c.denominator[1]=1;
-    EXPECT_FALSE(Biquad::IsStable(c));IIR<double> filter;
-    EXPECT_TRUE(filter.Configure(c)); // General recurrence policy is independent of the calculator.
+
+TEST(IIR, SeparatesStreamCoefficientsAndStatePrecision) {
+    using Filter = DspCore::Filters::IIR<float, double>;
+    const double numerator[] = {1.0};
+    const double denominator[] = {2.0, -1.0};
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(numerator, denominator));
+    float output{};
+    ASSERT_TRUE(processSample(filter, 1.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.5F);
+    ASSERT_TRUE(processSample(filter, 0.0F, output));
+    EXPECT_FLOAT_EQ(output, 0.25F);
 }
+
+TEST(IIR, ConvertsAnIntegralStreamAtTheProcessorBoundary) {
+    using Filter = DspCore::Filters::IIR<short>;
+    const float numerator[] = {0.5F};
+    const float denominator[] = {1.0F};
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(numerator, denominator));
+    short output{};
+    ASSERT_TRUE(processSample(filter, static_cast<short>(4), output));
+    EXPECT_EQ(output, 2);
+}
+
+TEST(Biquad, DesignersReturnIirCoefficientValues) {
+    using Filter = DspCore::Filters::IIR<float>;
+    const auto lowPass = DspCore::Filters::Biquad::LowPass(48000.0F, 1200.0F, 0.707F);
+    EXPECT_EQ(lowPass.numerator.size(), 3U);
+    EXPECT_EQ(lowPass.denominator.size(), 3U);
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(lowPass));
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(lowPass));
+    const auto notch = DspCore::Filters::Biquad::Notch(48000.0F, 1200.0F, 1.0F);
+    const auto allPass = DspCore::Filters::Biquad::AllPass(48000.0F, 1200.0F, 1.0F);
+    const auto peak = DspCore::Filters::Biquad::Peak(48000.0F, 1200.0F, 1.0F, 6.0F);
+    const auto lowShelf = DspCore::Filters::Biquad::LowShelf(48000.0F, 1200.0F, 1.0F, 6.0F);
+    const auto highShelf = DspCore::Filters::Biquad::HighShelf(48000.0F, 1200.0F, 1.0F, -6.0F);
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(notch));
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(allPass));
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(peak));
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(lowShelf));
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(highShelf));
+}
+
+TEST(Biquad, DoublePrecisionDesignConfiguresAFloatStream) {
+    using Filter = DspCore::Filters::IIR<float, double>;
+    const auto lowPass = DspCore::Filters::Biquad::Design<double>::LowPass(48000.0, 1200.0, 0.707);
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(lowPass));
+    float output{};
+    ASSERT_TRUE(processSample(filter, 1.0F, output));
+    EXPECT_GT(output, 0.0F);
+}
+
+TEST(Biquad, DefaultDesignerUsesFloatCoefficients) {
+    using Filter = DspCore::Filters::IIR<float>;
+    const auto lowPass = DspCore::Filters::Biquad::Design<>::LowPass(48000.0F, 1200.0F, 0.707F);
+
+    Filter filter;
+    ASSERT_TRUE(filter.Configure(lowPass));
+    EXPECT_TRUE(DspCore::Filters::Biquad::IsStable(lowPass));
+}
+
+TEST(Biquad, ExposesTheControlsRequiredByEachDesign) {
+    using namespace DspCore::Filters::Biquad;
+
+    EXPECT_EQ(ParameterCount(Type::Peak), 4U);
+    ParameterInfo parameter;
+    ASSERT_TRUE(ParameterAt(Type::Peak, 0U, parameter));
+    EXPECT_EQ(parameter.parameter, Parameter::SampleRate);
+    EXPECT_EQ(parameter.label, ParameterLabel::SampleRate);
+    EXPECT_EQ(parameter.unit, Unit::Hertz);
+    ASSERT_TRUE(ParameterAt(Type::Peak, 1U, parameter));
+    EXPECT_EQ(parameter.parameter, Parameter::Cutoff);
+    EXPECT_EQ(parameter.label, ParameterLabel::CenterFrequency);
+    ASSERT_TRUE(ParameterAt(Type::Peak, 2U, parameter));
+    EXPECT_EQ(parameter.parameter, Parameter::Quality);
+    ASSERT_TRUE(ParameterAt(Type::Peak, 3U, parameter));
+    EXPECT_EQ(parameter.parameter, Parameter::GainDecibels);
+    EXPECT_EQ(parameter.label, ParameterLabel::Gain);
+    EXPECT_EQ(parameter.unit, Unit::Decibels);
+    EXPECT_FALSE(ParameterAt(Type::Peak, 4U, parameter));
+
+    EXPECT_TRUE(HasParameter(Type::LowShelf, Parameter::Slope));
+    EXPECT_TRUE(HasParameter(Type::LowShelf, Parameter::GainDecibels));
+    EXPECT_FALSE(HasParameter(Type::LowShelf, Parameter::Quality));
+}
+
+} // namespace

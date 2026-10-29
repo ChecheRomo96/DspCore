@@ -12,20 +12,19 @@ This file records user-visible changes to DspCore. Release dates use the
   plotters show their time-domain and frequency-domain responses; shell and
   PowerShell helpers render each CSV directly to a sibling PNG. The Examples
   documentation includes versioned FIR, IIR and Biquad plot snapshots.
-- `DspCore::Processing::ProcessorBase`, a MIMO virtual block-processing
-  contract with non-owning input/output views and caller-controlled storage.
-- FIR and IIR implement `ProcessorBase` as SISO nodes: every public process
-  call consumes and produces equally sized blocks. Their CPSTL vector-backed
-  coefficients and histories resize at runtime through Configure.
-- FIR and IIR now expose `Process(input, output, sampleCount)`; their MIMO
-  port adapters remain private implementation details for `ProcessorBase`.
-- `ProcessorBase` now defines a synchronous block contract: all MIMO inputs use
-  one shared `n`, and every output yields exactly `n` values on success.
+- `DspCore::Processing::SampleBlock<T>`, a typed, non-owning fixed-size view
+  over caller-owned sample memory. `SampleBlock<const T>` expresses an input
+  view and `SampleBlock<T>` expresses writable output storage.
+- FIR and IIR now expose direct n-to-n `Process(SampleBlock, SampleBlock)`
+  APIs while retaining the pointer-and-count convenience overload. Their CPSTL
+  vector-backed coefficients and histories resize through Configure only.
 
 ### Changed
 
-- FIR/IIR processor objects are polymorphic and retain explicit size budgets;
-  they are no longer trivially-copyable value types.
+- Removed the in-library type-erased `SignalManager`/`SignalBlockBase` transport
+  and `ProcessorBase` graph contract. DspCore remains a deterministic algorithm
+  library; a future stream/runtime library will own MIMO routing, heterogeneous
+  ports, clocks, FIFOs and audio/MIDI/event transport.
 
 ## [0.2.0] - 2026-10-19
 

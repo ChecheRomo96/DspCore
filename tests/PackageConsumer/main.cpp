@@ -12,20 +12,6 @@
     #error "The installed DspCore package must export DSPCORE_PROCESSING"
 #endif
 
-class GainProcessor : public DspCore::Processing::ProcessorBase<float> {
-public:
-    size_t InputPorts() const noexcept override { return 1; }
-    size_t OutputPorts() const noexcept override { return 1; }
-    bool Process(const DspCore::Processing::InputBlock<float>* input,size_t inputs,
-                 DspCore::Processing::OutputBlock<float>* output,size_t outputs) noexcept override {
-        if(inputs!=1 || outputs!=1 || !input[0].IsValid() || !output[0].CanWrite(input[0].size)) return false;
-        for(size_t i=0;i<input[0].size;++i) output[0].data[i]=input[0].data[i]*2.f;
-        output[0].size=input[0].size;
-        return true;
-    }
-    void Reset() noexcept override {}
-};
-
 int main() {
     // The installed package must bring its transitive Foundation target with
     // it.
@@ -67,36 +53,24 @@ int main() {
     std::cout << "Installed generators and LUT-shaped envelope: PASS\n";
 
 
-    DspCore::Filters::FIR<double> fir;
+    DspCore::Filters::FIR<double,double> fir;
     const double taps[]={0.5,0.5};
-    double filtered=0;
-    if(!fir.Configure(taps,2)) return 1;
-    auto coefficients=DspCore::Filters::Biquad::LowPass(48000.,1000.,0.707);
-    DspCore::Filters::IIR<double> iir;
-    if(!iir.Configure(coefficients)) return 1;
-    DspCore::Processing::ProcessorBase<double>& filterNode=fir;
-    const double filterInput[]={1.,0.}; double filterOutput[]={0.,0.};
-    DspCore::Processing::InputBlock<double> filterInputBlock(filterInput,2);
-    DspCore::Processing::OutputBlock<double> filterOutputBlock(filterOutput,2);
-    fir.Reset();
-    if(!filterNode.Process(&filterInputBlock,1,&filterOutputBlock,1) || filterOutputBlock.size!=2 ||
+    const double filterInput[]={1.,0.};
+    double filterOutput[]={0.,0.};
+    if(!fir.Configure(taps,2) || !fir.Process(
+            DspCore::Processing::MakeInputBlock(filterInput,2U),
+            DspCore::Processing::MakeOutputBlock(filterOutput,2U)) ||
        filterOutput[0]!=0.5 || filterOutput[1]!=0.5) return 1;
+    const auto coefficients=DspCore::Filters::Biquad::LowPass(48000.,1000.,0.707);
+    DspCore::Filters::IIR<double,double> iir;
     double iirOutput[]={0.,0.};
-    if(!iir.Process(filterInput,iirOutput,2) || iirOutput[0]<=0.) return 1;
+    if(!iir.Configure(coefficients) || !iir.Process(filterInput,iirOutput,2) || iirOutput[0]<=0.) return 1;
+    double filtered=0;
     const double block[]={-3,4,0,0};
     if(!DspCore::Analysis::RMS(block,4,filtered) || filtered!=2.5) return 1;
     DspCore::Analysis::EnvelopeFollower<double> follower;
     if(!follower.Update(-2.,0.01,filtered) || filtered!=2.) return 1;
-    std::cout << "Installed SISO FIR ProcessorBase/biquad, RMS and follower: PASS\n";
-
-    const float processorInput[]={1.f,2.f};
-    float processorOutput[2]={};
-    DspCore::Processing::InputBlock<float> inputBlock(processorInput,2);
-    DspCore::Processing::OutputBlock<float> outputBlock(processorOutput,2);
-    GainProcessor processor;
-    if(!processor.Process(&inputBlock,1,&outputBlock,1) || outputBlock.size!=2 || processorOutput[1]!=4.f)
-        return 1;
-    std::cout << "Installed processing interface: PASS\n";
+    std::cout << "Installed typed block processing, FIR/IIR, RMS and follower: PASS\n";
 
     return (gcd == 4U &&
             std::strcmp(DspCore::Core::Version(), DSPCORE_VERSION) == 0) ? 0 : 1;
