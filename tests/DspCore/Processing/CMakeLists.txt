@@ -1,1 +1,1 @@
-dspcore_add_test(DspCoreProcessingTests ProcessorBaseTests.cc)
+dspcore_add_test(DspCoreProcessingTests SampleBlockTests.cc)

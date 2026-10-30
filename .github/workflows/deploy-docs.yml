@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz cmake ninja-build
+          sudo apt-get install -y graphviz cmake ninja-build texlive-latex-base texlive-latex-recommended texlive-latex-extra ghostscript
 
           archive="$RUNNER_TEMP/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
           curl --fail --location --silent --show-error \

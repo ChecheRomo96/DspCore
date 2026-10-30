@@ -35,7 +35,7 @@ if(DSPCORE_FULL_BUILD)
     set(DSPCORE_FILTERS ON CACHE BOOL "Enable DspCore::Filters" FORCE)
 endif()
 if(DSPCORE_FILTERS)
-    # FIR and IIR are SISO ProcessorBase implementations.
+    # FIR and IIR use the typed SampleBlock view contract.
     set(DSPCORE_PROCESSING ON CACHE BOOL "Enable DspCore::Processing" FORCE)
 endif()
 

@@ -1,93 +1,216 @@
 #ifndef DSPCORE_FILTERS_FIR_H
 #define DSPCORE_FILTERS_FIR_H
+
 #include <CPutility.h>
 #include <CPvector.h>
 #include <DspCore/Detail/SignalMath.h>
-#include <DspCore/Processing/ProcessorBase.h>
-namespace DspCore { namespace Filters {
-/// @ingroup DspCore_Filters
-/// @brief Runtime-tap SISO ProcessorBase with CPSTL vector storage.
-template<typename T=float> class FIR : public DspCore::Processing::ProcessorBase<T> {
-public:
-    /// The empty default state is a one-tap identity until Configure succeeds.
-    FIR() noexcept {}
-    /// b[0] multiplies the current sample. Storage grows or shrinks outside Process.
-    bool Configure(const T* coefficients,size_t count) noexcept {
-        if(!coefficients || count==0) return false;
-        for(size_t i=0;i<count;++i) if(!DspCore::Detail::Signal::Finite(coefficients[i])) return false;
-        cpstd::vector<T> nextCoefficients;
-        cpstd::vector<T> nextHistory;
-        nextCoefficients.resize(count);
-        nextHistory.resize(count);
-        if(nextCoefficients.size()!=count || nextHistory.size()!=count) return false;
-        for(size_t i=0;i<count;++i) nextCoefficients[i]=coefficients[i];
-        coefficients_=cpstd::move(nextCoefficients);
-        history_=cpstd::move(nextHistory);
-        next_=0;
-        return true;
-    }
-    void Reset() noexcept override {
-        for(size_t i=0;i<history_.size();++i) history_[i]=T(0);
-        next_=0;
-    }
+#include <DspCore/Processing/SampleBlock.h>
+
+namespace DspCore::Filters {
+
+/**
+ * @brief Runtime-tap finite impulse response SISO processor.
+ *
+ * @par Mathematical model
+ * For @f$N@f$ taps @f$b_0, \ldots, b_{N-1}@f$, FIR evaluates the causal
+ * discrete-time convolution
+ * @f[
+ * y[n] = \sum_{k=0}^{N-1} b_k x[n-k].
+ * @f]
+ * Its transfer function therefore contains no feedback terms:
+ * @f[
+ * H(z) = \sum_{k=0}^{N-1} b_k z^{-k}.
+ * @f]
+ * Written term by term, the same transfer function is
+ * @f[
+ * H(z) = b_0 z^0 + b_1 z^{-1} + \cdots + b_{N-1} z^{-(N-1)}.
+ * @f]
+ * The caller supplies @f$b_k@f$ as Coefficients::taps, usually from a filter
+ * design method such as a windowed-sinc, least-squares, or measured impulse
+ * response. This class implements that recurrence; it does not choose the
+ * taps or infer a filter shape.
+ *
+ * @par From the equation to one output sample
+ * Process does not evaluate a memoryless @f$Y(x)@f$. Each current input
+ * @f$x[n]@f$ produces the next output @f$y[n]@f$ using the current sample and
+ * the stored input history. Internally, processSample starts with
+ * @f$b_0x[n]@f$, walks the circular delay line to add
+ * @f$b_kx[n-k]@f$, then writes @f$x[n]@f$ into that line for the next call.
+ * The delay line is zero after construction or Reset, which gives the usual
+ * zero initial conditions.
+ *
+ * SampleType is the stream representation. CoefficientType controls the tap
+ * representation, while StateType controls the multiply-accumulate and delay
+ * line precision. The accumulated @f$y[n]@f$ is converted to SampleType only
+ * at the processor boundary. Process accepts direct, caller-owned
+ * Processing::SampleBlock input and output views; it does not participate in a
+ * graph or own a stream transport.
+ */
+template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
+class FIR final {
 private:
-    /** @brief Always returns one: FIR has exactly one signal input. */
-    size_t InputPorts() const noexcept override { return 1; }
-    /** @brief Always returns one: FIR has exactly one signal output. */
-    size_t OutputPorts() const noexcept override { return 1; }
+    static_assert(cpstd::is_arithmetic<SampleType>::value, "SampleType must be arithmetic");
+    static_assert(cpstd::is_same<CoefficientType, float>::value || cpstd::is_same<CoefficientType, double>::value,
+        "CoefficientType must be float or double");
+    static_assert(cpstd::is_same<StateType, float>::value || cpstd::is_same<StateType, double>::value,
+        "StateType must be float or double");
+
+    cpstd::vector<CoefficientType> coefficients_;
+    cpstd::vector<StateType> history_;
+    cpstd::size_t next_{};
+
 public:
     /**
-     * @brief Processes @p sampleCount input values into equally sized output storage.
+     * @brief Owns the @f$b_0 \ldots b_{N-1}@f$ vector of the FIR equation.
      *
-     * Both pointers may be null only for a zero-length block. On success every
-     * output value is valid. Invalid views or non-finite input leave state and
-     * output unchanged. A finite arithmetic failure may commit an output
-     * prefix before returning @c false.
+     * Assign copies a caller's designed taps while outside the processing path.
+     * A successful Configure copies that value into the processor and clears
+     * its delay line, so the first output uses zero initial conditions.
      */
-    bool Process(const T* input,T* output,size_t sampleCount) noexcept {
-        DspCore::Processing::InputBlock<T> inputs(input,sampleCount);
-        DspCore::Processing::OutputBlock<T> outputs(output,sampleCount);
-        return Process(&inputs,1,&outputs,1) && outputs.size==sampleCount;
+    struct Coefficients {
+        cpstd::vector<CoefficientType> taps;
+
+        bool Assign(const CoefficientType* values, const cpstd::size_t count) noexcept {
+            if (values == nullptr || count == 0U) {
+                return false;
+            }
+            cpstd::vector<CoefficientType> next;
+            next.resize(count);
+            if (next.size() != count) {
+                return false;
+            }
+            for (cpstd::size_t index = 0U; index < count; ++index) {
+                if (!DspCore::Detail::Signal::Finite(values[index])) {
+                    return false;
+                }
+                next[index] = values[index];
+            }
+            taps = cpstd::move(next);
+            return true;
+        }
+    };
+
+    /**
+     * @brief Sets @f$b_0 \ldots b_{N-1}@f$; successful configuration clears delay state.
+     *
+     * `coefficients[k]` maps directly to @f$b_k@f$ in
+     * @f$y[n] = \sum b_kx[n-k]@f$. No normalization occurs because there is
+     * no denominator polynomial in an FIR filter.
+     */
+    bool Configure(const CoefficientType* coefficients, const cpstd::size_t count) noexcept {
+        if (coefficients == nullptr || count == 0U) {
+            return false;
+        }
+
+        cpstd::vector<CoefficientType> nextCoefficients;
+        cpstd::vector<StateType> nextHistory;
+        nextCoefficients.resize(count);
+        nextHistory.resize(count);
+        if (nextCoefficients.size() != count || nextHistory.size() != count) {
+            return false;
+        }
+
+        for (cpstd::size_t index = 0U; index < count; ++index) {
+            if (!DspCore::Detail::Signal::Finite(coefficients[index])) {
+                return false;
+            }
+            nextCoefficients[index] = coefficients[index];
+        }
+
+        coefficients_ = cpstd::move(nextCoefficients);
+        history_ = cpstd::move(nextHistory);
+        next_ = 0U;
+        return true;
     }
-    size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
-    size_t Capacity() const noexcept { return coefficients_.capacity(); }
-private:
-    /// SISO adapter used only by ProcessorBase graphs.
-    bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
-                 DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
-        if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
-           !outputs[0].CanWrite(inputs[0].size)) return false;
-        for(size_t i=0;i<inputs[0].size;++i)
-            if(!DspCore::Detail::Signal::Finite(inputs[0].data[i])) return false;
-        for(size_t i=0;i<inputs[0].size;++i) {
-            if(!ProcessSample(inputs[0].data[i],outputs[0].data[i])) {
-                outputs[0].size=i;
+
+    template <cpstd::size_t Count>
+    bool Configure(const CoefficientType (&coefficients)[Count]) noexcept {
+        return Configure(coefficients, Count);
+    }
+
+    bool Configure(const Coefficients& coefficients) noexcept {
+        return Configure(coefficients.taps.data(), coefficients.taps.size());
+    }
+
+    /**
+     * @brief Applies the FIR recurrence to equally sized caller-owned sample blocks.
+     *
+     * The method allocates neither stream memory nor temporary buffers. Both
+     * views must be valid and have exactly the same size. It validates the
+     * complete input before changing filter state or output. A later arithmetic
+     * conversion failure may leave a valid processed prefix and its
+     * corresponding updated delay state.
+     *
+     * Exact in-place processing is supported when both blocks begin at the
+     * same address. Different, partially overlapping ranges are unsupported.
+     */
+    bool Process(const Processing::SampleBlock<const SampleType>& input,
+        const Processing::SampleBlock<SampleType>& output) noexcept {
+        if (!input.IsValid() || !output.IsValid() || input.size != output.size) {
+            return false;
+        }
+        for (cpstd::size_t index = 0U; index < input.size; ++index) {
+            if (!DspCore::Detail::Signal::Finite(input.data[index])) {
                 return false;
             }
         }
-        outputs[0].size=inputs[0].size;
-        return true;
-    }
-    /// Failure leaves delay history and output unchanged; no clipping is applied.
-    bool ProcessSample(T input,T& output) noexcept {
-        if(!DspCore::Detail::Signal::Finite(input)) return false;
-        if(coefficients_.empty()) { output=input; return true; }
-        T sum=coefficients_[0]*input;
-        if(!DspCore::Detail::Signal::Finite(sum)) return false;
-        size_t index=next_;
-        for(size_t tap=1;tap<coefficients_.size();++tap) {
-            index=index==0 ? coefficients_.size()-1 : index-1;
-            sum+=coefficients_[tap]*history_[index];
-            if(!DspCore::Detail::Signal::Finite(sum)) return false;
+        for (cpstd::size_t index = 0U; index < input.size; ++index) {
+            if (!processSample(input.data[index], output.data[index])) {
+                return false;
+            }
         }
-        history_[next_]=input;
-        next_=next_==coefficients_.size()-1 ? 0 : next_+1;
-        output=sum;
         return true;
     }
-    cpstd::vector<T> coefficients_;
-    cpstd::vector<T> history_;
-    size_t next_=0;
+
+    /** @brief Convenience overload that binds pointer-and-count arguments as equally sized SampleBlocks. */
+    bool Process(const SampleType* input, SampleType* output, const cpstd::size_t sampleCount) noexcept {
+        return Process(Processing::MakeInputBlock(input, sampleCount),
+            Processing::MakeOutputBlock(output, sampleCount));
+    }
+
+    /** @brief Clears prior-input delay state while retaining the configured taps. */
+    void Reset() noexcept {
+        for (cpstd::size_t index = 0U; index < history_.size(); ++index) {
+            history_[index] = StateType{};
+        }
+        next_ = 0U;
+    }
+
+    cpstd::size_t Taps() const noexcept { return coefficients_.empty() ? 1U : coefficients_.size(); }
+
+private:
+    bool processSample(const SampleType input, SampleType& output) noexcept {
+        if (coefficients_.empty()) {
+            output = input;
+            return true;
+        }
+
+        const StateType stateInput = static_cast<StateType>(input);
+        if (!DspCore::Detail::Signal::Finite(stateInput)) {
+            return false;
+        }
+
+        StateType sum = static_cast<StateType>(coefficients_[0]) * stateInput;
+        cpstd::size_t historyIndex = next_;
+        for (cpstd::size_t tap = 1U; tap < coefficients_.size(); ++tap) {
+            historyIndex = historyIndex == 0U ? coefficients_.size() - 1U : historyIndex - 1U;
+            sum += static_cast<StateType>(coefficients_[tap]) * history_[historyIndex];
+        }
+        if (!DspCore::Detail::Signal::Finite(sum)) {
+            return false;
+        }
+        SampleType converted{};
+        if (!DspCore::Detail::Signal::Convert(sum, converted)) {
+            return false;
+        }
+
+        history_[next_] = stateInput;
+        next_ = next_ == coefficients_.size() - 1U ? 0U : next_ + 1U;
+        output = converted;
+        return true;
+    }
 };
-}}
-#endif
+
+} // namespace DspCore::Filters
+
+#endif // DSPCORE_FILTERS_FIR_H

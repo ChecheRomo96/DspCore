@@ -1,148 +1,268 @@
 #ifndef DSPCORE_FILTERS_IIR_H
 #define DSPCORE_FILTERS_IIR_H
+
 #include <CPutility.h>
 #include <CPvector.h>
 #include <DspCore/Detail/SignalMath.h>
-#include <DspCore/Processing/ProcessorBase.h>
-namespace DspCore { namespace Filters {
-/// @ingroup DspCore_Filters
-/// @brief Runtime-order SISO ProcessorBase with CPSTL vector storage.
-template<typename T=float> class IIR : public DspCore::Processing::ProcessorBase<T> {
-public:
-    /// The empty default state is a one-pole identity until Configure succeeds.
-    IIR() noexcept {}
-    /// Normalize by a0 and resize storage outside Process. Failure preserves all state.
-    bool Configure(const T* numerator,size_t numeratorCount,
-                   const T* denominator,size_t denominatorCount) noexcept {
-        if(!numerator || !denominator || numeratorCount==0 || denominatorCount==0 ||
-           !DspCore::Detail::Signal::Finite(denominator[0]) || denominator[0]==T(0)) return false;
-        for(size_t i=0;i<numeratorCount;++i)
-            if(!DspCore::Detail::Signal::Finite(numerator[i])) return false;
-        for(size_t i=0;i<denominatorCount;++i)
-            if(!DspCore::Detail::Signal::Finite(denominator[i])) return false;
+#include <DspCore/Processing/SampleBlock.h>
 
-        cpstd::vector<T> nextNumerator;
-        cpstd::vector<T> nextDenominator;
-        cpstd::vector<T> nextInputHistory;
-        cpstd::vector<T> nextOutputHistory;
-        nextNumerator.resize(numeratorCount);
-        nextDenominator.resize(denominatorCount);
-        nextInputHistory.resize(numeratorCount-1);
-        nextOutputHistory.resize(denominatorCount-1);
-        if(nextNumerator.size()!=numeratorCount || nextDenominator.size()!=denominatorCount ||
-           nextInputHistory.size()!=numeratorCount-1 || nextOutputHistory.size()!=denominatorCount-1) return false;
-        for(size_t i=0;i<numeratorCount;++i) {
-            nextNumerator[i]=numerator[i]/denominator[0];
-            if(!DspCore::Detail::Signal::Finite(nextNumerator[i])) return false;
-        }
-        for(size_t i=0;i<denominatorCount;++i) {
-            nextDenominator[i]=denominator[i]/denominator[0];
-            if(!DspCore::Detail::Signal::Finite(nextDenominator[i])) return false;
-        }
-        numerator_=cpstd::move(nextNumerator);
-        denominator_=cpstd::move(nextDenominator);
-        inputHistory_=cpstd::move(nextInputHistory);
-        outputHistory_=cpstd::move(nextOutputHistory);
-        return true;
-    }
-    template<size_t B,size_t A> bool Configure(const T (&b)[B],const T (&a)[A]) noexcept {
-        return Configure(b,B,a,A);
-    }
-    /// Accept a coefficient struct with numerator/denominator arrays, e.g. Biquad::Coefficients<T>.
-    template<typename C> bool Configure(const C& coefficients) noexcept {
-        return Configure(coefficients.numerator,coefficients.denominator);
-    }
-    void Reset() noexcept override {
-        for(size_t i=0;i<inputHistory_.size();++i) inputHistory_[i]=T(0);
-        for(size_t i=0;i<outputHistory_.size();++i) outputHistory_[i]=T(0);
-    }
+namespace DspCore::Filters {
+
+/**
+ * @brief Runtime-order direct-form-I infinite impulse response SISO processor.
+ *
+ * @par Mathematical model
+ * Given numerator coefficients @f$b_0 \ldots b_M@f$ and denominator
+ * coefficients @f$a_0 \ldots a_N@f$, the processor represents
+ * @f[
+ * \sum_{k=0}^{N} a_k y[n-k] = \sum_{k=0}^{M} b_k x[n-k].
+ * @f]
+ * Its transfer function is
+ * @f[
+ * H(z) = \frac{Y(z)}{X(z)} =
+ * \frac{\sum_{k=0}^{M} b_kz^{-k}}{\sum_{k=0}^{N} a_kz^{-k}}.
+ * @f]
+ * Configure divides both polynomials by @f$a_0@f$. The recurrence executed
+ * for each sample is consequently
+ * @f[
+ * y[n] = \sum_{k=0}^{M}\frac{b_k}{a_0}x[n-k]
+ *        - \sum_{k=1}^{N}\frac{a_k}{a_0}y[n-k].
+ * @f]
+ *
+ * @par From the equation to one output sample
+ * There is no stateless @f$Y(x)@f$ for an IIR filter: @f$y[n]@f$ depends on
+ * the current input plus previous @f$x@f$ and @f$y@f$ values. processSample
+ * computes the first summation from `numerator_` and `inputHistory_`, subtracts
+ * the feedback summation from `denominator_` and `outputHistory_`, then shifts
+ * both histories. Reset establishes zero initial conditions. This is direct
+ * form I, expressed with separate input and output delay lines.
+ *
+ * Coefficients can come from any valid discrete-time design method. For
+ * example, Biquad returns a normalized second-order numerator and denominator
+ * that Configure can consume directly; a bilinear transform or a measured
+ * model can supply higher-order coefficients in the same convention.
+ *
+ * The stream's SampleType is intentionally independent from both coefficient
+ * storage and recurrence StateType. StateType defaults to CoefficientType.
+ * Arithmetic for the recurrence occurs in StateType, followed by conversion to
+ * SampleType at the output boundary. Process accepts direct, caller-owned
+ * Processing::SampleBlock input and output views; it does not participate in a
+ * graph or own a stream transport.
+ */
+template <typename SampleType = float, typename CoefficientType = float, typename StateType = CoefficientType>
+class IIR final {
 private:
-    /** @brief Always returns one: IIR has exactly one signal input. */
-    size_t InputPorts() const noexcept override { return 1; }
-    /** @brief Always returns one: IIR has exactly one signal output. */
-    size_t OutputPorts() const noexcept override { return 1; }
+    static_assert(cpstd::is_arithmetic<SampleType>::value, "SampleType must be arithmetic");
+    static_assert(cpstd::is_same<CoefficientType, float>::value || cpstd::is_same<CoefficientType, double>::value,
+        "CoefficientType must be float or double");
+    static_assert(cpstd::is_same<StateType, float>::value || cpstd::is_same<StateType, double>::value,
+        "StateType must be float or double");
+
+    cpstd::vector<CoefficientType> numerator_;
+    cpstd::vector<CoefficientType> denominator_;
+    cpstd::vector<StateType> inputHistory_;
+    cpstd::vector<StateType> outputHistory_;
+
 public:
     /**
-     * @brief Processes @p sampleCount input values into equally sized output storage.
+     * @brief Owns the @f$b@f$ numerator and @f$a@f$ denominator polynomials.
      *
-     * Both pointers may be null only for a zero-length block. On success every
-     * output value is valid. Invalid views or non-finite input leave state and
-     * output unchanged. A finite arithmetic failure may commit an output
-     * prefix before returning @c false.
+     * `numerator[k]` is @f$b_k@f$ and `denominator[k]` is @f$a_k@f$ in the
+     * unnormalized difference equation. Assign only copies and validates these
+     * design values; Configure owns the normalization by @f$a_0@f$.
      */
-    bool Process(const T* input,T* output,size_t sampleCount) noexcept {
-        DspCore::Processing::InputBlock<T> inputs(input,sampleCount);
-        DspCore::Processing::OutputBlock<T> outputs(output,sampleCount);
-        return Process(&inputs,1,&outputs,1) && outputs.size==sampleCount;
+    struct Coefficients {
+        cpstd::vector<CoefficientType> numerator;
+        cpstd::vector<CoefficientType> denominator;
+
+        bool Assign(const CoefficientType* numeratorValues, const cpstd::size_t numeratorCount,
+            const CoefficientType* denominatorValues, const cpstd::size_t denominatorCount) noexcept {
+            if (numeratorValues == nullptr || denominatorValues == nullptr || numeratorCount == 0U ||
+                denominatorCount == 0U) {
+                return false;
+            }
+            cpstd::vector<CoefficientType> nextNumerator;
+            cpstd::vector<CoefficientType> nextDenominator;
+            nextNumerator.resize(numeratorCount);
+            nextDenominator.resize(denominatorCount);
+            if (nextNumerator.size() != numeratorCount || nextDenominator.size() != denominatorCount) {
+                return false;
+            }
+            for (cpstd::size_t index = 0U; index < numeratorCount; ++index) {
+                if (!DspCore::Detail::Signal::Finite(numeratorValues[index])) {
+                    return false;
+                }
+                nextNumerator[index] = numeratorValues[index];
+            }
+            for (cpstd::size_t index = 0U; index < denominatorCount; ++index) {
+                if (!DspCore::Detail::Signal::Finite(denominatorValues[index])) {
+                    return false;
+                }
+                nextDenominator[index] = denominatorValues[index];
+            }
+            numerator = cpstd::move(nextNumerator);
+            denominator = cpstd::move(nextDenominator);
+            return true;
+        }
+    };
+
+    /**
+     * @brief Copies @f$b[]@f$ and @f$a[]@f$, normalizing both by @f$a_0@f$.
+     *
+     * The caller supplies the coefficient convention
+     * @f$\sum a_ky[n-k] = \sum b_kx[n-k]@f$. `denominator[0]` must be finite
+     * and nonzero. After configuration the stored leading denominator term is
+     * one, allowing processSample to implement the normalized recurrence with
+     * explicit subtraction of the feedback terms.
+     */
+    bool Configure(const CoefficientType* numerator, const cpstd::size_t numeratorCount,
+        const CoefficientType* denominator, const cpstd::size_t denominatorCount) noexcept {
+        if (numerator == nullptr || denominator == nullptr || numeratorCount == 0U || denominatorCount == 0U ||
+            !DspCore::Detail::Signal::Finite(denominator[0]) || denominator[0] == CoefficientType{}) {
+            return false;
+        }
+
+        cpstd::vector<CoefficientType> nextNumerator;
+        cpstd::vector<CoefficientType> nextDenominator;
+        cpstd::vector<StateType> nextInputHistory;
+        cpstd::vector<StateType> nextOutputHistory;
+        nextNumerator.resize(numeratorCount);
+        nextDenominator.resize(denominatorCount);
+        nextInputHistory.resize(numeratorCount - 1U);
+        nextOutputHistory.resize(denominatorCount - 1U);
+        if (nextNumerator.size() != numeratorCount || nextDenominator.size() != denominatorCount ||
+            nextInputHistory.size() != numeratorCount - 1U || nextOutputHistory.size() != denominatorCount - 1U) {
+            return false;
+        }
+
+        for (cpstd::size_t index = 0U; index < numeratorCount; ++index) {
+            const auto normalized = numerator[index] / denominator[0];
+            if (!DspCore::Detail::Signal::Finite(numerator[index]) || !DspCore::Detail::Signal::Finite(normalized)) {
+                return false;
+            }
+            nextNumerator[index] = normalized;
+        }
+        for (cpstd::size_t index = 0U; index < denominatorCount; ++index) {
+            const auto normalized = denominator[index] / denominator[0];
+            if (!DspCore::Detail::Signal::Finite(denominator[index]) || !DspCore::Detail::Signal::Finite(normalized)) {
+                return false;
+            }
+            nextDenominator[index] = normalized;
+        }
+
+        numerator_ = cpstd::move(nextNumerator);
+        denominator_ = cpstd::move(nextDenominator);
+        inputHistory_ = cpstd::move(nextInputHistory);
+        outputHistory_ = cpstd::move(nextOutputHistory);
+        return true;
     }
-private:
-    /// SISO adapter used only by ProcessorBase graphs.
-    bool Process(const DspCore::Processing::InputBlock<T>* inputs,size_t inputCount,
-                 DspCore::Processing::OutputBlock<T>* outputs,size_t outputCount) noexcept override {
-        if(inputCount!=1 || outputCount!=1 || !inputs || !outputs || !inputs[0].IsValid() ||
-           !outputs[0].CanWrite(inputs[0].size)) return false;
-        for(size_t i=0;i<inputs[0].size;++i)
-            if(!DspCore::Detail::Signal::Finite(inputs[0].data[i])) return false;
-        for(size_t i=0;i<inputs[0].size;++i) {
-            if(!ProcessSample(inputs[0].data[i],outputs[0].data[i])) {
-                outputs[0].size=i;
+
+    template <cpstd::size_t NumeratorCount, cpstd::size_t DenominatorCount>
+    bool Configure(const CoefficientType (&numerator)[NumeratorCount],
+        const CoefficientType (&denominator)[DenominatorCount]) noexcept {
+        return Configure(numerator, NumeratorCount, denominator, DenominatorCount);
+    }
+
+    /** @brief Configures from any coefficient value exposing numerator and denominator arrays. */
+    template <typename CoefficientSet>
+    bool Configure(const CoefficientSet& coefficients) noexcept {
+        return Configure(coefficients.numerator.data(), coefficients.numerator.size(),
+            coefficients.denominator.data(), coefficients.denominator.size());
+    }
+
+    /**
+     * @brief Applies the IIR recurrence to equally sized caller-owned sample blocks.
+     *
+     * The method allocates neither stream memory nor temporary buffers. Both
+     * views must be valid and have exactly the same size. It validates the
+     * complete input before changing filter state or output. A later arithmetic
+     * conversion failure may leave a valid processed prefix and its
+     * corresponding updated delay state.
+     *
+     * Exact in-place processing is supported when both blocks begin at the
+     * same address. Different, partially overlapping ranges are unsupported.
+     */
+    bool Process(const Processing::SampleBlock<const SampleType>& input,
+        const Processing::SampleBlock<SampleType>& output) noexcept {
+        if (!input.IsValid() || !output.IsValid() || input.size != output.size) {
+            return false;
+        }
+        for (cpstd::size_t index = 0U; index < input.size; ++index) {
+            if (!DspCore::Detail::Signal::Finite(input.data[index])) {
                 return false;
             }
         }
-        outputs[0].size=inputs[0].size;
-        return true;
-    }
-public:
-    bool GetNumerator(size_t index,T& value) const noexcept {
-        if(numerator_.empty()) {
-            if(index!=0) return false;
-            value=T(1);
-            return true;
+        for (cpstd::size_t index = 0U; index < input.size; ++index) {
+            if (!processSample(input.data[index], output.data[index])) {
+                return false;
+            }
         }
-        if(index>=numerator_.size()) return false;
-        value=numerator_[index];
         return true;
     }
-    bool GetDenominator(size_t index,T& value) const noexcept {
-        if(denominator_.empty()) {
-            if(index!=0) return false;
-            value=T(1);
-            return true;
+
+    /** @brief Convenience overload that binds pointer-and-count arguments as equally sized SampleBlocks. */
+    bool Process(const SampleType* input, SampleType* output, const cpstd::size_t sampleCount) noexcept {
+        return Process(Processing::MakeInputBlock(input, sampleCount),
+            Processing::MakeOutputBlock(output, sampleCount));
+    }
+
+    /** @brief Clears prior-input and prior-output delay state while retaining the configured polynomials. */
+    void Reset() noexcept {
+        for (cpstd::size_t index = 0U; index < inputHistory_.size(); ++index) {
+            inputHistory_[index] = StateType{};
         }
-        if(index>=denominator_.size()) return false;
-        value=denominator_[index];
-        return true;
+        for (cpstd::size_t index = 0U; index < outputHistory_.size(); ++index) {
+            outputHistory_[index] = StateType{};
+        }
     }
-    size_t NumeratorCount() const noexcept { return numerator_.empty() ? 1U : numerator_.size(); }
-    size_t DenominatorCount() const noexcept { return denominator_.empty() ? 1U : denominator_.size(); }
-    size_t NumeratorCapacity() const noexcept { return numerator_.capacity(); }
-    size_t DenominatorCapacity() const noexcept { return denominator_.capacity(); }
+
+    cpstd::size_t NumeratorCount() const noexcept { return numerator_.empty() ? 1U : numerator_.size(); }
+    cpstd::size_t DenominatorCount() const noexcept { return denominator_.empty() ? 1U : denominator_.size(); }
+
 private:
-    /// Direct-form I recurrence; no pole inference, clipping or allocation.
-    bool ProcessSample(T input,T& output) noexcept {
-        if(!DspCore::Detail::Signal::Finite(input)) return false;
-        if(numerator_.empty()) { output=input; return true; }
-        T sample=numerator_[0]*input;
-        if(!DspCore::Detail::Signal::Finite(sample)) return false;
-        for(size_t i=1;i<numerator_.size();++i) {
-            sample+=numerator_[i]*inputHistory_[i-1];
-            if(!DspCore::Detail::Signal::Finite(sample)) return false;
+    bool processSample(const SampleType input, SampleType& output) noexcept {
+        if (numerator_.empty()) {
+            output = input;
+            return true;
         }
-        for(size_t i=1;i<denominator_.size();++i) {
-            sample-=denominator_[i]*outputHistory_[i-1];
-            if(!DspCore::Detail::Signal::Finite(sample)) return false;
+
+        const StateType stateInput = static_cast<StateType>(input);
+        if (!DspCore::Detail::Signal::Finite(stateInput)) {
+            return false;
         }
-        for(size_t i=inputHistory_.size();i>1;--i) inputHistory_[i-1]=inputHistory_[i-2];
-        for(size_t i=outputHistory_.size();i>1;--i) outputHistory_[i-1]=outputHistory_[i-2];
-        if(!inputHistory_.empty()) inputHistory_[0]=input;
-        if(!outputHistory_.empty()) outputHistory_[0]=sample;
-        output=sample;
+
+        StateType sample = static_cast<StateType>(numerator_[0]) * stateInput;
+        for (cpstd::size_t index = 1U; index < numerator_.size(); ++index) {
+            sample += static_cast<StateType>(numerator_[index]) * inputHistory_[index - 1U];
+        }
+        for (cpstd::size_t index = 1U; index < denominator_.size(); ++index) {
+            sample -= static_cast<StateType>(denominator_[index]) * outputHistory_[index - 1U];
+        }
+        if (!DspCore::Detail::Signal::Finite(sample)) {
+            return false;
+        }
+        SampleType converted{};
+        if (!DspCore::Detail::Signal::Convert(sample, converted)) {
+            return false;
+        }
+
+        for (cpstd::size_t index = inputHistory_.size(); index > 1U; --index) {
+            inputHistory_[index - 1U] = inputHistory_[index - 2U];
+        }
+        for (cpstd::size_t index = outputHistory_.size(); index > 1U; --index) {
+            outputHistory_[index - 1U] = outputHistory_[index - 2U];
+        }
+        if (!inputHistory_.empty()) {
+            inputHistory_[0] = stateInput;
+        }
+        if (!outputHistory_.empty()) {
+            outputHistory_[0] = sample;
+        }
+        output = converted;
         return true;
     }
-    cpstd::vector<T> numerator_;
-    cpstd::vector<T> denominator_;
-    cpstd::vector<T> inputHistory_;
-    cpstd::vector<T> outputHistory_;
 };
-}}
-#endif
+
+} // namespace DspCore::Filters
+
+#endif // DSPCORE_FILTERS_IIR_H

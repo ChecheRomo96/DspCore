@@ -1,6 +1,6 @@
-#ifndef DSPCORE_PROCESSING_H
-#define DSPCORE_PROCESSING_H
+#ifndef DSPCORE_PROCESSING_MODULE_H
+#define DSPCORE_PROCESSING_MODULE_H
 
-#include <DspCore/Processing/ProcessorBase.h>
+#include <DspCore/Processing/SampleBlock.h>
 
-#endif
+#endif // DSPCORE_PROCESSING_MODULE_H
