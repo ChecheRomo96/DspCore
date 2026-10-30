@@ -12,14 +12,19 @@ static_assert(DBL_MIN_EXP <= FLT_MIN_EXP, "double must preserve float lower rang
 
 // SPEC-EMB-1..2: size budgets and trivial copyability of DspCore value types
 // are checked here, when the library is built for every target, AVR and Arm
-// included. Polymorphic ProcessorBase implementations retain size budgets but
-// are intentionally not value types.
+// included. Processor and coefficient containers deliberately own dynamic
+// state, so they are not value types.
 #define DSPCORE_CHECK_VALUE_TYPE(Type, MaximumBytes)                                  \
     static_assert(sizeof(Type) <= (MaximumBytes), #Type " exceeds its size budget"); \
     static_assert(__is_trivially_copyable(Type), #Type " must be trivially copyable")
 
 #if defined(DSPCORE_INTERPOLATION) && defined(DSPCORE_LUT)
 DSPCORE_CHECK_VALUE_TYPE(DspCore::Interpolation::Boundary, 1);
+#endif
+
+#if defined(DSPCORE_PROCESSING)
+DSPCORE_CHECK_VALUE_TYPE(DspCore::Processing::SampleBlock<float>, sizeof(void*) + sizeof(size_t));
+DSPCORE_CHECK_VALUE_TYPE(DspCore::Processing::SampleBlock<const float>, sizeof(void*) + sizeof(size_t));
 #endif
 
 
@@ -39,8 +44,6 @@ static_assert(sizeof(DspCoreFirFloatBudget)<=
 static_assert(sizeof(DspCoreFirDoubleBudget)<=
     AlignedSizeBudget(8*sizeof(void*)+2*sizeof(size_t),alignof(DspCoreFirDoubleBudget)),
     "DspCoreFirDoubleBudget exceeds its size budget");
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<float>, 6*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Filters::Biquad::Coefficients<double>, 6*sizeof(double));
 using DspCoreIirFloatBudget=DspCore::Filters::IIR<float>;
 using DspCoreIirDoubleBudget=DspCore::Filters::IIR<double>;
 static_assert(sizeof(DspCoreIirFloatBudget)<=

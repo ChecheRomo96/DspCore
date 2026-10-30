@@ -1,41 +1,69 @@
 /**
- * @defgroup DspCore_Processing Processing interfaces
- * @brief MIMO, block-oriented contracts for composing signal processors.
+ * @defgroup DspCore_Processing Processing
+ * @ingroup DspCore
+ * @brief Typed, zero-copy fixed-size sample-block views.
  *
- * Include `<DspCore_Processing.h>` or `<DspCore/Processing.h>`.
+ * @section DspCore_Processing_Model Ownership and processing model
+ * DspCore separates signal memory from signal processing:
  *
- * A @ref DspCore::Processing::ProcessorBase receives one input block per ordered
- * input port and writes one output block per ordered output port. Every call is
- * synchronous: all inputs hold @c n values and every output holds exactly @c n
- * values on success. It supports one-value blocks as the sample-by-sample case
- * without introducing a separate sample interface. It does not own those blocks: callers choose external
- * storage, while a future graph may manage its own private working storage.
+ * @code
+ * Caller-owned input samples ---> SampleBlock<const T> ---> DspCore algorithm
+ * Caller-owned output samples <--- SampleBlock<T>       <--- DspCore algorithm
+ * @endcode
  *
- * This module deliberately does not define a graph, port-format taxonomy,
- * latency policy, audio device, scheduler, plugin ABI or allocator. Those
- * policies require a concrete consumer. DSP Designer may consume this
- * interface, but it is an independent application and is not a DspCore
- * dependency.
+ * SampleBlock is a small, non-owning view over externally owned contiguous
+ * samples. It never allocates, copies, frees, queues, resamples, schedules,
+ * timestamps, or routes samples. The caller owns the backing memory and keeps
+ * it alive for the duration of the Process call.
  *
- * @section DspCore_Processing_Contracts Contracts
+ * DspCore algorithms own no external input or output block. They may own
+ * internal algorithm state: FIR owns taps and delay history, while IIR owns
+ * numerator, denominator, and delay histories. This makes a JUCE callback or
+ * a microcontroller DMA buffer usable without an intermediate copy.
  *
- * - **SPEC-PROC-1**: A processor declares its current ordered input/output port
- *   counts. Calls provide exactly that many block views. Every input view in a
- *   call has the same length @c n.
- * - **SPEC-PROC-2**: Input storage is readable and output storage is writable
- *   only for the call. Neither is retained or owned by the processor.
- * - **SPEC-PROC-3**: A successful call writes exactly @c n values to every
- *   output and declares each valid extent as `OutputBlock::size == n`. A failed
- *   calculation may commit and report a valid prefix; each derived processor
- *   documents that behavior. Malformed ports, invalid views, unequal input
- *   lengths and insufficient output capacity are rejected before processing begins.
- * - **SPEC-PROC-4**: A processor documents accepted block sizes, aliasing
- *   support and intrinsic latency. Windowing, overlap, buffering and delayed
- *   output are internal details; they do not change the n-to-n block cadence.
- * - **SPEC-PROC-5**: Reset restores documented signal state but preserves
- *   configuration, ports and caller-owned buffers.
+ * @section DspCore_Processing_Typed Typed n-to-n blocks
+ * The owner normally constructs the input and output views when it prepares
+ * its buffers, then can reuse those views across process calls:
+ * @code{.cpp}
+ * const float audio[] = { 1.0F, 0.0F };
+ * float result[2]{};
  *
- * FIR and IIR are SISO implementations of @ref DspCore::Processing::ProcessorBase.
- * They accept a block of any length, preserve their filter state between calls
- * and produce one output value per input value without windowing latency.
+ * const SampleBlock<const float> audioBlock{audio, 2U};
+ * const SampleBlock<float> resultBlock{result, 2U};
+ *
+ * Filters::FIR<float> filter;
+ * filter.Configure(taps, tapCount);
+ * filter.Process(audioBlock, resultBlock);
+ * @endcode
+ * `MakeInputBlock(data, size)` and `MakeOutputBlock(data, size)` provide the
+ * same views at an integration boundary that only exposes a raw pointer and
+ * size, such as an audio callback. Neither form copies the samples.
+ *
+ * `SampleBlock<const float>` makes the input read-only at compile time, while
+ * `SampleBlock<float>` represents writable output. SampleBlock itself may
+ * describe any element type; a particular DspCore algorithm can impose a
+ * narrower requirement. FIR and IIR require arithmetic SampleType values.
+ *
+ * The block extent is its `size`: there is deliberately no capacity or
+ * produced-count distinction in this layer. FIR and IIR are synchronous n-to-n
+ * transforms and reject invalid blocks or unequal input/output sizes before
+ * touching their state or output. Empty blocks are valid and retain state.
+ *
+ * @section DspCore_Processing_Access Lifetime and aliasing
+ * A block is a borrowed view, not a container. It must not outlive the caller's
+ * memory. A filter may process exactly in place when input and output start at
+ * the same address. Partially overlapping, different ranges are not supported.
+ *
+ * @section DspCore_Processing_WhatThisIsNot What processing does not provide
+ * DspCore is not a graph owner, stream clock, sample-rate converter, thread
+ * synchronizer, FIFO, MIDI/event transport, or port-routing system. A future
+ * stream/runtime library will own those concerns, including heterogeneous
+ * audio, MIDI, envelope and event transport. It can adapt its buffers to these
+ * typed blocks at the boundary.
+ */
+
+/**
+ * @namespace DspCore::Processing
+ * @ingroup DspCore_Processing
+ * @brief Non-owning fixed-size sample views used by DspCore algorithms.
  */

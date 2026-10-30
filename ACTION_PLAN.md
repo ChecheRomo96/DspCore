@@ -113,21 +113,26 @@ Status: implemented and validated. Control, including Smoother, is outside this 
 See docs/Design/FiltersAnalysisImplementation.md for contracts and evidence.
 
 
-## Phase 6 - Processing interfaces
+## Phase 6 - Block processing interfaces
 
 Status: started. User authorized the base interface on 2026-10-20.
 
-- [x] Define ProcessorBase: a MIMO, block-oriented abstract interface with
-  non-owning input/output buffers, synchronous n-to-n block cadence, and
-  explicit failure, ownership and lifecycle contracts.
-- [x] Make FIR and IIR SISO ProcessorBase nodes with n-to-n block-processing
-  APIs, rejecting malformed blocks before processing
-  and reporting a valid prefix on finite arithmetic failure.
-- [ ] Define graph construction, port formats, scheduling, latency, buffer planning
-  and audio/control/spectral adapters after concrete consumers are approved.
+- [x] Define Processing::SampleBlock<T>: a typed, non-owning view over a
+  caller-provided contiguous region, with `SampleBlock<const T>` for input and
+  `SampleBlock<T>` for output.
+- [x] Make FIR and IIR n-to-n block processors. Their direct block APIs reject
+  malformed or unequal views before processing, allocate nothing in Process,
+  and retain only algorithm-specific delay state between calls.
+- [x] Preserve the pointer-and-count Process overload as a convenience adapter
+  to the same typed block contract.
+- [ ] Create a separate stream/runtime library after concrete consumers are
+  approved. It will own MIMO routing, heterogeneous ports, FIFOs, scheduling,
+  clocks, latency, audio/MIDI/envelope/event transport, and adapters.
 
-This phase intentionally does not add a graph, an audio backend, DSP Designer
-or implicit allocation. Those remain independent consumers of DspCore.
+This phase intentionally does not add a graph, an audio backend, stream owner,
+FIFO, sample-rate boundary, DSP Designer, or implicit allocation. Those belong
+to the future runtime layer, which will adapt its caller-owned memory to
+DspCore's typed blocks.
 
 ## Subsequent phases
 
