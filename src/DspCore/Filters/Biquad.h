@@ -3,11 +3,17 @@
 
 #include <Foundation_Utils.h>
 #include <DspCore/Detail/SignalMath.h>
-#include <DspCore/Filters/IIR.h>
+#include <DspCore/Filters/SingleRate/IIR.h>
 
 #include <stdint.h>
 
 namespace DspCore::Filters::Biquad {
+
+/**
+ * @namespace DspCore::Filters::Biquad
+ * @ingroup DspCore_Filters_SingleRate
+ * @brief Stateless second-order IIR coefficient designers.
+ */
 
 /** @brief The result type of every biquad designer: directly consumable by IIR::Configure. */
 template <typename CoefficientType = float>

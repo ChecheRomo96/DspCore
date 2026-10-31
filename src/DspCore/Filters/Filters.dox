@@ -1,7 +1,7 @@
 /**
  * @defgroup DspCore_Filters Filters
  * @ingroup DspCore
- * @brief Portable runtime-order FIR and IIR filters and coefficient designers.
+ * @brief Single-rate FIR/IIR filters, coefficient designers, and future filter families.
  *
  * FIR<SampleType, CoefficientType, StateType> and
  * IIR<SampleType, CoefficientType, StateType> own their coefficient and delay
@@ -18,6 +18,10 @@
  * Biquad::HasParameter(Type, Parameter) expose allocation-free metadata for
  * controls required by each design. The metadata remains in program memory on
  * AVR and is copied into a caller-owned value on access.
+ *
+ * The implemented processors are under @ref DspCore_Filters_SingleRate.
+ * `SOS.h`, `Multirate.h`, and `MIMO.h` establish future module boundaries;
+ * they deliberately declare no incomplete runtime API.
  *
  * @section DspCore_Filters_Equations Difference equations and coefficients
  * Both processors apply a discrete-time difference equation one sample at a

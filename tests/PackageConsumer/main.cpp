@@ -1,5 +1,9 @@
 #include <Foundation/Math/Arithmetic.h>
 #include <DspCore.h>
+#include <DspCore/Filters/FIR.h>
+#include <DspCore/Filters/IIR.h>
+#include <DspCore/Filters/SingleRate/FIR.h>
+#include <DspCore/Filters/SingleRate/IIR.h>
 
 #include <cstring>
 #include <iostream>
@@ -10,6 +14,12 @@
 
 #ifndef DSPCORE_PROCESSING
     #error "The installed DspCore package must export DSPCORE_PROCESSING"
+#endif
+#ifndef DSPCORE_DYNAMICS
+    #error "The installed DspCore package must export DSPCORE_DYNAMICS"
+#endif
+#ifndef DSPCORE_TRANSFORMS
+    #error "The installed DspCore package must export DSPCORE_TRANSFORMS"
 #endif
 
 int main() {

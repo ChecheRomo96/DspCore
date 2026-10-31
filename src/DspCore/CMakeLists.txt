@@ -25,6 +25,14 @@ if(DSPCORE_ANALYSIS)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Analysis.h")
 endif()
 
+if(DSPCORE_DYNAMICS)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Dynamics.h")
+endif()
+
+if(DSPCORE_TRANSFORMS)
+    list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Transforms.h")
+endif()
+
 if(DSPCORE_PROCESSING)
     list(APPEND DSPCORE_MODULE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/Processing.h")
 endif()
@@ -62,6 +70,14 @@ endif()
 
 if(DSPCORE_ANALYSIS)
     add_subdirectory(Analysis)
+endif()
+
+if(DSPCORE_DYNAMICS)
+    add_subdirectory(Dynamics)
+endif()
+
+if(DSPCORE_TRANSFORMS)
+    add_subdirectory(Transforms)
 endif()
 
 if(DSPCORE_PROCESSING)

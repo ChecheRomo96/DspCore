@@ -1,0 +1,12 @@
+/**
+ * @defgroup DspCore_Dynamics Signal dynamics
+ * @brief Signal-dependent, stateful processors such as compressors and gates.
+ *
+ * @par Status
+ * The module boundary is established, but compressor, limiter, and gate
+ * implementations are planned. Existing Analysis::EnvelopeFollower remains
+ * an analysis utility until a separately approved API migration.
+ *
+ * Dynamics processors differ from filters: their effective gain may depend on
+ * measured input level, so they are generally nonlinear and time-varying.
+ */

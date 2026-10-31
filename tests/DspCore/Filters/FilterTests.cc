@@ -1,8 +1,8 @@
 #include <cmath>
 
 #include <DspCore/Filters/Biquad.h>
-#include <DspCore/Filters/FIR.h>
-#include <DspCore/Filters/IIR.h>
+#include <DspCore/Filters/SingleRate/FIR.h>
+#include <DspCore/Filters/SingleRate/IIR.h>
 #include <gtest/gtest.h>
 
 namespace {
