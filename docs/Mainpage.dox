@@ -18,7 +18,8 @@
  * - @ref DspCore_Dynamics "Dynamics": planned signal-dependent processors.
  * - @ref DspCore_Analysis "Analysis": Block peak/RMS measurements and Streaming level estimators,
  *   plus planned response and pole-zero analysis.
- * - @ref DspCore_Transforms "Transforms": planned DFT/FFT implementations.
+ * - @ref DspCore_Transforms "Transforms": configured direct DFT and radix-2 FFT classes,
+ *   each with forward and inverse operations.
  * - @ref DspCore_Generators "Generators": periodic, shaping, envelopes, noise and windows.
  * - @ref DspCore_Interpolation "Interpolation": linear, bilinear and trilinear formulas.
  * - @ref DspCore_LUT "Lookup tables": 1D, 2D and 3D arithmetic storage plus sampled access.

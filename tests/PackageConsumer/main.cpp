@@ -82,6 +82,14 @@ int main() {
     if(!follower.Update(-2.,0.01,filtered) || filtered!=2.) return 1;
     std::cout << "Installed typed block processing, FIR/IIR, RMS and follower: PASS\n";
 
+    DspCore::Transforms::FFT<float> fft;
+    Foundation::Math::Complex<float> bins[2]{};
+    const float impulse[]={1.f,0.f};
+    if(!fft.Configure(2U) || !fft.ForwardReal(DspCore::Processing::MakeInputBlock(impulse,2U),
+        DspCore::Processing::MakeOutputBlock(bins,2U))) return 1;
+    if(bins[0].real!=1.f || bins[1].real!=1.f) return 1;
+    std::cout << "Installed FFT forward transform: PASS\n";
+
     return (gcd == 4U &&
             std::strcmp(DspCore::Core::Version(), DSPCORE_VERSION) == 0) ? 0 : 1;
 }
