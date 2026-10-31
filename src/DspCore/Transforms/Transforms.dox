@@ -1,5 +1,6 @@
 /**
  * @defgroup DspCore_Transforms Transforms
+ * @ingroup DspCore
  * @brief Discrete transforms and their analysis-oriented utilities.
  *
  * @par Status

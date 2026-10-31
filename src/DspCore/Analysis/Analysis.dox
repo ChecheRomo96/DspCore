@@ -1,5 +1,6 @@
 /**
  * @defgroup DspCore_Analysis Signal analysis
+ * @ingroup DspCore
  * @brief Block peak/RMS measurements and an attack/release amplitude follower.
  *
  * Include `<DspCore_Analysis.h>` or Levels.h/EnvelopeFollower.h individually.
@@ -7,8 +8,8 @@
  *
  * @section DspCore_Analysis_Levels Block measurements
  *
- * - **SPEC-ANA-1**: Peak and RMS validate a finite sample block, checked count
- *   in elements, and non-null storage when nonempty. Failure leaves output
+ * - **SPEC-ANA-1**: Peak and RMS accept a read-only Processing::SampleBlock.
+ *   They require a valid view and finite samples; failure leaves output
  *   unchanged. Empty blocks, including nullptr with zero count, produce zero.
  *   The caller guarantees accessible input extent. Output may alias an input
  *   sample: it is committed only after all reads finish.
@@ -20,6 +21,17 @@
  *   Reductions use the selected precision; large-block rounding remains its
  *   normal limitation. No mean removal, dB conversion or loudness weighting
  *   is hidden in either measurement.
+ *
+ * For a block @f$x[0],\ldots,x[N-1]@f$, Peak evaluates
+ * @f[
+ * P = \max_{0\leq n<N}\left|x[n]\right|.
+ * @f]
+ * RMS evaluates @f$R=0@f$ when @f$P=0@f$. Otherwise it uses the algebraically
+ * equivalent, overflow-resistant form
+ * @f[
+ * R = P\sqrt{\min\left(1,\frac{1}{N}
+ *     \sum_{n=0}^{N-1}\left(\frac{x[n]}{P}\right)^2\right)}.
+ * @f]
  *
  * @section DspCore_Analysis_Follower Envelope follower
  *
@@ -33,6 +45,17 @@
  * - **SPEC-ANA-4**: One-pole alpha=1-exp(-dt/tau) uses a stable small-ratio
  *   series and a snap at ratios >=40. No global denormal mode is changed.
  *   State is a trivially copyable three-scalar object with target size budgets.
+ *
+ * Let @f$m[n]=|x[n]|@f$ and choose @f$\tau@f$ as attack when
+ * @f$m[n]>v[n-1]@f$, otherwise release. For a positive interval @f$\Delta t@f$,
+ * the follower evaluates
+ * @f[
+ * \alpha = 1-e^{-\Delta t/\tau}, \qquad
+ * v[n] = v[n-1] + \alpha\bigl(m[n]-v[n-1]\bigr).
+ * @f]
+ * A zero time constant selects @f$\alpha=1@f$, so the state snaps to
+ * @f$m[n]@f$. The implementation evaluates the small-ratio limit with a series
+ * rather than subtracting nearly equal floating-point values.
  *
  * This is an amplitude follower rather than RMS detection or a synthesizer
  * envelope generator. Examples: Analysis/Levels and Analysis/Envelope.

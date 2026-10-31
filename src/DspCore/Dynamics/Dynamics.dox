@@ -1,5 +1,6 @@
 /**
  * @defgroup DspCore_Dynamics Signal dynamics
+ * @ingroup DspCore
  * @brief Signal-dependent, stateful processors such as compressors and gates.
  *
  * @par Status

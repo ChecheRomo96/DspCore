@@ -19,8 +19,8 @@
  * - @ref DspCore_Analysis "Analysis": implemented peak/RMS plus planned response and pole-zero analysis.
  * - @ref DspCore_Transforms "Transforms": planned DFT/FFT implementations.
  * - @ref DspCore_Generators "Generators": periodic, shaping, envelopes, noise and windows.
- * - @ref DspCore_Interpolation "Interpolation": formulas and explicit LUT boundaries.
- * - @ref DspCore_LUT "Lookup tables": 1D, 2D and 3D arithmetic storage.
+ * - @ref DspCore_Interpolation "Interpolation": linear, bilinear and trilinear formulas.
+ * - @ref DspCore_LUT "Lookup tables": 1D, 2D and 3D arithmetic storage plus sampled access.
  * - @ref DspCore_Core "Core": DspCore and Foundation version information.
  *
  * - @ref DspCore_Architecture "Architecture and planned content".

@@ -1,4 +1,4 @@
-# Interpolation migration
+# Interpolation and LUT sampling migration
 
 Phase 3 implements `DspCore::Interpolation` independently of generators.
 Historical source was reviewed rather than copied verbatim.
@@ -19,7 +19,7 @@ Historical source was reviewed rather than copied verbatim.
   and selects its 0-side, avoiding division by zero. The interpolation API is
   mathematical and returns a value directly; it does not expose Try variants
   or validation booleans.
-- Lookup overloads for 1D/2D/3D require an explicit Boundary policy. Clamp and
+- LUT::Sample overloads for 1D/2D/3D require an explicit Boundary policy. Clamp and
   Reject use normalized closed coordinates with N-1 intervals. Wrap uses N
   distinct periodic samples with the last-to-first interval included. All
   axes share the chosen policy; per-axis policies remain a future extension.
@@ -30,12 +30,14 @@ Historical source was reviewed rather than copied verbatim.
   normalized, double computation stays double, and narrowing range overflow
   explicitly produces signed infinity instead of an out-of-range cast.
 - Boundary uses a one-byte enum with target-build size/triviality assertions.
-- Arithmetic is available without LUT; Lookup is staged/installed when the
-  LUT module is enabled. Arduino C++11 can discover the module facade.
+- Arithmetic is available without LUT. Sampling is staged/installed with the
+  LUT module only when Interpolation is enabled, because it composes the
+  generic arithmetic formulas over LUT-owned data. Arduino C++11 can discover
+  the module facade.
 
 ## Validation
 
-- Windows MSVC: 26/26 tests pass (12 previous, 6 arithmetic, 8 lookup).
+- Windows MSVC: 26/26 tests pass (12 previous, 6 arithmetic, 8 LUT sampling).
 - Tests include double precision, endpoint selection, opposite-sign maximum
   samples, extrapolation, reversed and collapsed physical axes, affine planes/volumes,
   negative cycles, periodic seams, singleton axes, NaN/Inf coordinates,
@@ -48,7 +50,7 @@ Historical source was reviewed rather than copied verbatim.
 - AddressSanitizer standalone probe passed 18,009 lookups across three ranks
   and boundary policies plus extreme finite coordinates. Probe artifacts are
   under ignored build/interpolation-validation; no address errors reported.
-- Doxygen generates the linked topic, functions and Boundary enum. The
+- Doxygen generates the linked LUT topic, functions and Boundary enum. The
   existing obsolete DOT_MULTI_TARGETS configuration warning remains.
 - Arm/hardware validation remains unavailable in this environment.
 

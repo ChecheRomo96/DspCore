@@ -45,6 +45,55 @@
  * coefficients by @f$a_0@f$, after which the code computes the feed-forward
  * sum and subtracts the feedback sum. See FIR and IIR for the exact mapping
  * from these equations to their delay lines and arithmetic types.
+ *
+ * @section DspCore_Filters_Biquad RBJ biquad coefficient design
+ *
+ * Biquad's stateless designers return the unnormalized second-order form
+ * @f[
+ * H(z)=\frac{b_0+b_1z^{-1}+b_2z^{-2}}
+ *            {a_0+a_1z^{-1}+a_2z^{-2}}.
+ * @f]
+ * IIR::Configure subsequently normalizes every coefficient by @f$a_0@f$.
+ * For sample rate @f$f_s@f$, cutoff or center frequency @f$f_0@f$, and
+ * quality @f$Q@f$, the shared RBJ terms are
+ * @f[
+ * \omega_0=2\pi\frac{f_0}{f_s}, \qquad
+ * c=\cos\omega_0, \qquad
+ * \alpha=\frac{\sin\omega_0}{2Q}.
+ * @f]
+ * Low-pass and high-pass use, respectively,
+ * @f[
+ * (b_0,b_1,b_2)=\left(\frac{1-c}{2},1-c,\frac{1-c}{2}\right),
+ * \qquad (a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha),
+ * @f]
+ * @f[
+ * (b_0,b_1,b_2)=\left(\frac{1+c}{2},-(1+c),\frac{1+c}{2}\right),
+ * \qquad (a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha).
+ * @f]
+ * Band-pass, notch, and all-pass use
+ * @f[
+ * \begin{array}{c|c}
+ * \mathrm{BandPass}&(\alpha,0,-\alpha)\\
+ * \mathrm{Notch}&(1,-2c,1)\\
+ * \mathrm{AllPass}&(1-\alpha,-2c,1+\alpha)
+ * \end{array}
+ * \qquad
+ * (a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha).
+ * @f]
+ * Peak EQ additionally uses @f$A=10^{G/40}@f$ for gain @f$G@f$ in dB:
+ * @f[
+ * (b_0,b_1,b_2)=(1+\alpha A,-2c,1-\alpha A), \qquad
+ * (a_0,a_1,a_2)=\left(1+\frac{\alpha}{A},-2c,1-\frac{\alpha}{A}\right).
+ * @f]
+ * Shelf designs use @f$A=10^{G/40}@f$, slope @f$S@f$, and
+ * @f[
+ * \alpha=\frac{\sin\omega_0}{2}
+ * \sqrt{\left(A+\frac1A\right)\left(\frac1S-1\right)+2},
+ * \qquad \beta=2\sqrt A\,\alpha.
+ * @f]
+ * Their low/high shelf coefficient forms are the RBJ equations implemented by
+ * Biquad::LowShelf and Biquad::HighShelf; the returned six values remain the
+ * exact source of truth for a configured IIR section.
  */
 
 /**

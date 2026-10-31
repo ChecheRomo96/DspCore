@@ -68,7 +68,7 @@ Status: complete. User authorized continuation after phase 1.
 
 Validation and differences from the legacy API are in docs/Design/LutMigration.md.
 
-## Phase 3 - Interpolation and lookup boundaries
+## Phase 3 - Interpolation and LUT sampling boundaries
 
 Status: complete. User authorized continuation after phase 2.
 
