@@ -15,7 +15,7 @@
  * @section DspCore_Example_CoreVersion_Output Output
  * @code{.text}
  * DspCore :: Core / Version
- * DspCore ....... 0.2.0
+ * DspCore ....... 0.3.0
  * Foundation .... 2.0.8
  * @endcode
  *

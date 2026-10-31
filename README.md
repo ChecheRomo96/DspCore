@@ -10,7 +10,8 @@ implementer's choice.
 
 > **Status: early development.** Core/version and owning LUT1D, LUT2D and LUT3D
 > storage, interpolation, explicit boundary lookup, table/segment generators,
-> generic FIR/IIR filters with Biquad coefficient calculators and signal analysis are implemented.
+> generic FIR/IIR filters with Biquad coefficient calculators, block and
+> streaming signal analysis, and configured DFT/FFT transforms are implemented.
 > Numeric/buffer contracts and the module
 > architecture are documented. Further algorithms follow `ACTION_PLAN.md`.
 
