@@ -1,0 +1,27 @@
+/**
+ * @defgroup DspCore_Example_CoreVersion Version
+ * @ingroup DspCore_Examples_Core
+ * @brief Read the library and Foundation version metadata compiled into an application.
+ *
+ * @section DspCore_Example_CoreVersion_Goal Goal
+ * Confirm the exact DspCore and Foundation releases seen by an application.
+ * This is the smallest possible integration check before using a larger API.
+ *
+ * @section DspCore_Example_CoreVersion_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
+ * @endcode
+ *
+ * @section DspCore_Example_CoreVersion_Output Output
+ * @code{.text}
+ * DspCore :: Core / Version
+ * DspCore ....... 0.2.0
+ * Foundation .... 2.0.8
+ * @endcode
+ *
+ * The values identify the headers selected by the build, rather than a runtime
+ * package discovered by the executable.
+ *
+ * @section DspCore_Example_CoreVersion_Code Implementation
+ * \include Core/Version/Shared.cpp
+ */

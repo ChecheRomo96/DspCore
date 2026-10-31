@@ -19,7 +19,7 @@ static_assert(DBL_MIN_EXP <= FLT_MIN_EXP, "double must preserve float lower rang
     static_assert(__is_trivially_copyable(Type), #Type " must be trivially copyable")
 
 #if defined(DSPCORE_INTERPOLATION) && defined(DSPCORE_LUT)
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Interpolation::Boundary, 1);
+DSPCORE_CHECK_VALUE_TYPE(DspCore::LUT::Boundary, 1);
 #endif
 
 #if defined(DSPCORE_PROCESSING)

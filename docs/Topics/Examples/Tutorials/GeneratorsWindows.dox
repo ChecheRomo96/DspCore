@@ -1,0 +1,32 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsWindows Windows
+ * @ingroup DspCore_Examples_Generators
+ * @brief Generate symmetric Hann and Hamming analysis windows.
+ *
+ * @section DspCore_Example_GeneratorsWindows_Goal Goal
+ * Inspect a small Hann window at every sample, compare Hamming endpoints and
+ * center, and verify the meaningful one-sample limit.
+ *
+ * @section DspCore_Example_GeneratorsWindows_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_Windows_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsWindows_Output Output
+ * @code{.text}
+ * Hann[0]=0%
+ * Hann[1]=50%
+ * Hann[2]=100%
+ * Hann[3]=50%
+ * Hann[4]=0%
+ * Hamming endpoints=8%; center=100%
+ * Singleton window=1
+ * Overall: PASS
+ * @endcode
+ *
+ * The five Hann samples make its symmetry tangible; the singleton result avoids
+ * treating a degenerate analysis window as an error.
+ *
+ * @section DspCore_Example_GeneratorsWindows_Code Implementation
+ * \include Generators/Windows/Shared.cpp
+ */

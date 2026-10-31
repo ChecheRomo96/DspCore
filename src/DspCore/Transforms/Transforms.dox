@@ -1,0 +1,10 @@
+/**
+ * @defgroup DspCore_Transforms Transforms
+ * @ingroup DspCore
+ * @brief Discrete transforms and their analysis-oriented utilities.
+ *
+ * @par Status
+ * The module boundary is established; DFT and FFT implementations are planned.
+ * They are intentionally not conflated with filter execution or audio-stream
+ * transport.
+ */

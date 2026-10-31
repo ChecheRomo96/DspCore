@@ -1,0 +1,29 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsEnvelopes Envelope segments
+ * @ingroup DspCore_Examples_Generators
+ * @brief Generate stable exponential and logarithmic curve shapes.
+ *
+ * @section DspCore_Example_GeneratorsEnvelopes_Goal Goal
+ * Examine gentle and strong curve values while also checking the numerically
+ * sensitive near-linear case (`curve = 1e-9`).
+ *
+ * @section DspCore_Example_GeneratorsEnvelopes_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_Envelopes_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsEnvelopes_Output Output
+ * @code{.text}
+ * Exp curve=1e-9 midpoint: 50%; expected=50%
+ * Log curve=1e-9 midpoint=50%; no NaN
+ * Exp curve=4 midpoint: 881/1000; expected=881/1000
+ * Log curve=4 midpoint: 683/1000; expected=683/1000
+ * Overall: PASS
+ * @endcode
+ *
+ * The near-zero rows demonstrate a stable linear-limit behavior instead of a
+ * divide-by-small-number artefact.
+ *
+ * @section DspCore_Example_GeneratorsEnvelopes_Code Implementation
+ * \include Generators/Envelopes/Shared.cpp
+ */

@@ -10,6 +10,8 @@ if(DOXYGEN_FOUND)
         ${DSPCORE_ROOT_DIRECTORY}/docs/assets/DspCoreDocs.js)
     set(DOXYGEN_IMAGE_PATH
         ${DSPCORE_ROOT_DIRECTORY}/docs/Topics/Examples/Images)
+    set(DOXYGEN_EXAMPLE_PATH
+        ${DSPCORE_ROOT_DIRECTORY}/examples)
 
     add_subdirectory(${DSPCORE_ROOT_DIRECTORY}/docs)
 

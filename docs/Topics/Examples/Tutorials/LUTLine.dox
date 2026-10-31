@@ -1,0 +1,32 @@
+/**
+ * @defgroup DspCore_Example_LUTLine Line
+ * @ingroup DspCore_Examples_LUT
+ * @brief Build a normalized one-dimensional curve and inspect capacity behavior.
+ *
+ * @section DspCore_Example_LUTLine_Goal Goal
+ * Fill a five-sample curve, reserve capacity, then shrink and regrow it. The
+ * tutorial makes values, size and allocation reuse observable without exposing
+ * implementation storage to a consumer.
+ *
+ * @section DspCore_Example_LUTLine_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_LUT_Line_d
+ * @endcode
+ *
+ * @section DspCore_Example_LUTLine_Output Output
+ * @code{.text}
+ * curve[0]=0%; expected=0%
+ * curve[1]=25%; expected=25%
+ * curve[2]=50%; expected=50%
+ * curve[3]=75%; expected=75%
+ * curve[4]=100%; expected=100%
+ * Regrown samples=0; pointer retained; capacity=8: PASS
+ * Overall: PASS
+ * @endcode
+ *
+ * The regrowth line demonstrates that reserving eight elements allows a later
+ * resize within that capacity to reuse the existing allocation.
+ *
+ * @section DspCore_Example_LUTLine_Code Implementation
+ * \include LUT/Line/Shared.cpp
+ */
