@@ -1,6 +1,6 @@
 /**
  * @mainpage DspCore
- * @version 0.2.0
+ * @version 0.3.0
  *
  * DspCore is the signal-processing layer of the RoModular ecosystem: lookup
  * tables, interpolation, generators, filters, dynamics, analysis and
