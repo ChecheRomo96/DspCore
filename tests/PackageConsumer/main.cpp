@@ -77,8 +77,8 @@ int main() {
     if(!iir.Configure(coefficients) || !iir.Process(filterInput,iirOutput,2) || iirOutput[0]<=0.) return 1;
     double filtered=0;
     const double block[]={-3,4,0,0};
-    if(!DspCore::Analysis::RMS(DspCore::Processing::MakeInputBlock(block,4U),filtered) || filtered!=2.5) return 1;
-    DspCore::Analysis::EnvelopeFollower<double> follower;
+    if(!DspCore::Analysis::Block::RMS(DspCore::Processing::MakeInputBlock(block,4U),filtered) || filtered!=2.5) return 1;
+    DspCore::Analysis::Streaming::EnvelopeFollower<double> follower;
     if(!follower.Update(-2.,0.01,filtered) || filtered!=2.) return 1;
     std::cout << "Installed typed block processing, FIR/IIR, RMS and follower: PASS\n";
 

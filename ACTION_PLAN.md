@@ -105,8 +105,8 @@ Status: implemented and validated. Control, including Smoother, is outside this 
 - [x] Runtime-order IIR with CPSTL vector coefficients/histories, independent
   numerator/denominator lengths and a0 normalization.
 - [x] Biquad::LowPass/HighPass return a six-scalar Coefficients<T> struct by value.
-- [x] Block peak/RMS with scaled RMS arithmetic and finite-input validation.
-- [x] Rectified one-pole follower with independent attack/release seconds.
+- [x] `Analysis::Block` peak/RMS with scaled RMS arithmetic and finite-input validation.
+- [x] `Analysis::Streaming` envelope following and moving RMS with one output per sample.
 - [x] Size budgets, reference/response tests and five portable examples.
 - [x] Package consumer, Arduino compilation, Doxygen and AddressSanitizer probe.
 

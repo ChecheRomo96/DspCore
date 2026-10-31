@@ -1,7 +1,7 @@
 /**
  * @defgroup DspCore_Example_AnalysisEnvelope Envelope follower
  * @ingroup DspCore_Examples_Analysis
- * @brief Follow a rectified signal with independent attack and release constants.
+ * @brief Follow a rectified signal with `Analysis::Streaming::EnvelopeFollower`.
  *
  * @section DspCore_Example_AnalysisEnvelope_Goal Goal
  * Demonstrate asymmetric smoothing: a one-second attack rises to the expected

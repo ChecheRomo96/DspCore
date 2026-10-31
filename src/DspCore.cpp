@@ -54,8 +54,8 @@ static_assert(sizeof(DspCoreIirDoubleBudget)<=
     "DspCoreIirDoubleBudget exceeds its size budget");
 #endif
 #if defined(DSPCORE_ANALYSIS)
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Analysis::EnvelopeFollower<float>, 3*sizeof(float));
-DSPCORE_CHECK_VALUE_TYPE(DspCore::Analysis::EnvelopeFollower<double>, 3*sizeof(double));
+DSPCORE_CHECK_VALUE_TYPE(DspCore::Analysis::Streaming::EnvelopeFollower<float>, 3*sizeof(float));
+DSPCORE_CHECK_VALUE_TYPE(DspCore::Analysis::Streaming::EnvelopeFollower<double>, 3*sizeof(double));
 #endif
 
 #undef DSPCORE_CHECK_VALUE_TYPE

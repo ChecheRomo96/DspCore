@@ -16,7 +16,8 @@
  *
  * - @ref DspCore_Filters "Filters": single-rate FIR/IIR processors and Biquad coefficient calculators.
  * - @ref DspCore_Dynamics "Dynamics": planned signal-dependent processors.
- * - @ref DspCore_Analysis "Analysis": implemented peak/RMS plus planned response and pole-zero analysis.
+ * - @ref DspCore_Analysis "Analysis": Block peak/RMS measurements and Streaming level estimators,
+ *   plus planned response and pole-zero analysis.
  * - @ref DspCore_Transforms "Transforms": planned DFT/FFT implementations.
  * - @ref DspCore_Generators "Generators": periodic, shaping, envelopes, noise and windows.
  * - @ref DspCore_Interpolation "Interpolation": linear, bilinear and trilinear formulas.
