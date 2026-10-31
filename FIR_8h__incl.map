@@ -1,0 +1,15 @@
+<map id="src/DspCore/Filters/FIR.h" name="src/DspCore/Filters/FIR.h">
+<area shape="rect" id="Node000001" title="Compatibility include for the single&#45;rate FIR implementation." alt="" coords="177,5,321,45"/>
+<area shape="rect" id="Node000002" href="$SingleRate_2FIR_8h_source.html" title=" " alt="" coords="151,93,346,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,46,251,79,246,79,246,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,189,92,214"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,136,89,186,87,181,204,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="117,189,207,214"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="231,136,186,180,182,177,228,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="232,189,441,214"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="270,132,316,177,313,180,266,136"/>
+<area shape="rect" id="Node000006" href="$SampleBlock_8h_source.html" title=" " alt="" coords="465,181,616,221"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="313,131,465,175,463,180,312,136"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="480,269,601,295"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="543,222,543,255,538,255,538,222"/>
+</map>

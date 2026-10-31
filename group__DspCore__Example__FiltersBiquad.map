@@ -1,0 +1,4 @@
+<map id="Biquad" name="Biquad">
+<area shape="rect" id="Node000001" title="Visualize a 12 kHz low&#45;pass/high&#45;pass Biquad handoff." alt="" coords="116,5,183,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Filters.html" title="Tutorials for FIR, IIR and Biquad filter design and execution." alt="" coords="5,5,68,31"/>
+</map>

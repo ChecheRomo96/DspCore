@@ -1,0 +1,180 @@
+\_form#0=28x20:$W$
+\_form#1=23x20:$H$
+\_form#2=20x20:$D$
+\_form#3=775x28:\[i_{1\mathrm D}(x)=x, \qquad
+i_{2\mathrm D}(x,y)=yW+x, \qquad
+i_{3\mathrm D}(x,y,z)=(zH+y)W+x.
+\]
+\_form#4=145x28:$p=x(N-1)$
+\_form#5=15x13:$x$
+\_form#6=50x28:$[0,1)$
+\_form#7=85x25:$p=xN$
+\_form#8=28x28:$\lfloor p\rfloor$
+\_form#9=118x28:$t=p-\lfloor p\rfloor$
+\_form#10=23x20:$N$
+\_form#11=313x28:\[L(v_0,v_1,t)=(1-t)v_0+tv_1.
+\]
+\_form#12=688x33:\[B(f_{00},f_{10},f_{01},f_{11},t_x,t_y)=
+L\bigl(L(f_{00},f_{10},t_x),L(f_{01},f_{11},t_x),t_y\bigr),
+\]
+\_form#13=888x33:\[T(\mathbf f,t_x,t_y,t_z)=
+L\bigl(B(f_{000},f_{100},f_{010},f_{110},t_x,t_y),
+        B(f_{001},f_{101},f_{011},f_{111},t_x,t_y),t_z\bigr).
+\]
+\_form#14=148x50:\[t_x=\frac{x-x_0}{x_1-x_0}.
+\]
+\_form#15=85x18:$x_0=x_1$
+\_form#16=70x23:$t_x=0$
+\_form#17=243x23:$L=\mathtt{last}-\mathtt{first}>1$
+\_form#18=10x18:$i$
+\_form#19=505x53:\[t_i=\frac{i}{L-1}, \qquad y_i=\mathtt{start}+(\mathtt{end}-\mathtt{start})t_i.
+\]
+\_form#20=843x58:\[t_i=\frac{i}{L-1}, \qquad
+q_{\mathrm{exp}}(t_i)=\frac{1-e^{-ct_i}}{1-e^{-c}}, \qquad
+y_i=\mathtt{start}+(\mathtt{end}-\mathtt{start})q_{\mathrm{exp}}(t_i),
+\]
+\_form#21=155x23:$c=\mathtt{curve}\geq0$
+\_form#22=55x18:$c=0$
+\_form#23=83x28:$q(t)=t$
+\_form#24=10x13:$c$
+\_form#25=858x63:\[t_i=\frac{i}{L-1}, \qquad
+q_{\mathrm{log}}(t_i)=\frac{\log(1+ct_i)}{\log(1+c)}, \qquad
+y_i=\mathtt{start}+(\mathtt{end}-\mathtt{start})q_{\mathrm{log}}(t_i),
+\]
+\_form#26=68x23:$N>0$
+\_form#27=645x63:\[p_i=\mathrm{wrap}\left(\phi+\frac{i}{N}\right), \qquad
+y_i=o+A\,w(p_i), \qquad 0\leq i<N.
+\]
+\_form#28=583x53:\[w_{\mathrm{sine}}(p)=\sin(2\pi p), \qquad
+w_{\mathrm{saw}}(p)=2\mathrm{wrap}(p+\frac12)-1.
+\]
+\_form#29=608x53:\[w_{\mathrm{square}}(p)=1 \quad (p<\frac12), \qquad
+w_{\mathrm{square}}(p)=-1 \quad (p\geq\frac12).
+\]
+\_form#30=423x63:\[w_{\mathrm{triangle}}(p)=2\left|2\mathrm{wrap}(p+\frac34)-1\right|-1.
+\]
+\_form#31=158x28:$t_i=i/(N-1)$
+\_form#32=68x23:$N>1$
+\_form#33=130x23:$x_i=2t_i-1$
+\_form#34=75x23:$x_i=t_i$
+\_form#35=440x28:\[a(x)=\arctan(d x), \qquad h(x)=\tanh(d x).
+\]
+\_form#36=103x28:$\arctan(d)$
+\_form#37=83x28:$\tanh(d)$
+\_form#38=238x30:\[y_i=s\,t_i^\gamma, \qquad \gamma=g^m,
+\]
+\_form#39=15x18:$g$
+\_form#40=25x13:$m$
+\_form#41=60x23:$L>1$
+\_form#42=153x28:$t_i=i/(L-1)$
+\_form#43=225x28:\[y_i=s+(e-s)q(t_i).
+\]
+\_form#44=678x63:\[q_{\mathrm{linear}}(t)=t, \qquad
+q_{\mathrm{exp}}(t)=\frac{1-e^{-ct}}{1-e^{-c}}, \qquad
+q_{\mathrm{log}}(t)=\frac{\log(1+ct)}{\log(1+c)}.
+\]
+\_form#45=38x28:$q(t)$
+\_form#46=40x28:$\ell(t)$
+\_form#47=743x28:\[s\leftarrow s\ \mathrm{xor}\ (s\ll13),\qquad
+s\leftarrow s\ \mathrm{xor}\ (s\gg17),\qquad
+s\leftarrow s\ \mathrm{xor}\ (s\ll5),
+\]
+\_form#48=393x48:\[u=\frac{s}{2^{32}-1}, \qquad y=o+A(2u-1).
+\]
+\_form#49=113x25:$0\leq i<N$
+\_form#50=858x63:\[w_{\mathrm{Hann}}[i]=0.5-0.5\cos\left(\frac{2\pi i}{N-1}\right),
+\qquad
+w_{\mathrm{Hamming}}[i]=0.54-0.46\cos\left(\frac{2\pi i}{N-1}\right).
+\]
+\_form#51=113x25:$A,B,C,D$
+\_form#52=130x25:$b_0, \ldots, b_{N-1}$
+\_form#53=240x78:\[y[n] = \sum_{k=0}^{N-1} b_k x[n-k].
+\]
+\_form#54=205x78:\[H(z) = \sum_{k=0}^{N-1} b_k z^{-k}.
+\]
+\_form#55=465x33:\[H(z) = b_0 z^0 + b_1 z^{-1} + \cdots + b_{N-1} z^{-(N-1)}.
+\]
+\_form#56=20x25:$b_k$
+\_form#57=55x28:$Y(x)$
+\_form#58=43x28:$x[n]$
+\_form#59=43x28:$y[n]$
+\_form#60=63x28:$b_0x[n]$
+\_form#61=108x28:$b_kx[n-k]$
+\_form#62=113x25:$b_0 \ldots b_{N-1}$
+\_form#63=215x28:$y[n] = \sum b_kx[n-k]$
+\_form#64=90x25:$b_0 \ldots b_M$
+\_form#65=93x18:$a_0 \ldots a_N$
+\_form#66=343x78:\[\sum_{k=0}^{N} a_k y[n-k] = \sum_{k=0}^{M} b_k x[n-k].
+\]
+\_form#67=328x75:\[H(z) = \frac{Y(z)}{X(z)} =
+\frac{\sum_{k=0}^{M} b_kz^{-k}}{\sum_{k=0}^{N} a_kz^{-k}}.
+\]
+\_form#68=23x18:$a_0$
+\_form#69=428x78:\[y[n] = \sum_{k=0}^{M}\frac{b_k}{a_0}x[n-k]
+       - \sum_{k=1}^{N}\frac{a_k}{a_0}y[n-k].
+\]
+\_form#70=15x18:$y$
+\_form#71=10x20:$b$
+\_form#72=13x13:$a$
+\_form#73=23x18:$a_k$
+\_form#74=23x28:$b[]$
+\_form#75=25x28:$a[]$
+\_form#76=313x28:$\sum a_ky[n-k] = \sum b_kx[n-k]$
+\_form#77=18x13:$n$
+\_form#78=498x78:\[y[n] = \sum_{k=0}^{N-1}b_kx[n-k], \qquad
+H(z) = \sum_{k=0}^{N-1}b_kz^{-k}.
+\]
+\_form#79=593x78:\[\sum_{k=0}^{N}a_ky[n-k] = \sum_{k=0}^{M}b_kx[n-k], \qquad
+H(z) = \frac{\sum b_kz^{-k}}{\sum a_kz^{-k}}.
+\]
+\_form#80=313x60:\[H(z)=\frac{b_0+b_1z^{-1}+b_2z^{-2}}
+           {a_0+a_1z^{-1}+a_2z^{-2}}.
+\]
+\_form#81=20x25:$f_s$
+\_form#82=23x25:$f_0$
+\_form#83=20x25:$Q$
+\_form#84=470x60:\[\omega_0=2\pi\frac{f_0}{f_s}, \qquad
+c=\cos\omega_0, \qquad
+\alpha=\frac{\sin\omega_0}{2Q}.
+\]
+\_form#85=793x63:\[(b_0,b_1,b_2)=\left(\frac{1-c}{2},1-c,\frac{1-c}{2}\right),
+\qquad (a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha),
+\]
+\_form#86=833x63:\[(b_0,b_1,b_2)=\left(\frac{1+c}{2},-(1+c),\frac{1+c}{2}\right),
+\qquad (a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha).
+\]
+\_form#87=750x93:\[\begin{array}{c|c}
+\mathrm{BandPass}&(\alpha,0,-\alpha)\\
+\mathrm{Notch}&(1,-2c,1)\\
+\mathrm{AllPass}&(1-\alpha,-2c,1+\alpha)
+\end{array}
+\qquad
+(a_0,a_1,a_2)=(1+\alpha,-2c,1-\alpha).
+\]
+\_form#88=125x25:$A=10^{G/40}$
+\_form#89=20x20:$G$
+\_form#90=828x48:\[(b_0,b_1,b_2)=(1+\alpha A,-2c,1-\alpha A), \qquad
+(a_0,a_1,a_2)=\left(1+\frac{\alpha}{A},-2c,1-\frac{\alpha}{A}\right).
+\]
+\_form#91=18x20:$S$
+\_form#92=588x78:\[\alpha=\frac{\sin\omega_0}{2}
+\sqrt{\left(A+\frac1A\right)\left(\frac1S-1\right)+2},
+\qquad \beta=2\sqrt A\,\alpha.
+\]
+\_form#93=190x28:$x[0],\ldots,x[N-1]$
+\_form#94=195x40:\[P = \max_{0\leq n<N}\left|x[n]\right|.
+\]
+\_form#95=65x20:$R=0$
+\_form#96=65x20:$P=0$
+\_form#97=390x90:\[R = P\sqrt{\min\left(1,\frac{1}{N}
+    \sum_{n=0}^{N-1}\left(\frac{x[n]}{P}\right)^2\right)}.
+\]
+\_form#98=140x28:$m[n]=|x[n]|$
+\_form#99=15x13:$\tau$
+\_form#100=168x28:$m[n]>v[n-1]$
+\_form#101=30x20:$\Delta t$
+\_form#102=628x35:\[\alpha = 1-e^{-\Delta t/\tau}, \qquad
+v[n] = v[n-1] + \alpha\bigl(m[n]-v[n-1]\bigr).
+\]
+\_form#103=60x18:$\alpha=1$
+\_form#104=50x28:$m[n]$

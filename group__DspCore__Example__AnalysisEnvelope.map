@@ -1,0 +1,4 @@
+<map id="Envelope follower" name="Envelope follower">
+<area shape="rect" id="Node000001" title="Follow a rectified signal with independent attack and release constants." alt="" coords="173,5,312,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Analysis.html" title="Tutorials for level measurement and envelope following." alt="" coords="5,5,125,31"/>
+</map>

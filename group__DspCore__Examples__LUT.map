@@ -1,0 +1,8 @@
+<map id="Lookup tables" name="Lookup tables">
+<area shape="rect" id="Node000004" href="$group__DspCore__Example__LUTLine.html" title="Build a normalized one&#45;dimensional curve and inspect capacity behavior." alt="" coords="402,5,451,31"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__Example__LUTSampling.html" title="Sample lookup tables with closed and periodic boundary behavior." alt="" coords="385,55,468,80"/>
+<area shape="rect" id="Node000005" href="$group__DspCore__Example__LUTSurface.html" title="Access a row&#45;major 2D table safely and reshape it without losing flat order." alt="" coords="391,104,462,129"/>
+<area shape="rect" id="Node000006" href="$group__DspCore__Example__LUTVolume.html" title="Exercise 3D table indexing, move semantics and rejected impossible shapes." alt="" coords="391,153,462,179"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples.html" title="Runnable, reproducible walkthroughs of the public DspCore API." alt="" coords="5,80,177,105"/>
+<area shape="rect" id="Node000001" title="Tutorials for one&#45;, two&#45; and three&#45;dimensional lookup&#45;table storage." alt="" coords="225,80,337,105"/>
+</map>

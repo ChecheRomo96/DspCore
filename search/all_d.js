@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['package_20consumer_20test_0',['Installed Package Consumer Test',['../group__DspCore__Workflows__PackageConsumer.html',1,'']]],
+  ['parameter_1',['Parameter',['../namespaceDspCore_1_1Filters_1_1Biquad.html#ab245d0356a4d6cabcc4c5eeb2d9060a4',1,'DspCore::Filters::Biquad']]],
+  ['parameterat_2',['ParameterAt',['../namespaceDspCore_1_1Filters_1_1Biquad.html#ac6e97891891ffe44dfcc5b1676c14828',1,'DspCore::Filters::Biquad']]],
+  ['parametercount_3',['ParameterCount',['../namespaceDspCore_1_1Filters_1_1Biquad.html#a65cdc9394a83bbce5e56934aa3ed1741',1,'DspCore::Filters::Biquad']]],
+  ['parameterinfo_4',['ParameterInfo',['../structDspCore_1_1Filters_1_1Biquad_1_1ParameterInfo.html',1,'DspCore::Filters::Biquad']]],
+  ['parameterlabel_5',['ParameterLabel',['../namespaceDspCore_1_1Filters_1_1Biquad.html#aa297feb2e22faf961b7d59e1f6ee895a',1,'DspCore::Filters::Biquad']]],
+  ['peak_6',['Peak',['../namespaceDspCore_1_1Filters_1_1Biquad.html#ad9927ca9e0800a1b1e42b3900478493b',1,'DspCore::Filters::Biquad::Peak()'],['../group__DspCore__Analysis.html#ga1ad3e5277c1c7551346820f3c07da1c9',1,'DspCore::Analysis::Peak()']]],
+  ['periodic_20tables_7',['Periodic tables',['../group__DspCore__Generators__Periodic.html',1,'Periodic tables'],['../group__DspCore__Example__GeneratorsPeriodic.html',1,'Periodic tables']]],
+  ['physical_20coordinates_8',['Physical coordinates',['../group__DspCore__Interpolation.html#DspCore_Interpolation_Coordinates',1,'']]],
+  ['pin_9',['Updating the Pin',['../group__DspCore__Workflows__SharedInfrastructure.html#DspCoreSharedInfrastructurePin',1,'']]],
+  ['planned_20content_10',['Architecture and planned content',['../DspCore_Architecture.html',1,'']]],
+  ['platform_20presets_11',['Platform Presets',['../group__DspCore__BuildGuide__Platforms.html',1,'']]],
+  ['plotting_20tools_12',['Desktop output and plotting tools',['../group__DspCore__Examples.html#DspCore_Examples_DesktopTools',1,'']]],
+  ['polezero_2eh_13',['PoleZero.h',['../PoleZero_8h.html',1,'']]],
+  ['portable_20biquad_20api_20use_14',['Portable Biquad API use',['../group__DspCore__Example__FiltersBiquad.html#DspCore_Example_FiltersBiquad_Kernel',1,'']]],
+  ['portable_20fir_20api_20use_15',['Portable FIR API use',['../group__DspCore__Example__FiltersFIR.html#DspCore_Example_FiltersFIR_Kernel',1,'']]],
+  ['portable_20iir_20api_20use_16',['Portable IIR API use',['../group__DspCore__Example__FiltersIIR.html#DspCore_Example_FiltersIIR_Kernel',1,'']]],
+  ['presets_17',['Platform Presets',['../group__DspCore__BuildGuide__Platforms.html',1,'']]],
+  ['process_18',['Process',['../classDspCore_1_1Filters_1_1FIR.html#a4268b6d0edc84ca2c9be32c096742969',1,'DspCore::Filters::FIR::Process(const Processing::SampleBlock&lt; const SampleType &gt; &amp;input, const Processing::SampleBlock&lt; SampleType &gt; &amp;output) noexcept'],['../classDspCore_1_1Filters_1_1FIR.html#a6aa082200c39c815439e8299b1ae367f',1,'DspCore::Filters::FIR::Process(const SampleType *input, SampleType *output, const cpstd::size_t sampleCount) noexcept'],['../classDspCore_1_1Filters_1_1IIR.html#a7c49ecae3e4580d96746b89ca1c02d95',1,'DspCore::Filters::IIR::Process(const Processing::SampleBlock&lt; const SampleType &gt; &amp;input, const Processing::SampleBlock&lt; SampleType &gt; &amp;output) noexcept'],['../classDspCore_1_1Filters_1_1IIR.html#abc352ab4d7335761d9659aeb0032786b',1,'DspCore::Filters::IIR::Process(const SampleType *input, SampleType *output, const cpstd::size_t sampleCount) noexcept']]],
+  ['processing_19',['Processing',['../group__DspCore__Processing.html',1,'']]],
+  ['processing_20does_20not_20provide_20',['What processing does not provide',['../group__DspCore__Processing.html#DspCore_Processing_WhatThisIsNot',1,'']]],
+  ['processing_20model_21',['Ownership and processing model',['../group__DspCore__Processing.html#DspCore_Processing_Model',1,'']]],
+  ['provide_22',['What processing does not provide',['../group__DspCore__Processing.html#DspCore_Processing_WhatThisIsNot',1,'']]]
+];

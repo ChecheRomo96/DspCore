@@ -1,0 +1,12 @@
+<map id="DspCore" name="DspCore">
+<area shape="rect" id="Node000001" title="Portable signal processing built on Foundation." alt="" coords="5,203,83,228"/>
+<area shape="rect" id="Node000007" href="$group__DspCore__Analysis.html" title="Block peak/RMS measurements and an attack/release amplitude follower." alt="" coords="135,5,255,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Core.html" title="Version information for DspCore and its dependencies." alt="" coords="169,55,221,80"/>
+<area shape="rect" id="Node000008" href="$group__DspCore__Dynamics.html" title="Signal&#45;dependent, stateful processors such as compressors and gates." alt="" coords="131,104,260,129"/>
+<area shape="rect" id="Node000006" href="$group__DspCore__Filters.html" title="Single&#45;rate FIR/IIR filters, coefficient designers, and future filter families." alt="" coords="164,153,227,179"/>
+<area shape="rect" id="Node000005" href="$group__DspCore__Generators.html" title="Allocation&#45;free table and segment generation into caller&#45;owned buffers." alt="" coords="148,203,243,228"/>
+<area shape="rect" id="Node000004" href="$group__DspCore__Interpolation.html" title="Float/double linear, bilinear and trilinear interpolation arithmetic." alt="" coords="143,252,248,277"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__LUT.html" title="Move&#45;only 1D, 2D and 3D arithmetic sample storage and sampling." alt="" coords="139,301,251,327"/>
+<area shape="rect" id="Node000010" href="$group__DspCore__Processing.html" title="Typed, zero&#45;copy fixed&#45;size sample&#45;block views." alt="" coords="149,351,241,376"/>
+<area shape="rect" id="Node000009" href="$group__DspCore__Transforms.html" title="Discrete transforms and their analysis&#45;oriented utilities." alt="" coords="148,400,243,425"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Signal analysis" name="Signal analysis">
+<area shape="rect" id="Node000003" href="$group__DspCore__Example__AnalysisEnvelope.html" title="Follow a rectified signal with independent attack and release constants." alt="" coords="393,5,532,31"/>
+<area shape="rect" id="Node000004" href="$group__DspCore__Example__AnalysisLevels.html" title="Measure block peak and RMS levels safely." alt="" coords="431,55,495,80"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples.html" title="Runnable, reproducible walkthroughs of the public DspCore API." alt="" coords="5,31,177,56"/>
+<area shape="rect" id="Node000001" title="Tutorials for level measurement and envelope following." alt="" coords="225,31,345,56"/>
+</map>

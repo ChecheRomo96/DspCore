@@ -1,0 +1,4 @@
+<map id="FIR" name="FIR">
+<area shape="rect" id="Node000001" title="Compare 10&#45; and 100&#45;tap moving&#45;average low&#45;pass filters." alt="" coords="116,5,159,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Filters.html" title="Tutorials for FIR, IIR and Biquad filter design and execution." alt="" coords="5,5,68,31"/>
+</map>

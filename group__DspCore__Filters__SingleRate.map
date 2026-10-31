@@ -1,0 +1,4 @@
+<map id="Single&#45;rate filters" name="Single&#45;rate filters">
+<area shape="rect" id="Node000002" href="$group__DspCore__Filters.html" title="Single&#45;rate FIR/IIR filters, coefficient designers, and future filter families." alt="" coords="5,5,68,31"/>
+<area shape="rect" id="Node000001" title="Filters whose input and output advance at the same sample rate." alt="" coords="116,5,251,31"/>
+</map>
