@@ -1,81 +1,81 @@
 /**
- * @defgroup DspCore_Examples Examples
- * @brief Runnable demonstrations of DspCore APIs.
+ * @defgroup DspCore_Examples Examples and tutorials
+ * @brief Runnable, reproducible walkthroughs of the public DspCore API.
  *
- * Examples mirror the source hierarchy and share portable code between the
- * Arduino sketch and native desktop adapter:
+ * An example is a small program intended to be read, changed and run. It
+ * demonstrates a workflow and gives a human-readable result; it is therefore
+ * different from a test. Tests assert contracts automatically and may exercise
+ * edge cases that are deliberately not part of a first explanation. Examples
+ * are closer to a MATLAB live script: source, command, output and the meaning
+ * of that output live together.
  *
- * @code
- * examples/<module>/<example>/
- * |-- CMakeLists.txt
- * |-- <example>.ino
- * |-- Shared.h
- * |-- Shared.cpp
- * `-- Desktop/
- *     |-- CMakeLists.txt
- *     `-- main.cpp
- * @endcode
+ * Each tutorial below contains its goal, the specific API behavior it makes
+ * visible, a desktop command, representative output captured from the current
+ * build, and the portable `Shared.cpp` implementation used by both the desktop
+ * adapter and Arduino sketch. Filter tutorials also contain their generated
+ * figure and native CSV-producing adapter.
  *
- * Available examples:
- *
- * | Target | Shows |
- * | --- | --- |
- * | `DspCore_Core_Version` | DspCore and Foundation versions |
- * | `DspCore_LUT_Line` | Reserve, normalized samples, shrink/regrowth |
- * | `DspCore_LUT_Surface` | Row-major 2D access, bounds and reshape |
- * | `DspCore_LUT_Volume` | 3D access, moves, overflow and release |
- * | `DspCore_Interpolation_Linear` | Physical coordinates, extrapolation and invalid spans |
- * | `DspCore_Interpolation_Lookup` | Closed/periodic boundaries and 2D/3D lookup |
- * | `DspCore_Generators_Periodic` | Waveform reference samples and phase conventions |
- * | `DspCore_Generators_Shaping` | Normalized sigmoid endpoints and gamma morph |
- * | `DspCore_Generators_Envelopes` | Stable tiny curves and exponential/logarithmic reference values |
- * | `DspCore_Generators_LUTEnvelope` | Normalized table mapping and constant singleton shapes |
- * | `DspCore_Generators_Noise` | State continuity between blocks and zero-seed rejection |
- * | `DspCore_Generators_Windows` | Symmetric Hann/Hamming coefficients and singleton windows |
- * | `DspCore_Filters_FIR` | 33-tap moving-average low-pass: 300 Hz + 6 kHz signal |
- * | `DspCore_Filters_Biquad` | 12 kHz low/high-pass response to a 100 Hz--20 kHz sweep |
- * | `DspCore_Filters_IIR` | Generic numerator/denominator step-pulse response and a0 normalization |
- * | `DspCore_Analysis_Levels` | Block peak/RMS and overflow-safe scaling |
- * | `DspCore_Analysis_Envelope` | Rectification and distinct attack/release time constants |
- *
- * Build and run one on the desktop:
+ * @section DspCore_Examples_Start Run an example
  *
  * @code{.bash}
  * ./scripts/build.sh macos_arm64 --examples-on
  * ./build/macos_arm64/bin/Debug/DspCore_Core_Version_d
  * @endcode
  *
+ * The source layout intentionally keeps the tutorial logic portable:
+ *
+ * @code
+ * examples/<module>/<example>/
+ * |-- CMakeLists.txt       # native target definition
+ * |-- <example>.ino        # Arduino entry point
+ * |-- Shared.h             # portable entry point
+ * |-- Shared.cpp           # code shown by the tutorial
+ * `-- Desktop/main.cpp     # desktop adapter, when required
+ * @endcode
+ *
+ * @section DspCore_Examples_Contents Tutorial index
+ *
+ * | Tutorial | What it explores |
+ * | --- | --- |
+ * | @ref DspCore_Example_CoreVersion | DspCore and Foundation version metadata |
+ * | @ref DspCore_Example_LUTLine | One-dimensional storage, reserve and growth |
+ * | @ref DspCore_Example_LUTSurface | Row-major two-dimensional storage and reshape |
+ * | @ref DspCore_Example_LUTVolume | Three-dimensional storage, moves and overflow safety |
+ * | @ref DspCore_Example_InterpolationLinear | Physical coordinates and linear extrapolation |
+ * | @ref DspCore_Example_LUTSampling | Closed and periodic sampling in 1D, 2D and 3D |
+ * | @ref DspCore_Example_GeneratorsPeriodic | Oscillator phase conventions |
+ * | @ref DspCore_Example_GeneratorsShaping | Normalized nonlinear shaping |
+ * | @ref DspCore_Example_GeneratorsEnvelopes | Stable exponential and logarithmic curves |
+ * | @ref DspCore_Example_GeneratorsLUTEnvelope | Envelope mapping from a lookup table |
+ * | @ref DspCore_Example_GeneratorsNoise | Reproducible stateful noise blocks |
+ * | @ref DspCore_Example_GeneratorsWindows | Symmetric analysis windows |
+ * | @ref DspCore_Example_FiltersFIR | 10- and 100-tap moving-average filters |
+ * | @ref DspCore_Example_FiltersBiquad | Low-pass/high-pass Biquad crossover |
+ * | @ref DspCore_Example_FiltersIIR | Generic normalized IIR recurrence |
+ * | @ref DspCore_Example_AnalysisLevels | Peak and RMS measurement |
+ * | @ref DspCore_Example_AnalysisEnvelope | Attack/release envelope following |
+ *
  * @section DspCore_Examples_DesktopTools Desktop output and plotting tools
  *
- * `examples/Tools/` contains host-side convenience tools for the native filter
- * demonstrations. It is not part of the DspCore library, is not compiled into
- * an Arduino sketch, and is not required by an embedded consumer:
+ * `examples/Tools/` contains optional host-side helpers for the filter
+ * tutorials. These scripts are not part of DspCore, are not compiled into an
+ * Arduino sketch, and are not needed by an embedded consumer.
  *
  * | File | Purpose |
  * | --- | --- |
- * | `plot_signal.py` | Reads a signal CSV and writes a time-domain/spectrum PNG using NumPy and Matplotlib. |
+ * | `plot_signal.py` | Reads a signal CSV and produces a PNG with NumPy and Matplotlib. |
  * | `plot_signal.m` | MATLAB equivalent of the Python plotter. |
- * | `render_signal.sh` | macOS/Linux wrapper that finds Python and runs `plot_signal.py`. |
- * | `render_signal.ps1` | Windows PowerShell equivalent of the shell wrapper. |
+ * | `render_signal.sh` | macOS/Linux wrapper for the Python plotter. |
+ * | `render_signal.ps1` | Windows PowerShell wrapper for the Python plotter. |
  *
- * `examples/Tools/` intentionally has no `CMakeLists.txt`: these are scripts,
- * not build targets. `examples/CMakeLists.txt` names them so that a native
- * `--examples-on` build copies them beside its executables and an exported
- * Release examples package installs them beside its launcher. A normal DspCore
- * library build without examples does not include or distribute these tools.
+ * `examples/Tools/` has no `CMakeLists.txt` because these are scripts rather
+ * than build targets. The examples build copies them beside its executables;
+ * exported Release examples ship them beside the launcher. Doxygen uses only
+ * the versioned PNG snapshots in `Images/`, so reading the documentation never
+ * requires Python or MATLAB.
  *
- * The documentation integration has a separate purpose. `cmake/BuildDocs.cmake`
- * supplies `docs/Topics/Examples/Images/` as Doxygen's image search path, and
- * `docs/Doxyfile` consumes that value through `IMAGE_PATH`. Doxygen then copies
- * the versioned PNG snapshots into its HTML output; no Python or MATLAB is
- * needed merely to read the published documentation.
- *
- * The desktop filter examples write long, plot-ready CSV signals to
- * `~/Documents/DspCoreExampleOutput/` by default. Pass `--output <directory>` to choose
- * another location. Each CSV has `sample`, `time_seconds`, input and output
- * columns plus title, sample-rate and plot-mode metadata. Plot it with Python (NumPy and
- * Matplotlib) or MATLAB using the included helpers. The helpers are copied
- * beside native build executables and shipped beside exported examples:
+ * The filter adapters write CSV files to `~/Documents/DspCoreExampleOutput/`
+ * by default. Select another directory with `--output` and render a result:
  *
  * @code{.bash}
  * ./build/macos_arm64/bin/Debug/DspCore_Filters_FIR_d --output ./output
@@ -85,38 +85,40 @@
  * @code{.matlab}
  * plot_signal("output/fir_moving_average.csv")
  * @endcode
- *
- * @section DspCore_Examples_FilterPlots Filter example plots
- *
- * These versioned snapshots are generated from the desktop filter examples
- * with the included plotting helper. They show the time-domain signals above
- * and their normalized spectra below; regenerate the CSV data and PNGs when
- * changing the example signal or filter configuration.
- *
- * @subsection DspCore_Examples_FIRPlot FIR moving-average low-pass
- *
- * The 33-tap moving average retains the 300 Hz component while substantially
- * attenuating the 6 kHz component.
- *
- * \image html fir_moving_average.png "FIR moving-average example" width=900px
- *
- * @subsection DspCore_Examples_IIRPlot Generic IIR step-pulse response
- *
- * The generic IIR example makes its normalized a0=2 recurrence, unity DC gain
- * and stateful response to the step pulse directly inspectable. Its CSV selects
- * a time-only plot because an FFT of a step pulse is not a filter response plot.
- *
- * \image html iir_step_pulse.png "Generic IIR step-pulse example" width=900px
- *
- * @subsection DspCore_Examples_BiquadPlot Biquad low-pass and high-pass sweep
- *
- * A logarithmic sine sweep contrasts the 12 kHz low-pass and high-pass outputs.
- *
- * \image html biquad_sweep.png "Biquad low-pass and high-pass sweep example" width=900px
- *
- * Enable and export Release examples with:
- *
- * @code{.bash}
- * ./scripts/export.sh macos_arm64 --fresh --examples-on
- * @endcode
+ */
+
+/**
+ * @defgroup DspCore_Examples_Core Core
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for the DspCore core module.
+ */
+
+/**
+ * @defgroup DspCore_Examples_LUT Lookup tables
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for one-, two- and three-dimensional lookup-table storage.
+ */
+
+/**
+ * @defgroup DspCore_Examples_Interpolation Interpolation
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for interpolation formulas and physical coordinates.
+ */
+
+/**
+ * @defgroup DspCore_Examples_Generators Generators
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for periodic, shaping, envelope, noise and window generators.
+ */
+
+/**
+ * @defgroup DspCore_Examples_Filters Filters
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for FIR, IIR and Biquad filter design and execution.
+ */
+
+/**
+ * @defgroup DspCore_Examples_Analysis Signal analysis
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for level measurement and envelope following.
  */

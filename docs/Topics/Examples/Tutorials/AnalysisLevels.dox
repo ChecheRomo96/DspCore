@@ -1,0 +1,28 @@
+/**
+ * @defgroup DspCore_Example_AnalysisLevels Levels
+ * @ingroup DspCore_Examples_Analysis
+ * @brief Measure block peak and RMS levels safely.
+ *
+ * @section DspCore_Example_AnalysisLevels_Goal Goal
+ * Calculate peak and RMS for a compact signal, then confirm that the RMS scale
+ * stays finite for the largest representable input.
+ *
+ * @section DspCore_Example_AnalysisLevels_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Analysis_Levels_d
+ * @endcode
+ *
+ * @section DspCore_Example_AnalysisLevels_Output Output
+ * @code{.text}
+ * Input [-3,4,0,0]: peak=4; expected=4
+ * RMS=25/10; expected=25/10
+ * Maximum finite input: scaled RMS stays finite: PASS
+ * Overall: PASS
+ * @endcode
+ *
+ * The signal has a peak of four and RMS of 2.5. The final line demonstrates
+ * that the implementation scales before squaring instead of overflowing.
+ *
+ * @section DspCore_Example_AnalysisLevels_Code Implementation
+ * \include Analysis/Levels/Shared.cpp
+ */

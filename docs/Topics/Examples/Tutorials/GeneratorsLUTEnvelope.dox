@@ -1,0 +1,31 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsLUTEnvelope LUT envelope
+ * @ingroup DspCore_Examples_Generators
+ * @brief Use a normalized table as an envelope shape over an output range.
+ *
+ * @section DspCore_Example_GeneratorsLUTEnvelope_Goal Goal
+ * Map a five-element normalized curve to output samples, then show that a
+ * singleton shape remains a valid constant envelope.
+ *
+ * @section DspCore_Example_GeneratorsLUTEnvelope_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_LUTEnvelope_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsLUTEnvelope_Output Output
+ * @code{.text}
+ * LUT envelope[0]=0/1000; expected=0/1000
+ * LUT envelope[1]=125/1000; expected=125/1000
+ * LUT envelope[2]=250/1000; expected=250/1000
+ * LUT envelope[3]=625/1000; expected=625/1000
+ * LUT envelope[4]=1000/1000; expected=1000/1000
+ * Singleton shape=0.25 maps [2,10] to 4 in all five output samples
+ * Overall: PASS
+ * @endcode
+ *
+ * A one-point LUT has no interpolation span, yet still has a well-defined
+ * constant result; this is useful for parameterized envelope pipelines.
+ *
+ * @section DspCore_Example_GeneratorsLUTEnvelope_Code Implementation
+ * \include Generators/LUTEnvelope/Shared.cpp
+ */

@@ -1,0 +1,28 @@
+/**
+ * @defgroup DspCore_Example_LUTSurface Surface
+ * @ingroup DspCore_Examples_LUT
+ * @brief Access a row-major 2D table safely and reshape it without losing flat order.
+ *
+ * @section DspCore_Example_LUTSurface_Goal Goal
+ * Store a 3-by-2 surface, demonstrate checked coordinates, and reshape it to
+ * 2-by-3 while preserving the six values in their flat row-major sequence.
+ *
+ * @section DspCore_Example_LUTSurface_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_LUT_Surface_d
+ * @endcode
+ *
+ * @section DspCore_Example_LUTSurface_Output Output
+ * @code{.text}
+ * 3x2 surface: (2,1)=12; expected=12
+ * Out-of-range read rejected; output preserved: PASS
+ * Reshape 2x3: flat sample 5=12; expected=12
+ * Overall: PASS
+ * @endcode
+ *
+ * A rejected coordinate leaves the caller's output value intact, which makes
+ * error handling explicit in no-exception embedded code.
+ *
+ * @section DspCore_Example_LUTSurface_Code Implementation
+ * \include LUT/Surface/Shared.cpp
+ */
