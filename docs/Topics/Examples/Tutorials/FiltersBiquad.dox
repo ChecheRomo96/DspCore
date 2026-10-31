@@ -1,0 +1,35 @@
+/**
+ * @defgroup DspCore_Example_FiltersBiquad Biquad
+ * @ingroup DspCore_Examples_Filters
+ * @brief Visualize a 12 kHz low-pass/high-pass Biquad handoff.
+ *
+ * @section DspCore_Example_FiltersBiquad_Goal Goal
+ * Send a 1--200 kHz logarithmic sine sweep through complementary low-pass and
+ * high-pass Biquads at 480 kHz, with a 12 kHz cutoff and Q=0.7071.
+ *
+ * @section DspCore_Example_FiltersBiquad_Run Run and render
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Filters_Biquad_d --output ./output
+ * ./build/macos_arm64/bin/Debug/render_signal.sh ./output/biquad_sweep.csv
+ * @endcode
+ *
+ * @section DspCore_Example_FiltersBiquad_Output Output
+ * @code{.text}
+ * DspCore :: Biquad 12 kHz low-pass / high-pass sweep
+ * Wrote signal data: ./output/biquad_sweep.csv
+ * PNG: .../render_signal.sh ./output/biquad_sweep.csv
+ * @endcode
+ *
+ * The upper plot is a short RMS envelope of the temporal sweep, so the handoff
+ * remains readable. The lower plot is the direct, coefficient-derived response
+ * on a logarithmic frequency axis. Its guides identify the 12 kHz crossover and
+ * -3 dB point.
+ *
+ * \image html biquad_sweep.png "Biquad crossover tutorial output" width=900px
+ *
+ * @section DspCore_Example_FiltersBiquad_Code Desktop data generator
+ * \include Filters/Biquad/Desktop/main.cpp
+ *
+ * @subsection DspCore_Example_FiltersBiquad_Kernel Portable Biquad API use
+ * \include Filters/Biquad/Shared.cpp
+ */

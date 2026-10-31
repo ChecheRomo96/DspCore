@@ -1,0 +1,30 @@
+/**
+ * @defgroup DspCore_Example_LUTSampling Sampling
+ * @ingroup DspCore_Examples_LUT
+ * @brief Sample lookup tables with closed and periodic boundary behavior.
+ *
+ * @section DspCore_Example_LUTSampling_Goal Goal
+ * Compare a closed one-dimensional lookup with a wrapped periodic phase, then
+ * evaluate bilinear and trilinear centers in two- and three-dimensional tables.
+ *
+ * @section DspCore_Example_LUTSampling_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_LUT_Sampling_d
+ * @endcode
+ *
+ * @section DspCore_Example_LUTSampling_Output Output
+ * @code{.text}
+ * Closed coordinate=0.5: value=15; expected=15
+ * Periodic phase=0.5: value=20; expected=20
+ * Periodic phase=-0.125: seam value=15; expected=15
+ * Bilinear center: value=3; expected=3
+ * Trilinear center: value=7; expected=7
+ * Overall: PASS
+ * @endcode
+ *
+ * The negative phase is the useful seam case: periodic lookup wraps it instead
+ * of clamping it, which is appropriate for oscillator tables.
+ *
+ * @section DspCore_Example_LUTSampling_Code Implementation
+ * \include LUT/Sampling/Shared.cpp
+ */

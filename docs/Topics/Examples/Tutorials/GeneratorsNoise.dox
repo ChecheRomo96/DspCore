@@ -1,0 +1,28 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsNoise White noise
+ * @ingroup DspCore_Examples_Generators
+ * @brief Demonstrate reproducible, stateful noise generation across block boundaries.
+ *
+ * @section DspCore_Example_GeneratorsNoise_Goal Goal
+ * Use a fixed seed to prove that processing eight samples at once equals
+ * processing the same stream as blocks of three and five samples.
+ *
+ * @section DspCore_Example_GeneratorsNoise_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_Noise_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsNoise_Output Output
+ * @code{.text}
+ * One 8-sample block equals split 3+5 blocks: PASS
+ * Zero seed rejected without changing output: PASS
+ * Continued PRNG state=3306712617
+ * Overall: PASS
+ * @endcode
+ *
+ * Block segmentation does not alter the generated stream, a fundamental
+ * requirement when a real-time host changes its callback block size.
+ *
+ * @section DspCore_Example_GeneratorsNoise_Code Implementation
+ * \include Generators/Noise/Shared.cpp
+ */

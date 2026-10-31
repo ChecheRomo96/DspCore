@@ -1,6 +1,6 @@
 /**
- * @defgroup DspCore_Example_InterpolationLinear Interpolation / Linear
- * @ingroup DspCore_Examples
+ * @defgroup DspCore_Example_InterpolationLinear Linear interpolation
+ * @ingroup DspCore_Examples_Interpolation
  * @brief Map physical and normalized coordinates through a linear segment.
  *
  * @section DspCore_Example_InterpolationLinear_Goal Goal

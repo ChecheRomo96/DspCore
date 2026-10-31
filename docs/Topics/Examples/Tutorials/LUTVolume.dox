@@ -1,0 +1,29 @@
+/**
+ * @defgroup DspCore_Example_LUTVolume Volume
+ * @ingroup DspCore_Examples_LUT
+ * @brief Exercise 3D table indexing, move semantics and rejected impossible shapes.
+ *
+ * @section DspCore_Example_LUTVolume_Goal Goal
+ * Populate a 2-by-3-by-4 volume, move its storage, reject a shape whose product
+ * would overflow, and release an empty volume safely.
+ *
+ * @section DspCore_Example_LUTVolume_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_LUT_Volume_d
+ * @endcode
+ *
+ * @section DspCore_Example_LUTVolume_Output Output
+ * @code{.text}
+ * 2x3x4 volume: (1,2,3)=123; expected=123
+ * Move transferred storage and cleared source: PASS
+ * Overflow rejected; shape and sample preserved: PASS
+ * Empty resize and repeated Release: PASS
+ * Overall: PASS
+ * @endcode
+ *
+ * The failed resize is intentionally non-destructive: the previously valid
+ * table remains available to the caller.
+ *
+ * @section DspCore_Example_LUTVolume_Code Implementation
+ * \include LUT/Volume/Shared.cpp
+ */
