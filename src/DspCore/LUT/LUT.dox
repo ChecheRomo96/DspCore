@@ -11,9 +11,12 @@
  * Default construction is empty and does not allocate. Resize and Reserve
  * return false on overflow or allocation failure, preserving all existing
  * state. Reserve is an element count, not a byte count; it does not change
- * logical size. Allocation uses non-throwing C malloc/free on every target.
- * Arithmetic objects are constructed in allocated storage. Copy is disabled;
- * moves transfer ownership without allocating and leave the source empty.
+ * logical size. Tables own their contiguous storage through cpstd::vector,
+ * so allocation follows the selected CPSTL backend. With CPSTL's native
+ * backend, allocation failure leaves the vector unchanged and these methods
+ * return false; with CPSTL_USING_STL, allocation follows std::vector's
+ * configured behavior. Copy is disabled; moves transfer ownership without
+ * allocating and leave the source dimensions empty.
  *
  * @code{.cpp}
  * DspCore::LUT::LUT1D<float> curve;
