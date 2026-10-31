@@ -1,0 +1,13 @@
+set(DSPCORE_DYNAMICS_HEADERS
+    "${CMAKE_CURRENT_LIST_DIR}/Compressor.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Gate.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Limiter.h")
+
+target_sources(DspCore PRIVATE ${DSPCORE_DYNAMICS_HEADERS})
+dspcore_stage_headers(${DSPCORE_DYNAMICS_HEADERS})
+dspcore_add_dox(${DSPCORE_DYNAMICS_HEADERS}
+    "${CMAKE_CURRENT_LIST_DIR}/Dynamics.dox")
+
+install(FILES ${DSPCORE_DYNAMICS_HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/DspCore/Dynamics"
+    CONFIGURATIONS Release)

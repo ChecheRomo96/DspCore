@@ -43,3 +43,13 @@ option(DSPCORE_ANALYSIS "Enable DspCore::Analysis" ON)
 if(DSPCORE_FULL_BUILD)
     set(DSPCORE_ANALYSIS ON CACHE BOOL "Enable DspCore::Analysis" FORCE)
 endif()
+
+option(DSPCORE_DYNAMICS "Enable DspCore::Dynamics" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_DYNAMICS ON CACHE BOOL "Enable DspCore::Dynamics" FORCE)
+endif()
+
+option(DSPCORE_TRANSFORMS "Enable DspCore::Transforms" ON)
+if(DSPCORE_FULL_BUILD)
+    set(DSPCORE_TRANSFORMS ON CACHE BOOL "Enable DspCore::Transforms" FORCE)
+endif()

@@ -1,6 +1,9 @@
 set(DSPCORE_ANALYSIS_HEADERS
     "${CMAKE_CURRENT_LIST_DIR}/Levels.h"
-    "${CMAKE_CURRENT_LIST_DIR}/EnvelopeFollower.h")
+    "${CMAKE_CURRENT_LIST_DIR}/EnvelopeFollower.h"
+    "${CMAKE_CURRENT_LIST_DIR}/FrequencyResponse.h"
+    "${CMAKE_CURRENT_LIST_DIR}/PoleZero.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Stability.h")
 target_sources(DspCore PRIVATE ${DSPCORE_ANALYSIS_HEADERS})
 dspcore_stage_headers(${DSPCORE_ANALYSIS_HEADERS})
 dspcore_add_dox(${DSPCORE_ANALYSIS_HEADERS} "${CMAKE_CURRENT_LIST_DIR}/Analysis.dox")

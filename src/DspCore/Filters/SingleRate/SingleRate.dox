@@ -1,0 +1,16 @@
+/**
+ * @defgroup DspCore_Filters_SingleRate Single-rate filters
+ * @ingroup DspCore_Filters
+ * @brief Filters whose input and output advance at the same sample rate.
+ *
+ * `FIR` and `IIR` are SISO, causal, block-processing implementations. Both
+ * retain only algorithmic delay state and consume caller-owned
+ * Processing::SampleBlock views. They do not own streams, route channels, or
+ * manage an audio clock.
+ *
+ * - FIR implements a finite numerator polynomial and a finite impulse
+ *   response.
+ * - IIR implements a rational transfer function with numerator and
+ *   denominator polynomials.
+ * - Biquad designs a second-order IIR coefficient set that IIR can consume.
+ */

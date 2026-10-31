@@ -1,5 +1,5 @@
 #include "Shared.h"
-#include <DspCore/Filters/IIR.h>
+#include <DspCore/Filters/SingleRate/IIR.h>
 #include <stdio.h>
 namespace DspCoreExamples { namespace Filters { namespace IIR {
 bool Run(void (*print)(const char*)) {
