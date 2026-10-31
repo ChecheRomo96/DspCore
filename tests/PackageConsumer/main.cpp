@@ -43,11 +43,11 @@ int main() {
     std::cout << "Installed LUT1D/2D/3D headers and storage: PASS\n";
 
     double interpolated = 0;
-    if (!DspCore::Interpolation::Lookup(line, 0.5, interpolated,
-            DspCore::Interpolation::Boundary::Clamp) || interpolated != 0.25) return 1;
+    if (!DspCore::LUT::Sample(line, 0.5, interpolated,
+            DspCore::LUT::Boundary::Clamp) || interpolated != 0.25) return 1;
     if (DspCore::Interpolation::NormalizedTrilinear(1.,3.,5.,7.,9.,11.,13.,15.,0.25,0.5,0.75) != 9.5)
         return 1;
-    std::cout << "Installed interpolation and LUT lookup: PASS\n";
+    std::cout << "Installed interpolation and LUT sampling: PASS\n";
 
     double generated[5];
     if (!DspCore::Generators::Envelopes::ExpSegment(generated,0.,1.,1e-9,5) ||
@@ -77,7 +77,7 @@ int main() {
     if(!iir.Configure(coefficients) || !iir.Process(filterInput,iirOutput,2) || iirOutput[0]<=0.) return 1;
     double filtered=0;
     const double block[]={-3,4,0,0};
-    if(!DspCore::Analysis::RMS(block,4,filtered) || filtered!=2.5) return 1;
+    if(!DspCore::Analysis::RMS(DspCore::Processing::MakeInputBlock(block,4U),filtered) || filtered!=2.5) return 1;
     DspCore::Analysis::EnvelopeFollower<double> follower;
     if(!follower.Update(-2.,0.01,filtered) || filtered!=2.) return 1;
     std::cout << "Installed typed block processing, FIR/IIR, RMS and follower: PASS\n";

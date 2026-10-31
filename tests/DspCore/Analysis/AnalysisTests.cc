@@ -6,35 +6,36 @@ using namespace DspCore::Analysis;
 
 TEST(Levels, PeakAndRmsHaveExplicitBlockAndEmptySemantics) {
     const double input[]={-3.,4.,0.,0.}; double output=99;
-    ASSERT_TRUE(Peak(input,4,output)); EXPECT_EQ(output,4.);
-    ASSERT_TRUE(RMS(input,4,output)); EXPECT_EQ(output,2.5);
-    ASSERT_TRUE(Peak(static_cast<const double*>(nullptr),0,output)); EXPECT_EQ(output,0.);
-    ASSERT_TRUE(RMS(static_cast<const double*>(nullptr),0,output)); EXPECT_EQ(output,0.);
+    ASSERT_TRUE(Peak(DspCore::Processing::MakeInputBlock(input,4U),output)); EXPECT_EQ(output,4.);
+    ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(input,4U),output)); EXPECT_EQ(output,2.5);
+    const DspCore::Processing::SampleBlock<const double> empty{};
+    ASSERT_TRUE(Peak(empty,output)); EXPECT_EQ(output,0.);
+    ASSERT_TRUE(RMS(empty,output)); EXPECT_EQ(output,0.);
 }
 TEST(Levels, ScaledRmsHandlesExtremeFiniteValuesAndSmallSignals) {
     const double maximum=std::numeric_limits<double>::max();
     const double large[]={maximum,-maximum}; double output=0;
-    ASSERT_TRUE(RMS(large,2,output)); EXPECT_EQ(output,maximum);
+    ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(large,2U),output)); EXPECT_EQ(output,maximum);
     const double tiny=std::numeric_limits<double>::min(); const double small[]={tiny,-tiny};
-    ASSERT_TRUE(RMS(small,2,output)); EXPECT_EQ(output,tiny);
+    ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(small,2U),output)); EXPECT_EQ(output,tiny);
     const double mixed[]={maximum,0};
-    ASSERT_TRUE(RMS(mixed,2,output)); EXPECT_NEAR(output/maximum,std::sqrt(0.5),1e-15);
+    ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(mixed,2U),output)); EXPECT_NEAR(output/maximum,std::sqrt(0.5),1e-15);
 }
-TEST(Levels, InvalidBuffersSamplesAndCountsPreserveOutput) {
+TEST(Levels, InvalidBlocksAndSamplesPreserveOutput) {
     float output=99;
     const float nan[]={0,std::numeric_limits<float>::quiet_NaN()};
-    EXPECT_FALSE(Peak(nan,2,output)); EXPECT_FALSE(RMS(nan,2,output));
-    EXPECT_FALSE(Peak(static_cast<const float*>(nullptr),1,output));
-    EXPECT_FALSE(RMS(nan,std::numeric_limits<size_t>::max()/sizeof(float)+1,output));
+    EXPECT_FALSE(Peak(DspCore::Processing::MakeInputBlock(nan,2U),output));
+    EXPECT_FALSE(RMS(DspCore::Processing::MakeInputBlock(nan,2U),output));
+    EXPECT_FALSE(Peak(DspCore::Processing::SampleBlock<const float>{nullptr,1U},output));
     EXPECT_EQ(output,99);
 }
 TEST(Levels, SineReferenceAndOutputAliasingAreSupported) {
     double wave[64];
     for(size_t i=0;i<64;++i) wave[i]=std::sin(2.*std::acos(-1.)*static_cast<double>(i)/64.);
     double output=0;
-    ASSERT_TRUE(RMS(wave,64,output)); EXPECT_NEAR(output,std::sqrt(0.5),1e-15);
-    ASSERT_TRUE(Peak(wave,64,wave[0])); EXPECT_EQ(wave[0],1.);
-    double input[]={-3,4}; ASSERT_TRUE(RMS(input,2,input[0])); EXPECT_NEAR(input[0],std::sqrt(12.5),1e-15);
+    ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(wave,64U),output)); EXPECT_NEAR(output,std::sqrt(0.5),1e-15);
+    ASSERT_TRUE(Peak(DspCore::Processing::MakeInputBlock(wave,64U),wave[0])); EXPECT_EQ(wave[0],1.);
+    double input[]={-3,4}; ASSERT_TRUE(RMS(DspCore::Processing::MakeInputBlock(input,2U),input[0])); EXPECT_NEAR(input[0],std::sqrt(12.5),1e-15);
 }
 TEST(Follower, RectificationAttackReleaseAndZeroTimes) {
     EnvelopeFollower<double> follower;

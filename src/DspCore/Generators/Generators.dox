@@ -1,5 +1,6 @@
 /**
  * @defgroup DspCore_Generators Generators
+ * @ingroup DspCore
  * @brief Allocation-free table and segment generation into caller-owned buffers.
  *
  * Include `<DspCore_Generators.h>` or an individual family header under
@@ -62,6 +63,23 @@
  * Phase is in cycles, wraps negative/large finite values into [0,1), and is
  * computed from the sample index rather than accumulated. A singleton samples
  * the supplied phase. Output is offset + amplitude * waveform(phase+i/N).
+ * For @f$N>0@f$, the table coordinate and output are
+ * @f[
+ * p_i=\mathrm{wrap}\left(\phi+\frac{i}{N}\right), \qquad
+ * y_i=o+A\,w(p_i), \qquad 0\leq i<N.
+ * @f]
+ * The implemented waveforms are
+ * @f[
+ * w_{\mathrm{sine}}(p)=\sin(2\pi p), \qquad
+ * w_{\mathrm{saw}}(p)=2\mathrm{wrap}(p+\frac12)-1.
+ * @f]
+ * @f[
+ * w_{\mathrm{square}}(p)=1 \quad (p<\frac12), \qquad
+ * w_{\mathrm{square}}(p)=-1 \quad (p\geq\frac12).
+ * @f]
+ * @f[
+ * w_{\mathrm{triangle}}(p)=2\left|2\mathrm{wrap}(p+\frac34)-1\right|-1.
+ * @f]
  *
  * | Wave | Phase zero | Quarter-cycle | Half-cycle | Three-quarter-cycle |
  * | --- | --- | --- | --- | --- |
@@ -72,7 +90,8 @@
  *
  * These conventions preserve the historical saw/triangle phase offsets.
  * The tables are naive and not band-limited. They are not streaming oscillators
- * with a sample rate or anti-aliasing. Use periodic lookup with Boundary::Wrap
+ * with a sample rate or anti-aliasing. Use periodic LUT sampling with
+ * LUT::Boundary::Wrap
  * for tables without duplicated endpoints. Example: Generators/Periodic.
  */
 /**
@@ -92,6 +111,18 @@
  * Normalized results are bounded against numerical overshoot before scaling.
  * This phase provides offline curve builders, not a per-sample waveshaper.
  * Example: Generators/Shaping.
+ *
+ * With @f$t_i=i/(N-1)@f$ for @f$N>1@f$, full curves use
+ * @f$x_i=2t_i-1@f$ and half curves use @f$x_i=t_i@f$. Their raw forms are
+ * @f[
+ * a(x)=\arctan(d x), \qquad h(x)=\tanh(d x).
+ * @f]
+ * The normalized forms divide respectively by @f$\arctan(d)@f$ and
+ * @f$\tanh(d)@f$, then multiply by scale. Gamma and GammaMorph use
+ * @f[
+ * y_i=s\,t_i^\gamma, \qquad \gamma=g^m,
+ * @f]
+ * where @f$g@f$ is gain and @f$m@f$ is morph.
  */
 /**
  * @defgroup DspCore_Generators_Envelopes Envelope segments
@@ -115,6 +146,19 @@
  * rejected before writing. Table validation precedes output and does not
  * allocate. Output is written only within [first,last).
  * Examples: Generators/Envelopes and Generators/LUTEnvelope.
+ *
+ * For a range of length @f$L>1@f$, @f$t_i=i/(L-1)@f$ and every segment writes
+ * @f[
+ * y_i=s+(e-s)q(t_i).
+ * @f]
+ * The implemented shapes are
+ * @f[
+ * q_{\mathrm{linear}}(t)=t, \qquad
+ * q_{\mathrm{exp}}(t)=\frac{1-e^{-ct}}{1-e^{-c}}, \qquad
+ * q_{\mathrm{log}}(t)=\frac{\log(1+ct)}{\log(1+c)}.
+ * @f]
+ * At @f$c=0@f$, both nonlinear shapes take their linear limit. LUTSegment
+ * substitutes @f$q(t)@f$ with the normalized table lookup @f$\ell(t)@f$.
  */
 /**
  * @defgroup DspCore_Generators_Noise White noise
@@ -128,6 +172,17 @@
  * offset+[-amplitude,amplitude]. Floating rounding can reach endpoints.
  * This is deterministic pseudorandom signal generation, not cryptography.
  * An empty call leaves a valid state unchanged. Example: Generators/Noise.
+ *
+ * Each sample applies xorshift32 to the unsigned state
+ * @f[
+ * s\leftarrow s\ \mathrm{xor}\ (s\ll13),\qquad
+ * s\leftarrow s\ \mathrm{xor}\ (s\gg17),\qquad
+ * s\leftarrow s\ \mathrm{xor}\ (s\ll5),
+ * @f]
+ * then maps it to the output interval as
+ * @f[
+ * u=\frac{s}{2^{32}-1}, \qquad y=o+A(2u-1).
+ * @f]
  */
 /**
  * @defgroup DspCore_Generators_Windows Windows
@@ -141,4 +196,10 @@
  * the library; no Arduino TWO_PI or include-order-dependent M_PI macro is
  * required. These functions generate coefficients; they do not multiply an
  * existing signal. Example: Generators/Windows.
+ * For @f$N>1@f$ and @f$0\leq i<N@f$,
+ * @f[
+ * w_{\mathrm{Hann}}[i]=0.5-0.5\cos\left(\frac{2\pi i}{N-1}\right),
+ * \qquad
+ * w_{\mathrm{Hamming}}[i]=0.54-0.46\cos\left(\frac{2\pi i}{N-1}\right).
+ * @f]
  */
