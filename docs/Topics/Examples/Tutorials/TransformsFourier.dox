@@ -1,0 +1,29 @@
+/**
+ * @defgroup DspCore_Example_TransformsFourier Fourier transforms
+ * @ingroup DspCore_Examples_Transforms
+ * @brief Compare direct DFT and radix-2 FFT, then reconstruct with IFFT.
+ *
+ * @section DspCore_Example_TransformsFourier_Goal Goal
+ * Configure a four-sample direct DFT and radix-2 FFT, transform an alternating
+ * real signal, then invert the FFT result. Both forward transforms put the
+ * signal at the Nyquist bin; Inverse applies the normalizing `1/N` factor.
+ *
+ * @section DspCore_Example_TransformsFourier_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Transforms_Fourier_d
+ * @endcode
+ *
+ * @section DspCore_Example_TransformsFourier_Output Output
+ * @code{.text}
+ * Nyquist bin: DFT=4, FFT=4; expected=4
+ * FFT inverse first sample=1; expected=1
+ * Overall: PASS
+ * @endcode
+ *
+ * Configure performs the only allocation. ForwardReal, Forward and Inverse
+ * use the configured workspace and therefore do not allocate. DFT accepts any
+ * nonzero size; FFT requires a power of two.
+ *
+ * @section DspCore_Example_TransformsFourier_Code Implementation
+ * \include Transforms/Fourier/Shared.cpp
+ */

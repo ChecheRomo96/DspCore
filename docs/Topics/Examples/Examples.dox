@@ -54,6 +54,7 @@
  * | @ref DspCore_Example_FiltersIIR | Generic normalized IIR recurrence |
  * | @ref DspCore_Example_AnalysisLevels | Peak and RMS measurement |
  * | @ref DspCore_Example_AnalysisEnvelope | Attack/release envelope following |
+ * | @ref DspCore_Example_TransformsFourier | Direct DFT and radix-2 FFT round trip |
  *
  * @section DspCore_Examples_DesktopTools Desktop output and plotting tools
  *
@@ -121,4 +122,10 @@
  * @defgroup DspCore_Examples_Analysis Signal analysis
  * @ingroup DspCore_Examples
  * @brief Tutorials for level measurement and envelope following.
+ */
+
+/**
+ * @defgroup DspCore_Examples_Transforms Transforms
+ * @ingroup DspCore_Examples
+ * @brief Tutorials for configured block Fourier transforms.
  */

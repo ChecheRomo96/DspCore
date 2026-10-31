@@ -14,6 +14,10 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ### Added
 
+- `Transforms::DFT<T>` and radix-2 `Transforms::FFT<T>` configured classes
+  with complex Forward/Inverse and real-input ForwardReal operations. Their
+  configured workspace permits allocation-free calls and exact in-place blocks;
+  inverse transforms apply `1/N` normalization.
 - `Analysis::Streaming::MovingRMS<T>`, an O(1) fixed-window RMS estimator.
   Configure allocates its ring history once; Update and Reset do not allocate.
   It reports partial-window RMS until `IsReady()` confirms a full window.

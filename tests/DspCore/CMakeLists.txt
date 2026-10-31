@@ -24,6 +24,10 @@ if(DSPCORE_ANALYSIS)
     add_subdirectory(Analysis)
 endif()
 
+if(DSPCORE_TRANSFORMS)
+    add_subdirectory(Transforms)
+endif()
+
 if(DSPCORE_PROCESSING)
     add_subdirectory(Processing)
 endif()

@@ -140,6 +140,12 @@ Each phase needs the user's approval before it starts.
 
 7. Extend the approved module structure deliberately: SOS, multirate and MIMO
    filters; dynamics processors; response/pole-zero/stability analysis; and
-   transforms. The public headers currently establish these boundaries but do
-   not claim implementations.
+   transforms.
+
+   - [x] Add configured block `Transforms::DFT` and radix-2 `Transforms::FFT`
+     classes with forward, real-forward and normalized inverse operations.
+     Each reserves its workspace in Configure and has allocation-free block
+     calls thereafter. User authorized this work on 2026-10-31.
+   - [ ] Design streaming spectral analysis and synthesis only after its hop,
+     window, latency and overlap-add contracts are approved.
 8. MIDILAR integration and the first DSP feature release.
