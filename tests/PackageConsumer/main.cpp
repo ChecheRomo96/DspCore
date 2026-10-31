@@ -45,7 +45,7 @@ int main() {
     double interpolated = 0;
     if (!DspCore::Interpolation::Lookup(line, 0.5, interpolated,
             DspCore::Interpolation::Boundary::Clamp) || interpolated != 0.25) return 1;
-    if (DspCore::Interpolation::Trilinear(1.,3.,5.,7.,9.,11.,13.,15.,0.25,0.5,0.75) != 9.5)
+    if (DspCore::Interpolation::NormalizedTrilinear(1.,3.,5.,7.,9.,11.,13.,15.,0.25,0.5,0.75) != 9.5)
         return 1;
     std::cout << "Installed interpolation and LUT lookup: PASS\n";
 

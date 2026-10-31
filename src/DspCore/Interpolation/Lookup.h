@@ -68,7 +68,7 @@ bool Lookup(const LUT::LUT1D<T>& table, Real x, Real& output, Boundary boundary)
     size_t a = 0, b = 0;
     Real t = Real(0);
     if (!Detail::Axis(table.Width(), x, boundary, a, b, t)) return false;
-    output = Linear(Detail::Sample<Real>(table.GetValue(a)), Detail::Sample<Real>(table.GetValue(b)), t);
+    output = NormalizedLinear(Detail::Sample<Real>(table.GetValue(a)), Detail::Sample<Real>(table.GetValue(b)), t);
     return true;
 }
 /// @ingroup DspCore_Interpolation
@@ -79,7 +79,7 @@ bool Lookup(const LUT::LUT2D<T>& table, Real x, Real y, Real& output, Boundary b
     Real tx = Real(0), ty = Real(0);
     if (!Detail::Axis(table.Width(), x, boundary, a, b, tx) ||
         !Detail::Axis(table.Height(), y, boundary, c, d, ty)) return false;
-    output = Bilinear(Detail::Sample<Real>(table.GetValue(a,c)), Detail::Sample<Real>(table.GetValue(b,c)),
+    output = NormalizedBilinear(Detail::Sample<Real>(table.GetValue(a,c)), Detail::Sample<Real>(table.GetValue(b,c)),
                       Detail::Sample<Real>(table.GetValue(a,d)), Detail::Sample<Real>(table.GetValue(b,d)), tx, ty);
     return true;
 }
@@ -92,7 +92,7 @@ bool Lookup(const LUT::LUT3D<T>& table, Real x, Real y, Real z, Real& output, Bo
     if (!Detail::Axis(table.Width(), x, boundary, a, b, tx) ||
         !Detail::Axis(table.Height(), y, boundary, c, d, ty) ||
         !Detail::Axis(table.Depth(), z, boundary, e, f, tz)) return false;
-    output = Trilinear(Detail::Sample<Real>(table.GetValue(a,c,e)), Detail::Sample<Real>(table.GetValue(b,c,e)),
+    output = NormalizedTrilinear(Detail::Sample<Real>(table.GetValue(a,c,e)), Detail::Sample<Real>(table.GetValue(b,c,e)),
                        Detail::Sample<Real>(table.GetValue(a,d,e)), Detail::Sample<Real>(table.GetValue(b,d,e)),
                        Detail::Sample<Real>(table.GetValue(a,c,f)), Detail::Sample<Real>(table.GetValue(b,c,f)),
                        Detail::Sample<Real>(table.GetValue(a,d,f)), Detail::Sample<Real>(table.GetValue(b,d,f)), tx, ty, tz);

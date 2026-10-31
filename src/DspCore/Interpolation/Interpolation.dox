@@ -9,8 +9,9 @@
  *
  * @section DspCore_Interpolation_Formulas Arithmetic
  *
- * Linear(a,b,t) evaluates a line with normalized t; Bilinear and Trilinear
- * compose it on independent normalized axes. Values outside [0,1] extrapolate.
+ * NormalizedLinear(value0,value1,t) evaluates a line with normalized t;
+ * NormalizedBilinear and NormalizedTrilinear compose it on independent
+ * normalized axes. Values outside [0,1] extrapolate.
  * No boundary policy is hidden in the formulas. Use consistent float or double
  * arguments (or an explicit template argument); integer-only arithmetic is
  * rejected at compile time. Double computations are never reduced to float.
@@ -29,17 +30,17 @@
  *
  * @section DspCore_Interpolation_Coordinates Physical coordinates
  *
- * TryUnitCoordinate(x,low,high,t) validates finite coordinates and ascending
- * bounds. TryLinear/TryBilinear/TryTrilinear normalize physical coordinates
- * before applying the formulas. Each span, subtraction and normalized result
- * must be representable. Reversed or collapsed bounds fail rather than divide
- * by zero. Failure leaves the output unchanged. Extrapolation is permitted.
- * The bool reports coordinate validity, not finiteness of sample arithmetic.
+ * LinearAt/BilinearAt/TrilinearAt accept physical coordinates and normalize
+ * each axis before applying the corresponding normalized formula. Endpoint
+ * names use 0/1 rather than min/max because a descending axis is valid:
+ * x1 may be smaller than x0. A collapsed axis (x0==x1) produces normalized
+ * coordinate zero, selecting its 0-side without dividing by zero.
+ * Extrapolation is permitted. Non-finite arithmetic follows normal floating
+ * point propagation; these mathematical functions do not return a bool.
  *
  * @code{.cpp}
- * double value = 0;
- * // Physical x=15 in [10,20], output endpoints 2 and 8: value=5.
- * bool ok = DspCore::Interpolation::TryLinear(10.,20.,2.,8.,15.,value);
+ * // Physical x=15 over x0=10, x1=20, with values 2 and 8: value=5.
+ * double value = DspCore::Interpolation::LinearAt(10.,20.,2.,8.,15.);
  * @endcode
  *
  * @section DspCore_Interpolation_Lookup Normalized LUT lookup
