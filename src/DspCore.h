@@ -28,6 +28,14 @@
     #include <DspCore_Analysis.h>
 #endif
 
+#if __has_include(<DspCore_Dynamics.h>)
+    #include <DspCore_Dynamics.h>
+#endif
+
+#if __has_include(<DspCore_Transforms.h>)
+    #include <DspCore_Transforms.h>
+#endif
+
 #if __has_include(<DspCore_Processing.h>)
     #include <DspCore_Processing.h>
 #endif

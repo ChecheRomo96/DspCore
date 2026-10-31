@@ -51,9 +51,6 @@ bool Convert(const SourceType value,DestinationType& destination) noexcept {
     destination=converted;
     return true;
 }
-template<typename Real> bool Buffer(const Real* p,size_t count) noexcept {
-    return (count==0 || p!=nullptr) && count<=static_cast<size_t>(-1)/sizeof(Real);
-}
 inline float Sin(float x) noexcept { return sinf(x); }
 inline double Sin(double x) noexcept { return sin(x); }
 inline float Cos(float x) noexcept { return cosf(x); }

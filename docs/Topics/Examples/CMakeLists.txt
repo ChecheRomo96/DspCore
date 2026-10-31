@@ -1,1 +1,19 @@
-dspcore_add_dox("${CMAKE_CURRENT_LIST_DIR}/Examples.dox")
+dspcore_add_dox(
+    "${CMAKE_CURRENT_LIST_DIR}/Examples.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/AnalysisEnvelope.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/AnalysisLevels.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/CoreVersion.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/FiltersBiquad.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/FiltersFIR.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/FiltersIIR.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsEnvelopes.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsLUTEnvelope.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsNoise.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsPeriodic.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsShaping.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/GeneratorsWindows.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/InterpolationLinear.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/LUTSampling.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/LUTLine.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/LUTSurface.dox"
+    "${CMAKE_CURRENT_LIST_DIR}/Tutorials/LUTVolume.dox")

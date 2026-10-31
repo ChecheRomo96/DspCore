@@ -1,0 +1,29 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsShaping Shaping curves
+ * @ingroup DspCore_Examples_Generators
+ * @brief Compare normalized sigmoid endpoints with gamma shaping and morphing.
+ *
+ * @section DspCore_Example_GeneratorsShaping_Goal Goal
+ * Verify that normalized nonlinear functions preserve their useful endpoint
+ * ranges, then show a familiar gamma curve at the midpoint.
+ *
+ * @section DspCore_Example_GeneratorsShaping_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_Shaping_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsShaping_Output Output
+ * @code{.text}
+ * Normalized atan endpoints: -100%, 100%; expected=-100%,+100%
+ * Normalized positive tanh endpoints=0,1
+ * Gamma=2 at x=0.5: 25%; expected=25%
+ * GammaMorph gain=2,morph=1 matches Gamma=2
+ * Overall: PASS
+ * @endcode
+ *
+ * A morph value of one reaches the gamma curve exactly, providing a useful
+ * endpoint contract for a continuously variable response control.
+ *
+ * @section DspCore_Example_GeneratorsShaping_Code Implementation
+ * \include Generators/Shaping/Shared.cpp
+ */

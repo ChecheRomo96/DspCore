@@ -1,0 +1,36 @@
+/**
+ * @defgroup DspCore_Example_FiltersIIR IIR
+ * @ingroup DspCore_Examples_Filters
+ * @brief Inspect a generic numerator/denominator IIR response to a step pulse.
+ *
+ * @section DspCore_Example_FiltersIIR_Goal Goal
+ * Configure a generic IIR with four numerator and two denominator coefficients,
+ * including an `a0` normalization from two, then observe its stateful response
+ * to a pulse that is high from 10 ms through 40 ms.
+ *
+ * @section DspCore_Example_FiltersIIR_Run Run and render
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Filters_IIR_d --output ./output
+ * ./build/macos_arm64/bin/Debug/render_signal.sh ./output/iir_step_pulse.csv
+ * @endcode
+ *
+ * @section DspCore_Example_FiltersIIR_Output Output
+ * @code{.text}
+ * DspCore :: Generic IIR step-pulse response
+ * Wrote signal data: ./output/iir_step_pulse.csv
+ * PNG: .../render_signal.sh ./output/iir_step_pulse.csv
+ * @endcode
+ *
+ * This is intentionally a time-only view: an FFT of a finite step pulse would
+ * describe the stimulus, not the IIR transfer function. The plot shows the
+ * normalized recurrence reaching its unity DC response and decaying after the
+ * falling edge.
+ *
+ * \image html iir_step_pulse.png "Generic IIR step-pulse tutorial output" width=900px
+ *
+ * @section DspCore_Example_FiltersIIR_Code Desktop data generator
+ * \include Filters/IIR/Desktop/main.cpp
+ *
+ * @subsection DspCore_Example_FiltersIIR_Kernel Portable IIR API use
+ * \include Filters/IIR/Shared.cpp
+ */

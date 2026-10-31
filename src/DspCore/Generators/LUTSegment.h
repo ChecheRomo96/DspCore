@@ -1,7 +1,7 @@
 #ifndef DSPCORE_GENERATORS_LUT_SEGMENT_H
 #define DSPCORE_GENERATORS_LUT_SEGMENT_H
 #include <DspCore/Generators/Envelopes.h>
-#include <DspCore/Interpolation/Lookup.h>
+#include <DspCore/LUT/Sampling.h>
 namespace DspCore { namespace Generators { namespace Envelopes {
 /// @ingroup DspCore_Generators_Envelopes
 /// Fill from a normalized shape table; reject overlapping storage before writing.
@@ -17,7 +17,7 @@ bool LUTSegment(Real* out, Real start, Real end, size_t total, const LUT::LUT1D<
         if (!Generators::Detail::Finite(x) || x<Real(0) || x>Real(1)) return false;
     }
     Real shape=Real(0);
-    if (!Interpolation::Lookup(table,Real(0.5),shape,Interpolation::Boundary::Reject)) return false;
+    if (!LUT::Sample(table,Real(0.5),shape,LUT::Boundary::Reject)) return false;
     if (total!=0) {
         const uintptr_t a=reinterpret_cast<uintptr_t>(out), b=reinterpret_cast<uintptr_t>(table.GetBuffer());
         const size_t outBytes=total*sizeof(Real), inBytes=table.Size()*sizeof(Real);
@@ -28,7 +28,7 @@ bool LUTSegment(Real* out, Real start, Real end, size_t total, const LUT::LUT1D<
         if (length==1) { out[first]=start; break; }
         const Real t=static_cast<Real>(i)/static_cast<Real>(length-1);
         // Validation above guarantees this read succeeds; no table mutation occurs.
-        Interpolation::Lookup(table,t,shape,Interpolation::Boundary::Reject);
+        LUT::Sample(table,t,shape,LUT::Boundary::Reject);
         out[first+i]=Generators::Detail::Mix(start,end,shape);
     }
     return true;

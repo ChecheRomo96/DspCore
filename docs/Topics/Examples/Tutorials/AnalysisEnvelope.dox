@@ -1,0 +1,28 @@
+/**
+ * @defgroup DspCore_Example_AnalysisEnvelope Envelope follower
+ * @ingroup DspCore_Examples_Analysis
+ * @brief Follow a rectified signal with independent attack and release constants.
+ *
+ * @section DspCore_Example_AnalysisEnvelope_Goal Goal
+ * Demonstrate asymmetric smoothing: a one-second attack rises to the expected
+ * exponential fraction, while a two-second release decays at its own rate.
+ *
+ * @section DspCore_Example_AnalysisEnvelope_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Analysis_Envelope_d
+ * @endcode
+ *
+ * @section DspCore_Example_AnalysisEnvelope_Output Output
+ * @code{.text}
+ * Attack=1s after 1s: 632/1000; expected=632/1000
+ * Release=2s after 2s: 233/1000; expected=233/1000
+ * Zero time constants rectify immediately: input=-2 -> envelope=2
+ * Overall: PASS
+ * @endcode
+ *
+ * The last row makes the zero-time case explicit: no smoothing is requested,
+ * but the envelope remains a magnitude and therefore rectifies the input.
+ *
+ * @section DspCore_Example_AnalysisEnvelope_Code Implementation
+ * \include Analysis/Envelope/Shared.cpp
+ */

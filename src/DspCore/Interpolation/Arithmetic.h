@@ -7,88 +7,72 @@
 namespace DspCore { namespace Interpolation {
 /// @cond DSPCORE_INTERNAL
 namespace Detail {
-template<typename Real> bool Finite(Real value) noexcept {
+template<typename Real>
+bool Finite(Real value) noexcept {
     static_assert(cpstd::is_same<Real, float>::value || cpstd::is_same<Real, double>::value,
                   "Interpolation arithmetic must explicitly use float or double");
     return value <= cpstd::numeric_limits<Real>::max() &&
            value >= -cpstd::numeric_limits<Real>::max();
 }
+
+template<typename Real>
+Real NormalizedCoordinate(Real coordinate0, Real coordinate1, Real coordinate) noexcept {
+    static_assert(cpstd::is_same<Real, float>::value || cpstd::is_same<Real, double>::value,
+                  "Interpolation arithmetic must explicitly use float or double");
+    return coordinate0 == coordinate1 ? Real(0) : (coordinate - coordinate0) / (coordinate1 - coordinate0);
+}
 }
 /// @endcond
 /// @ingroup DspCore_Interpolation
-/// Unclamped interpolation; t=0/1 returns the exact corresponding endpoint.
+/// Interpolates values with an already normalized coordinate; t=0/1 selects the exact endpoint.
 template<typename Real>
-Real Linear(Real a, Real b, Real t) noexcept {
+Real NormalizedLinear(Real value0, Real value1, Real t) noexcept {
     static_assert(cpstd::is_same<Real, float>::value || cpstd::is_same<Real, double>::value,
                   "Interpolation arithmetic must explicitly use float or double");
-    if (t == Real(0)) return a;
-    if (t == Real(1)) return b;
-    // Weighted form avoids overflowing b-a for opposite-sign finite endpoints.
-    if ((a <= Real(0) && b >= Real(0)) || (a >= Real(0) && b <= Real(0)))
-        return (Real(1) - t) * a + t * b;
-    return a + t * (b - a);
+    if (t == Real(0)) return value0;
+    if (t == Real(1)) return value1;
+    // Weighted form avoids overflowing value1-value0 for opposite-sign finite endpoints.
+    if ((value0 <= Real(0) && value1 >= Real(0)) || (value0 >= Real(0) && value1 <= Real(0)))
+        return (Real(1) - t) * value0 + t * value1;
+    return value0 + t * (value1 - value0);
 }
 /// @ingroup DspCore_Interpolation
-/// Corners use x-fast order: f00, f10, f01, f11. Coordinates are unclamped.
+/// Interpolates x-fast corners with already normalized x/y coordinates.
 template<typename Real>
-Real Bilinear(Real f00, Real f10, Real f01, Real f11, Real x, Real y) noexcept {
-    return Linear(Linear(f00, f10, x), Linear(f01, f11, x), y);
+Real NormalizedBilinear(Real f00, Real f10, Real f01, Real f11, Real tx, Real ty) noexcept {
+    return NormalizedLinear(NormalizedLinear(f00, f10, tx), NormalizedLinear(f01, f11, tx), ty);
 }
 /// @ingroup DspCore_Interpolation
-/// Corners use x-fast order: f000,f100,f010,f110,f001,f101,f011,f111.
+/// Interpolates x-fast corners with already normalized x/y/z coordinates.
 template<typename Real>
-Real Trilinear(Real f000, Real f100, Real f010, Real f110,
-               Real f001, Real f101, Real f011, Real f111,
-               Real x, Real y, Real z) noexcept {
-    return Linear(Bilinear(f000, f100, f010, f110, x, y),
-                  Bilinear(f001, f101, f011, f111, x, y), z);
+Real NormalizedTrilinear(Real f000, Real f100, Real f010, Real f110,
+    Real f001, Real f101, Real f011, Real f111, Real tx, Real ty, Real tz) noexcept {
+    return NormalizedLinear(NormalizedBilinear(f000, f100, f010, f110, tx, ty),
+        NormalizedBilinear(f001, f101, f011, f111, tx, ty), tz);
 }
 /// @ingroup DspCore_Interpolation
-/// Normalize an ascending finite coordinate span; failure leaves t unchanged.
-/// The span and normalized result must be representable; extrapolation is allowed.
+/// Interpolates two values at a physical coordinate; a collapsed axis selects value0.
 template<typename Real>
-bool TryUnitCoordinate(Real x, Real low, Real high, Real& t) noexcept {
-    if (!Detail::Finite(x) || !Detail::Finite(low) || !Detail::Finite(high) || !(low < high))
-        return false;
-    const Real span = high - low;
-    if (!Detail::Finite(span)) return false;
-    const Real result = (x - low) / span;
-    if (!Detail::Finite(result)) return false;
-    t = result;
-    return true;
+Real LinearAt(Real x0, Real x1, Real value0, Real value1, Real x) noexcept {
+    return NormalizedLinear(value0, value1, Detail::NormalizedCoordinate(x0, x1, x));
 }
 /// @ingroup DspCore_Interpolation
-/// Checked physical-coordinate linear interpolation; failure leaves output unchanged.
+/// Interpolates x-fast corners at physical x/y coordinates; each collapsed axis selects its 0-side.
 template<typename Real>
-bool TryLinear(Real low, Real high, Real a, Real b, Real x, Real& output) noexcept {
-    Real t = Real(0);
-    if (!TryUnitCoordinate(x, low, high, t)) return false;
-    output = Linear(a, b, t);
-    return true;
+Real BilinearAt(Real x0, Real x1, Real y0, Real y1,
+    Real f00, Real f10, Real f01, Real f11, Real x, Real y) noexcept {
+    return NormalizedBilinear(f00, f10, f01, f11,
+        Detail::NormalizedCoordinate(x0, x1, x), Detail::NormalizedCoordinate(y0, y1, y));
 }
 /// @ingroup DspCore_Interpolation
-/// Checked physical coordinates; ascending spans are required on both axes.
+/// Interpolates x-fast corners at physical x/y/z coordinates; each collapsed axis selects its 0-side.
 template<typename Real>
-bool TryBilinear(Real x0, Real x1, Real y0, Real y1,
-                 Real f00, Real f10, Real f01, Real f11,
-                 Real x, Real y, Real& output) noexcept {
-    Real tx = Real(0), ty = Real(0);
-    if (!TryUnitCoordinate(x, x0, x1, tx) || !TryUnitCoordinate(y, y0, y1, ty)) return false;
-    output = Bilinear(f00, f10, f01, f11, tx, ty);
-    return true;
-}
-/// @ingroup DspCore_Interpolation
-/// Checked physical coordinates; ascending spans are required on all axes.
-template<typename Real>
-bool TryTrilinear(Real x0, Real x1, Real y0, Real y1, Real z0, Real z1,
-                  Real f000, Real f100, Real f010, Real f110,
-                  Real f001, Real f101, Real f011, Real f111,
-                  Real x, Real y, Real z, Real& output) noexcept {
-    Real tx = Real(0), ty = Real(0), tz = Real(0);
-    if (!TryUnitCoordinate(x, x0, x1, tx) || !TryUnitCoordinate(y, y0, y1, ty) ||
-        !TryUnitCoordinate(z, z0, z1, tz)) return false;
-    output = Trilinear(f000, f100, f010, f110, f001, f101, f011, f111, tx, ty, tz);
-    return true;
+Real TrilinearAt(Real x0, Real x1, Real y0, Real y1, Real z0, Real z1,
+    Real f000, Real f100, Real f010, Real f110, Real f001, Real f101, Real f011, Real f111,
+    Real x, Real y, Real z) noexcept {
+    return NormalizedTrilinear(f000, f100, f010, f110, f001, f101, f011, f111,
+        Detail::NormalizedCoordinate(x0, x1, x), Detail::NormalizedCoordinate(y0, y1, y),
+        Detail::NormalizedCoordinate(z0, z1, z));
 }
 }} // namespace DspCore::Interpolation
 #endif

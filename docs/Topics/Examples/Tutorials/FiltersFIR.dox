@@ -1,0 +1,36 @@
+/**
+ * @defgroup DspCore_Example_FiltersFIR FIR
+ * @ingroup DspCore_Examples_Filters
+ * @brief Compare 10- and 100-tap moving-average low-pass filters.
+ *
+ * @section DspCore_Example_FiltersFIR_Goal Goal
+ * Process the same 300 Hz + 6 kHz signal with two runtime-sized FIR filters.
+ * The longer average suppresses more high-frequency content, while its
+ * linear-phase delay increases from 0.094 ms to 1.031 ms at 48 kHz.
+ *
+ * @section DspCore_Example_FiltersFIR_Run Run and render
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Filters_FIR_d --output ./output
+ * ./build/macos_arm64/bin/Debug/render_signal.sh ./output/fir_moving_average.csv
+ * @endcode
+ *
+ * @section DspCore_Example_FiltersFIR_Output Output
+ * @code{.text}
+ * DspCore :: FIR moving-average low-pass
+ * Wrote signal data: ./output/fir_moving_average.csv
+ * PNG: .../render_signal.sh ./output/fir_moving_average.csv
+ * @endcode
+ *
+ * The top panel exposes the delay and smoothing in time. The middle panel
+ * isolates the 300 Hz and 6 kHz components in a normalized DFT; the bottom
+ * panel draws the coefficient-derived magnitude response, including the
+ * deeper nulls of the 100-tap filter.
+ *
+ * \image html fir_moving_average.png "FIR moving-average tutorial output" width=900px
+ *
+ * @section DspCore_Example_FiltersFIR_Code Desktop data generator
+ * \include Filters/FIR/Desktop/main.cpp
+ *
+ * @subsection DspCore_Example_FiltersFIR_Kernel Portable FIR API use
+ * \include Filters/FIR/Shared.cpp
+ */

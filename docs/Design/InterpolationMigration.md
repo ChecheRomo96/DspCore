@@ -1,22 +1,25 @@
-# Interpolation migration
+# Interpolation and LUT sampling migration
 
 Phase 3 implements `DspCore::Interpolation` independently of generators.
 Historical source was reviewed rather than copied verbatim.
 
 ## API and numerical decisions
 
-- Arithmetic.h provides Linear, Bilinear and Trilinear with explicitly
-  consistent float or double samples/coordinates. No float-only return type,
+- Arithmetic.h provides NormalizedLinear, NormalizedBilinear and
+  NormalizedTrilinear with explicitly consistent float or double
+  samples/coordinates. LinearAt, BilinearAt and TrilinearAt normalize physical
+  coordinates before applying those formulas. No float-only return type,
   integer arithmetic, allocation, hidden clipping or implicit edge policy.
-- Normalized formulas extrapolate. Linear selects exact endpoints and avoids
+- Normalized formulas extrapolate. NormalizedLinear selects exact endpoints and avoids
   subtracting opposite-sign finite endpoints during interpolation.
 - Corner order follows x-fast LUT storage; asymmetric field tests distinguish
   x, y and z rather than testing only a symmetric center average.
-- TryUnitCoordinate and TryLinear/TryBilinear/TryTrilinear validate physical
-  coordinate bounds. Bounds must ascend and all intermediate coordinate
-  differences/normalized values must be finite and representable. Failure
-  preserves output; bool reports coordinate validity, not sample finiteness.
-- Lookup overloads for 1D/2D/3D require an explicit Boundary policy. Clamp and
+- Physical coordinate endpoints use 0/1 names rather than min/max: descending
+  axes are valid. A collapsed physical axis maps to normalized coordinate zero
+  and selects its 0-side, avoiding division by zero. The interpolation API is
+  mathematical and returns a value directly; it does not expose Try variants
+  or validation booleans.
+- LUT::Sample overloads for 1D/2D/3D require an explicit Boundary policy. Clamp and
   Reject use normalized closed coordinates with N-1 intervals. Wrap uses N
   distinct periodic samples with the last-to-first interval included. All
   axes share the chosen policy; per-axis policies remain a future extension.
@@ -27,14 +30,16 @@ Historical source was reviewed rather than copied verbatim.
   normalized, double computation stays double, and narrowing range overflow
   explicitly produces signed infinity instead of an out-of-range cast.
 - Boundary uses a one-byte enum with target-build size/triviality assertions.
-- Arithmetic is available without LUT; Lookup is staged/installed when the
-  LUT module is enabled. Arduino C++11 can discover the module facade.
+- Arithmetic is available without LUT. Sampling is staged/installed with the
+  LUT module only when Interpolation is enabled, because it composes the
+  generic arithmetic formulas over LUT-owned data. Arduino C++11 can discover
+  the module facade.
 
 ## Validation
 
-- Windows MSVC: 26/26 tests pass (12 previous, 6 arithmetic, 8 lookup).
+- Windows MSVC: 26/26 tests pass (12 previous, 6 arithmetic, 8 LUT sampling).
 - Tests include double precision, endpoint selection, opposite-sign maximum
-  samples, extrapolation, invalid coordinate spans, affine planes/volumes,
+  samples, extrapolation, reversed and collapsed physical axes, affine planes/volumes,
   negative cycles, periodic seams, singleton axes, NaN/Inf coordinates,
   adjacent floating endpoints and explicit sample narrowing overflow.
 - Both new native examples run with actual values/expectations and PASS.
@@ -45,7 +50,7 @@ Historical source was reviewed rather than copied verbatim.
 - AddressSanitizer standalone probe passed 18,009 lookups across three ranks
   and boundary policies plus extreme finite coordinates. Probe artifacts are
   under ignored build/interpolation-validation; no address errors reported.
-- Doxygen generates the linked topic, functions and Boundary enum. The
+- Doxygen generates the linked LUT topic, functions and Boundary enum. The
   existing obsolete DOT_MULTI_TARGETS configuration warning remains.
 - Arm/hardware validation remains unavailable in this environment.
 

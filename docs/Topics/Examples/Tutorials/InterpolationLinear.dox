@@ -1,0 +1,30 @@
+/**
+ * @defgroup DspCore_Example_InterpolationLinear Linear interpolation
+ * @ingroup DspCore_Examples_Interpolation
+ * @brief Map physical and normalized coordinates through a linear segment.
+ *
+ * @section DspCore_Example_InterpolationLinear_Goal Goal
+ * Separate the coordinate system from the signal values: interpolate at a
+ * physical point, intentionally extrapolate a normalized point, and observe
+ * how a collapsed input axis selects its 0-side.
+ *
+ * @section DspCore_Example_InterpolationLinear_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Interpolation_Linear_d
+ * @endcode
+ *
+ * @section DspCore_Example_InterpolationLinear_Output Output
+ * @code{.text}
+ * Physical x=15 in [10,20]: value=5; expected=5
+ * Normalized t=2: extrapolated=14; expected=14
+ * Collapsed axis selects value0: PASS
+ * Overall: PASS
+ * @endcode
+ *
+ * Extrapolation is a deliberate linear continuation. A collapsed physical
+ * axis maps to normalized zero, avoiding division by zero and selecting the
+ * value at that axis' 0 endpoint.
+ *
+ * @section DspCore_Example_InterpolationLinear_Code Implementation
+ * \include Interpolation/Linear/Shared.cpp
+ */

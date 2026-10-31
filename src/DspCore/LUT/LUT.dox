@@ -1,19 +1,24 @@
 /**
  * @defgroup DspCore_LUT Lookup tables
- * @brief Move-only 1D, 2D and 3D arithmetic sample storage.
+ * @ingroup DspCore
+ * @brief Move-only 1D, 2D and 3D arithmetic sample storage and sampling.
  *
  * Include `<DspCore_LUT.h>` or an individual `<DspCore/LUT/LUT1D.h>` header.
  * `DspCore::LUT::LUT1D<T>`, `LUT2D<T>` and `LUT3D<T>` store mutable arithmetic
- * types other than bool. Storage is independent of interpolation or generation.
+ * types other than bool. Storage is independent of generation. When the
+ * Interpolation module is also enabled, LUTs expose normalized sampled access.
  *
  * @section DspCore_LUT_Ownership Ownership and allocation
  *
  * Default construction is empty and does not allocate. Resize and Reserve
  * return false on overflow or allocation failure, preserving all existing
  * state. Reserve is an element count, not a byte count; it does not change
- * logical size. Allocation uses non-throwing C malloc/free on every target.
- * Arithmetic objects are constructed in allocated storage. Copy is disabled;
- * moves transfer ownership without allocating and leave the source empty.
+ * logical size. Tables own their contiguous storage through cpstd::vector,
+ * so allocation follows the selected CPSTL backend. With CPSTL's native
+ * backend, allocation failure leaves the vector unchanged and these methods
+ * return false; with CPSTL_USING_STL, allocation follows std::vector's
+ * configured behavior. Copy is disabled; moves transfer ownership without
+ * allocating and leave the source dimensions empty.
  *
  * @code{.cpp}
  * DspCore::LUT::LUT1D<float> curve;
@@ -30,6 +35,12 @@
  * including elements exposed after shrinking and growing within capacity.
  * Reshaping is not a geometric resampling operation. 2D uses y*width+x;
  * 3D uses (z*height+y)*width+x, with x contiguous.
+ * Given extents @f$W@f$, @f$H@f$ and @f$D@f$, the row-major flat indices are
+ * @f[
+ * i_{1\mathrm D}(x)=x, \qquad
+ * i_{2\mathrm D}(x,y)=yW+x, \qquad
+ * i_{3\mathrm D}(x,y,z)=(zH+y)W+x.
+ * @f]
  *
  * Any zero extent canonicalizes all extents and Size to zero while retaining
  * capacity and allocated storage. Release frees storage, clears the pointer,
@@ -50,6 +61,46 @@
  * These owning resource types are not trivially copyable sample value types.
  * Do not resize/reserve/release in time-critical processing unless the caller
  * has explicitly budgeted that work. See @ref DspCore_Numeric.
+
+ * @section DspCore_LUT_Sampling Normalized sampling
+ *
+ * `LUT::Sample(table, coordinates..., output, policy)` is an operation on a
+ * LUT. It uses the generic Interpolation formulas internally, but lives in the
+ * LUT module because it gives coordinates meaning relative to stored table
+ * samples. It neither allocates nor changes the table; failure leaves @p output
+ * unchanged.
+ *
+ * | Boundary | Domain and indexing |
+ * | --- | --- |
+ * | Clamp | Clamp to [0,1]; position=x*(N-1), with exact first/last endpoints |
+ * | Reject | Same closed indexing, but outside [0,1] returns false |
+ * | Wrap | Wrap cycles into [0,1); position=x*N, interpolating last-to-first |
+ *
+ * For a closed Clamp/Reject axis, @f$p=x(N-1)@f$. For Wrap, after wrapping
+ * @f$x@f$ into @f$[0,1)@f$, @f$p=xN@f$. In each case the adjacent stored
+ * samples are @f$\lfloor p\rfloor@f$ and its next valid index, and the local
+ * interpolation coordinate is @f$t=p-\lfloor p\rfloor@f$.
+ *
+ * Wrap tables contain @f$N@f$ distinct periodic samples without a duplicate
+ * endpoint. Thus a four-sample table has sample 1 at phase 0.25. Closed tables
+ * include both endpoints; their sample 1 is at coordinate 1/3. Negative phase
+ * and arbitrarily many finite cycles wrap with `fmod`.
+ *
+ * Empty tables, invalid policies and non-finite coordinates fail without
+ * changing output. Singleton axes are constant for valid coordinates and
+ * still obey Reject; no division by zero occurs. The output/coordinate type is
+ * independent of table storage: integer samples are not PCM normalized, and a
+ * narrowing storage conversion produces signed infinity when out of range.
+ *
+ * @code{.cpp}
+ * DspCore::LUT::LUT1D<float> table;
+ * if (!table.Resize(2)) { return; }
+ * table.SetValue(0, 0.0f); table.SetValue(1, 10.0f);
+ * float value = 0;
+ * bool ok = DspCore::LUT::Sample(
+ *     table, 0.25f, value, DspCore::LUT::Boundary::Clamp);
+ * // value=2.5; no allocation during sampling.
+ * @endcode
  *
  * @section DspCore_LUT_Examples Examples
  *
@@ -58,6 +109,7 @@
  * - LUT/Surface: a row-major 3x2 surface, checked bounds and flat reshaping.
  * - LUT/Volume: a 2x3x4 volume, ownership transfer, overflow rejection and
  *   repeated release (regressions for the legacy 3D defects).
+ * - LUT/Sampling: closed and periodic sampled access in 1D, 2D and 3D.
  *
  * All examples share their logic between Arduino and desktop and print
  * actual values, expected values and an overall PASS/FAIL result.

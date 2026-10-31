@@ -36,8 +36,8 @@ Control systems, including Smoother, are outside DspCore.
 
 ## Analysis
 
-Peak and RMS measure only their supplied block. Empty blocks produce zero;
-invalid buffers/non-finite samples preserve output. RMS scales by peak before
+Peak and RMS measure only their supplied read-only SampleBlock. Empty valid
+blocks produce zero; invalid blocks/non-finite samples preserve output. RMS scales by peak before
 squaring to avoid overflow and bounds normalized roundoff before rescaling.
 There is no implicit DC removal, sliding window or dB conversion. Output may
 alias an input element because all reads finish before output is committed.

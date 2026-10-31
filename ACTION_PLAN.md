@@ -68,7 +68,7 @@ Status: complete. User authorized continuation after phase 1.
 
 Validation and differences from the legacy API are in docs/Design/LutMigration.md.
 
-## Phase 3 - Interpolation and lookup boundaries
+## Phase 3 - Interpolation and LUT sampling boundaries
 
 Status: complete. User authorized continuation after phase 2.
 
@@ -138,5 +138,8 @@ DspCore's typed blocks.
 
 Each phase needs the user's approval before it starts.
 
-7. Transforms (DFT/IDFT, FFT/IFFT).
+7. Extend the approved module structure deliberately: SOS, multirate and MIMO
+   filters; dynamics processors; response/pole-zero/stability analysis; and
+   transforms. The public headers currently establish these boundaries but do
+   not claim implementations.
 8. MIDILAR integration and the first DSP feature release.

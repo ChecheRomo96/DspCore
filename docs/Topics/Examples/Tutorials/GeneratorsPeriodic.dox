@@ -1,0 +1,32 @@
+/**
+ * @defgroup DspCore_Example_GeneratorsPeriodic Periodic tables
+ * @ingroup DspCore_Examples_Generators
+ * @brief Inspect phase conventions for sine, saw, square and triangle waves.
+ *
+ * @section DspCore_Example_GeneratorsPeriodic_Goal Goal
+ * Make waveform reference points explicit so a caller can align oscillators,
+ * modulation sources and lookup tables predictably.
+ *
+ * @section DspCore_Example_GeneratorsPeriodic_Run Run
+ * @code{.bash}
+ * ./build/macos_arm64/bin/Debug/DspCore_Generators_Periodic_d
+ * @endcode
+ *
+ * @section DspCore_Example_GeneratorsPeriodic_Output Output
+ * @code{.text}
+ * Sine[0]=0%; expected=0%
+ * Sine[1]=100%; expected=100%
+ * Sine[2]=0%; expected=0%
+ * Sine[3]=-100%; expected=-100%
+ * Saw phase 0 starts at zero; half-cycle=-1
+ * Square phase 0=+1; half-cycle=-1
+ * Triangle quarter-cycle=+1; three-quarter-cycle=-1
+ * Overall: PASS
+ * @endcode
+ *
+ * These points establish the phase origin and polarity conventions, not merely
+ * the nominal waveform shape.
+ *
+ * @section DspCore_Example_GeneratorsPeriodic_Code Implementation
+ * \include Generators/Periodic/Shared.cpp
+ */

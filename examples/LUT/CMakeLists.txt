@@ -1,3 +1,6 @@
 add_subdirectory(Line)
 add_subdirectory(Surface)
 add_subdirectory(Volume)
+if(DSPCORE_INTERPOLATION)
+    add_subdirectory(Sampling)
+endif()
