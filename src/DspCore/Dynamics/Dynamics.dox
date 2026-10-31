@@ -5,7 +5,7 @@
  *
  * @par Status
  * The module boundary is established, but compressor, limiter, and gate
- * implementations are planned. Existing Analysis::EnvelopeFollower remains
+ * implementations are planned. Existing Analysis::Streaming::EnvelopeFollower remains
  * an analysis utility until a separately approved API migration.
  *
  * Dynamics processors differ from filters: their effective gain may depend on

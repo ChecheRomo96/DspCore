@@ -36,14 +36,20 @@ Control systems, including Smoother, are outside DspCore.
 
 ## Analysis
 
-Peak and RMS measure only their supplied read-only SampleBlock. Empty valid
-blocks produce zero; invalid blocks/non-finite samples preserve output. RMS scales by peak before
-squaring to avoid overflow and bounds normalized roundoff before rescaling.
-There is no implicit DC removal, sliding window or dB conversion. Output may
-alias an input element because all reads finish before output is committed.
-EnvelopeFollower rectifies samples and applies explicit attack/release seconds
-with stable one-pole coefficients. Zero time constants snap; invalid updates
-preserve state. No clock, scheduler or MIDI interpretation is introduced.
+Analysis::Block::Peak and Analysis::Block::RMS measure only their supplied
+read-only SampleBlock. Empty valid blocks produce zero; invalid blocks or
+non-finite samples preserve output. RMS scales by peak before squaring to avoid
+overflow and bounds normalized roundoff before rescaling. There is no implicit
+DC removal, sliding window or dB conversion. Output may alias an input element
+because all reads finish before output is committed.
+
+Analysis::Streaming::EnvelopeFollower rectifies samples and applies explicit
+attack/release seconds with stable one-pole coefficients. Zero time constants
+snap; invalid updates preserve state. No clock, scheduler or MIDI
+interpretation is introduced. Analysis::Streaming::MovingRMS owns a configured
+ring of squared samples and a running sum: every update reuses that state to
+emit the exact current-window RMS in constant time, using a partial window
+until it becomes ready.
 
 ## Verification
 
@@ -55,7 +61,8 @@ preserve state. No clock, scheduler or MIDI interpretation is introduced.
 - Frequency checks cover known quarter-rate Butterworth coefficients,
   DC/Nyquist rejection/pass response and cutoff power.
 - Analysis checks include block/sine/full-scale/small-signal RMS, aliasing,
-  empty/invalid input, attack/release references and double precision.
+  empty/invalid input, attack/release references, exact moving-window updates,
+  state preservation on failure and double precision.
 - Five native examples pass, including the new generic Filters/IIR example
   and Filters/Biquad configuring an IIR from a returned coefficient value.
 - Seventeen Arduino Uno sketches compile in stock C++11 (compile/link only;

@@ -3,7 +3,7 @@
 #include <stdio.h>
 namespace DspCoreExamples { namespace Analysis { namespace Envelope {
 bool Run(void (*print)(const char*)) {
-    DspCore::Analysis::EnvelopeFollower<float> follower;
+    DspCore::Analysis::Streaming::EnvelopeFollower<float> follower;
     if(!follower.Configure(1.f,2.f)) return false;
     float output=0; char text[96];
     bool ok=follower.Update(-1.f,1.f,output) && fabsf(output-0.63212056f)<1e-6f;

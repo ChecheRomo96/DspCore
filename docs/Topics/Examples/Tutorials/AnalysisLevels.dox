@@ -1,7 +1,7 @@
 /**
  * @defgroup DspCore_Example_AnalysisLevels Levels
  * @ingroup DspCore_Examples_Analysis
- * @brief Measure block peak and RMS levels safely.
+ * @brief Measure `Analysis::Block` peak and RMS levels safely.
  *
  * @section DspCore_Example_AnalysisLevels_Goal Goal
  * Calculate peak and RMS for a compact signal, then confirm that the RMS scale

@@ -1,6 +1,6 @@
 set(DSPCORE_ANALYSIS_HEADERS
-    "${CMAKE_CURRENT_LIST_DIR}/Levels.h"
-    "${CMAKE_CURRENT_LIST_DIR}/EnvelopeFollower.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Block.h"
+    "${CMAKE_CURRENT_LIST_DIR}/Streaming.h"
     "${CMAKE_CURRENT_LIST_DIR}/FrequencyResponse.h"
     "${CMAKE_CURRENT_LIST_DIR}/PoleZero.h"
     "${CMAKE_CURRENT_LIST_DIR}/Stability.h")

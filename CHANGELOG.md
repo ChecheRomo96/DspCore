@@ -5,8 +5,18 @@ This file records user-visible changes to DspCore. Release dates use the
 
 ## Unreleased
 
+### Changed
+
+- Analysis APIs are explicitly split by execution model:
+  `Analysis::Block::{Peak,RMS}` measure a complete `SampleBlock`, while
+  `Analysis::Streaming::{EnvelopeFollower,MovingRMS}` retain state and emit
+  one result for every input sample.
+
 ### Added
 
+- `Analysis::Streaming::MovingRMS<T>`, an O(1) fixed-window RMS estimator.
+  Configure allocates its ring history once; Update and Reset do not allocate.
+  It reports partial-window RMS until `IsReady()` confirms a full window.
 - Desktop FIR, IIR and Biquad examples now generate long, metadata-bearing
   CSV signal captures by default. Companion Python/Matplotlib and MATLAB
   plotters show their time-domain and frequency-domain responses; shell and

@@ -55,6 +55,24 @@
  *
  * See @ref DspCore_Numeric and @ref DspCore_Examples.
  */
+
+/**
+ * @namespace DspCore::Generators
+ * @ingroup DspCore_Generators
+ * @brief Stateless table and segment generators, arranged by signal family.
+ *
+ * The parent namespace intentionally owns no direct waveform functions. Use
+ * the family namespaces and their corresponding Topics:
+ *
+ * - @ref DspCore_Generators_Periodic "Periodic": sine, saw, square and triangle cycles.
+ * - @ref DspCore_Generators_Shaping "Shaping": atan/tanh and gamma curves.
+ * - @ref DspCore_Generators_Envelopes "Envelopes": finite-length segments.
+ * - @ref DspCore_Generators_Noise "Noise": reproducible white noise.
+ * - @ref DspCore_Generators_Windows "Windows": Hann and Hamming coefficients.
+ *
+ * For the complete hierarchy and API summaries, start at the
+ * @ref DspCore_Generators "Generators Topic" rather than this namespace index.
+ */
 /**
  * @defgroup DspCore_Generators_Periodic Periodic tables
  * @ingroup DspCore_Generators

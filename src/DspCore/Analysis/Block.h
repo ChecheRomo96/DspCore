@@ -1,9 +1,11 @@
-#ifndef DSPCORE_ANALYSIS_LEVELS_H
-#define DSPCORE_ANALYSIS_LEVELS_H
+#ifndef DSPCORE_ANALYSIS_BLOCK_H
+#define DSPCORE_ANALYSIS_BLOCK_H
+
 #include <DspCore/Detail/SignalMath.h>
 #include <DspCore/Processing/SampleBlock.h>
-namespace DspCore { namespace Analysis {
-/// @ingroup DspCore_Analysis
+
+namespace DspCore { namespace Analysis { namespace Block {
+
 /// Absolute peak of a read-only sample block; an empty valid block produces zero.
 template<typename Real>
 bool Peak(const Processing::SampleBlock<const Real> input, Real& output) noexcept {
@@ -16,7 +18,7 @@ bool Peak(const Processing::SampleBlock<const Real> input, Real& output) noexcep
     }
     output=maximum;return true;
 }
-/// @ingroup DspCore_Analysis
+
 /// RMS of a read-only sample block without mean removal; scaled arithmetic avoids squaring large samples.
 template<typename Real>
 bool RMS(const Processing::SampleBlock<const Real> input, Real& output) noexcept {
@@ -32,5 +34,7 @@ bool RMS(const Processing::SampleBlock<const Real> input, Real& output) noexcept
     const Real bounded=mean>Real(1) ? Real(1) : mean;
     output=scale*DspCore::Detail::Signal::Sqrt(bounded);return true;
 }
-}}
+
+}}} // namespace DspCore::Analysis::Block
+
 #endif

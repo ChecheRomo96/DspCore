@@ -1,14 +1,16 @@
 /**
  * @defgroup DspCore_Analysis Signal analysis
  * @ingroup DspCore
- * @brief Block peak/RMS measurements and an attack/release amplitude follower.
+ * @brief Stateless block measurements and stateful streaming level estimators.
  *
- * Include `<DspCore_Analysis.h>` or Levels.h/EnvelopeFollower.h individually.
- * All operations use the selected float/double precision and allocate nothing.
+ * Include `<DspCore_Analysis.h>` or Block.h/Streaming.h individually.
+ * All operations use the selected float/double precision. Block measurements
+ * and streaming updates allocate nothing; Streaming::MovingRMS allocates its
+ * fixed history only in Configure.
  *
- * @section DspCore_Analysis_Levels Block measurements
+ * @section DspCore_Analysis_Block Block measurements
  *
- * - **SPEC-ANA-1**: Peak and RMS accept a read-only Processing::SampleBlock.
+ * - **SPEC-ANA-1**: Block::Peak and Block::RMS accept a read-only Processing::SampleBlock.
  *   They require a valid view and finite samples; failure leaves output
  *   unchanged. Empty blocks, including nullptr with zero count, produce zero.
  *   The caller guarantees accessible input extent. Output may alias an input
@@ -33,9 +35,9 @@
  *     \sum_{n=0}^{N-1}\left(\frac{x[n]}{P}\right)^2\right)}.
  * @f]
  *
- * @section DspCore_Analysis_Follower Envelope follower
+ * @section DspCore_Analysis_Streaming Streaming estimators
  *
- * - **SPEC-ANA-3**: EnvelopeFollower rectifies each sample and applies a
+ * - **SPEC-ANA-3**: Streaming::EnvelopeFollower rectifies each sample and applies a
  *   one-pole smoother with attack when magnitude>current value, release
  *   otherwise. Configure takes nonnegative finite time constants in seconds
  *   and preserves value. Default zero times snap immediately to magnitude.
@@ -57,10 +59,35 @@
  * @f$m[n]@f$. The implementation evaluates the small-ratio limit with a series
  * rather than subtracting nearly equal floating-point values.
  *
- * This is an amplitude follower rather than RMS detection or a synthesizer
- * envelope generator. Examples: Analysis/Levels and Analysis/Envelope.
+ * Streaming::MovingRMS retains a fixed ring of squared samples and one running
+ * sum. Each Update removes the oldest square, adds the new one and returns one
+ * exact RMS value. It uses partial-window normalization until IsReady reports
+ * that the configured window is full. Configure allocates its history; Update
+ * and Reset do not allocate.
+ * For a window containing @f$M@f$ available samples, it evaluates
+ * @f[
+ * R[n]=\sqrt{\frac{1}{M}\sum_{k=0}^{M-1}x[n-k]^2}.
+ * @f]
+ *
+ * @code{.cpp}
+ * DspCore::Analysis::Streaming::MovingRMS<float> rms;
+ * if (!rms.Configure(256U)) return;
+ *
+ * float level{};
+ * if (!rms.Update(inputSample, level)) return;
+ * const bool windowIsFull = rms.IsReady();
+ * @endcode
+ *
+ * The follower is an amplitude follower rather than RMS detection or a
+ * synthesizer envelope generator. Examples: Analysis/Levels and Analysis/Envelope.
  * See @ref DspCore_Generators_Envelopes for generated segments.
  */
 /** @namespace DspCore::Analysis
- * @brief Peak, RMS and amplitude-envelope measurements independent of MIDI.
+ * @brief Signal analysis split into Block measurements and Streaming estimators.
+ */
+/** @namespace DspCore::Analysis::Block
+ * @brief Stateless measurements over a complete SampleBlock.
+ */
+/** @namespace DspCore::Analysis::Streaming
+ * @brief Stateful processors that emit one estimate for every input sample.
  */
