@@ -11,6 +11,7 @@ in the current standalone source tree.
 
 The historical implementation is available in MIDILAR commit
 bc70ce639f8bb72f79995e1ec742b73aef544112 under src/DspCore. It is design input,
+The first audit covered:
 
 | Historical component | Observation | Consequence for the new design |
 | --- | --- | --- |

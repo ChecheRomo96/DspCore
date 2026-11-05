@@ -61,3 +61,4 @@ These are targeted probes and source inspection, not a full rebuild, exhaustive 
 
 First settle the numeric and buffer contracts using this audit. Then migrate safe LUT storage and interpolation with checks for overflow, allocation failure, moves, empty shapes and degenerate axes. Port generators together with their formulas, examples and reference-value/endpoint checks. Bring transforms across with explicit overlap and normalization contracts and DFT-versus-FFT comparisons. Treat streaming filters as new work rather than recovered functionality.
 
+Each implementation phase remains subject to the approval rule in `ACTION_PLAN.md`.
