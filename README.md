@@ -29,8 +29,10 @@ git submodule update --init --recursive
 
 ## Dependencies
 
-DspCore links `Foundation::Foundation` (Foundation `2.0.5` or a newer `2.x`,
-built on CPSTL `1.1.5`; Arduino users install CPSTL next to Foundation).
+DspCore 0.0.1 is the active RoModular baseline. It links
+`Foundation::Foundation` (Foundation `0.0.1` or newer, built on CPSTL `0.0.1`;
+Arduino users install CPSTL next to Foundation). Earlier tags remain historical
+references only.
 Configuring resolves it from a parent project, an explicit prefix
 (`DSPCORE_FOUNDATION_PREFIX`), a sibling export in `../Foundation/dist/<preset>`,
 normal `find_package`, and finally the pinned GitHub Release package, or the

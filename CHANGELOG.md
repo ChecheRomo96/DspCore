@@ -3,6 +3,13 @@
 This file records user-visible changes to DspCore. Release dates use the
 `YYYY-MM-DD` format.
 
+## [0.0.1] - Unreleased
+
+### Changed
+
+- Reset the active RoModular release baseline to 0.0.1 and require Foundation
+  0.0.1. Earlier tags remain historical references only.
+
 ## [0.3.0] - 2026-10-31
 
 ### Changed
