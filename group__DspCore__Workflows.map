@@ -1,0 +1,5 @@
+<map id="Workflows" name="Workflows">
+<area shape="rect" id="Node000001" title="Repeatable configure, build, test, documentation, install, and export." alt="" coords="5,31,95,56"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__Workflows__PackageConsumer.html" title="Validate DspCore exactly as an independent downstream project uses it." alt="" coords="143,5,377,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Workflows__SharedInfrastructure.html" title="DspCore&#39;s pinned RoModularBuild integration and ownership boundary." alt="" coords="162,55,358,80"/>
+</map>

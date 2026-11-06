@@ -1,0 +1,4 @@
+<map id="Fourier transforms" name="Fourier transforms">
+<area shape="rect" id="Node000001" title="Compare direct DFT and radix&#45;2 FFT, then reconstruct with IFFT." alt="" coords="148,5,291,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Transforms.html" title="Tutorials for configured block Fourier transforms." alt="" coords="5,5,100,31"/>
+</map>

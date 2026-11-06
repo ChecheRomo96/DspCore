@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['access_20and_20invalidation_0',['Access and invalidation',['../group__DspCore__LUT.html#DspCore_LUT_Access',1,'']]],
+  ['adapters_1',['Adapters',['../group__DspCore__Workflows__SharedInfrastructure.html#DspCoreSharedInfrastructureAdapters',1,'']]],
+  ['aliasing_2',['Lifetime and aliasing',['../group__DspCore__Processing.html#DspCore_Processing_Access',1,'']]],
+  ['allocation_3',['Ownership and allocation',['../group__DspCore__LUT.html#DspCore_LUT_Ownership',1,'']]],
+  ['an_20example_4',['Run an example',['../group__DspCore__Examples.html#DspCore_Examples_Start',1,'']]],
+  ['and_20aliasing_5',['Lifetime and aliasing',['../group__DspCore__Processing.html#DspCore_Processing_Access',1,'']]],
+  ['and_20allocation_6',['Ownership and allocation',['../group__DspCore__LUT.html#DspCore_LUT_Ownership',1,'']]],
+  ['and_20arithmetic_7',['Samples and arithmetic',['../DspCore_Numeric.html#DspCore_Numeric_Types',1,'']]],
+  ['and_20boundaries_8',['Coordinates and boundaries',['../DspCore_Numeric.html#DspCore_Numeric_Boundaries',1,'']]],
+  ['and_20buffer_20contracts_9',['Numeric and buffer contracts',['../DspCore_Numeric.html',1,'']]],
+  ['and_20coefficients_10',['Difference equations and coefficients',['../group__DspCore__Filters.html#DspCore_Filters_Equations',1,'']]],
+  ['and_20failure_11',['and failure',['../group__DspCore__Generators.html#DspCore_Generators_Contract',1,'Buffers and failure'],['../DspCore_Numeric.html#DspCore_Numeric_Buffers',1,'Storage and failure']]],
+  ['and_20initialization_12',['Dimensions and initialization',['../group__DspCore__LUT.html#DspCore_LUT_Resize',1,'']]],
+  ['and_20invalidation_13',['Access and invalidation',['../group__DspCore__LUT.html#DspCore_LUT_Access',1,'']]],
+  ['and_20planned_20content_14',['Architecture and planned content',['../DspCore_Architecture.html',1,'']]],
+  ['and_20plotting_20tools_15',['Desktop output and plotting tools',['../group__DspCore__Examples.html#DspCore_Examples_DesktopTools',1,'']]],
+  ['and_20processing_20model_16',['Ownership and processing model',['../group__DspCore__Processing.html#DspCore_Processing_Model',1,'']]],
+  ['and_20render_17',['and render',['../group__DspCore__Example__FiltersBiquad.html#DspCore_Example_FiltersBiquad_Run',1,'Run and render'],['../group__DspCore__Example__FiltersFIR.html#DspCore_Example_FiltersFIR_Run',1,'Run and render'],['../group__DspCore__Example__FiltersIIR.html#DspCore_Example_FiltersIIR_Run',1,'Run and render']]],
+  ['and_20test_18',['Build and test',['../md_README.html#autotoc_md2',1,'']]],
+  ['api_20use_19',['API use',['../group__DspCore__Example__FiltersBiquad.html#DspCore_Example_FiltersBiquad_Kernel',1,'Portable Biquad API use'],['../group__DspCore__Example__FiltersFIR.html#DspCore_Example_FiltersFIR_Kernel',1,'Portable FIR API use'],['../group__DspCore__Example__FiltersIIR.html#DspCore_Example_FiltersIIR_Kernel',1,'Portable IIR API use']]],
+  ['architecture_20and_20planned_20content_20',['Architecture and planned content',['../DspCore_Architecture.html',1,'']]],
+  ['arduino_21',['Arduino',['../md_README.html#autotoc_md3',1,'']]],
+  ['arithmetic_22',['Arithmetic',['../group__DspCore__Interpolation.html#DspCore_Interpolation_Formulas',1,'']]],
+  ['arithmetic_23',['Samples and arithmetic',['../DspCore_Numeric.html#DspCore_Numeric_Types',1,'']]]
+];

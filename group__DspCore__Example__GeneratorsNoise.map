@@ -1,0 +1,4 @@
+<map id="White noise" name="White noise">
+<area shape="rect" id="Node000001" title="Demonstrate reproducible, stateful noise generation across block boundaries." alt="" coords="148,5,247,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Generators.html" title="Tutorials for periodic, shaping, envelope, noise and window generators." alt="" coords="5,5,100,31"/>
+</map>

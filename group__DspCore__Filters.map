@@ -1,0 +1,5 @@
+<map id="Filters" name="Filters">
+<area shape="rect" id="Node000002" href="$group__DspCore.html" title="Portable signal processing built on Foundation." alt="" coords="5,5,83,31"/>
+<area shape="rect" id="Node000001" title="Single&#45;rate FIR/IIR filters, coefficient designers, and future filter families." alt="" coords="131,5,193,31"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__Filters__SingleRate.html" title="Filters whose input and output advance at the same sample rate." alt="" coords="241,5,376,31"/>
+</map>

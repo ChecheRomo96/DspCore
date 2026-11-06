@@ -1,0 +1,7 @@
+<map id="Filters" name="Filters">
+<area shape="rect" id="Node000003" href="$group__DspCore__Example__FiltersBiquad.html" title="Visualize a 12 kHz low&#45;pass/high&#45;pass Biquad handoff." alt="" coords="336,5,403,31"/>
+<area shape="rect" id="Node000004" href="$group__DspCore__Example__FiltersFIR.html" title="Compare 10&#45; and 100&#45;tap moving&#45;average low&#45;pass filters." alt="" coords="348,55,391,80"/>
+<area shape="rect" id="Node000005" href="$group__DspCore__Example__FiltersIIR.html" title="Inspect a generic numerator/denominator IIR response to a step pulse." alt="" coords="350,104,389,129"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples.html" title="Runnable, reproducible walkthroughs of the public DspCore API." alt="" coords="5,55,177,80"/>
+<area shape="rect" id="Node000001" title="Tutorials for FIR, IIR and Biquad filter design and execution." alt="" coords="225,55,288,80"/>
+</map>

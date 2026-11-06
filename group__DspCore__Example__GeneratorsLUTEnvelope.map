@@ -1,0 +1,4 @@
+<map id="LUT envelope" name="LUT envelope">
+<area shape="rect" id="Node000001" title="Use a normalized table as an envelope shape over an output range." alt="" coords="148,5,259,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Generators.html" title="Tutorials for periodic, shaping, envelope, noise and window generators." alt="" coords="5,5,100,31"/>
+</map>

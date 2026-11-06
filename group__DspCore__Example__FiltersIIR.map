@@ -1,0 +1,4 @@
+<map id="IIR" name="IIR">
+<area shape="rect" id="Node000001" title="Inspect a generic numerator/denominator IIR response to a step pulse." alt="" coords="116,5,155,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Filters.html" title="Tutorials for FIR, IIR and Biquad filter design and execution." alt="" coords="5,5,68,31"/>
+</map>
