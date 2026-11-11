@@ -1,0 +1,9 @@
+<map id="Generators" name="Generators">
+<area shape="rect" id="Node000002" href="$group__DspCore.html" title="Portable signal processing built on Foundation." alt="" coords="5,104,83,129"/>
+<area shape="rect" id="Node000001" title="Allocation&#45;free table and segment generation into caller&#45;owned buffers." alt="" coords="131,104,225,129"/>
+<area shape="rect" id="Node000005" href="$group__DspCore__Generators__Envelopes.html" title="Linear, exponential, logarithmic and optional LUT&#45;shaped segments." alt="" coords="273,5,424,31"/>
+<area shape="rect" id="Node000006" href="$group__DspCore__Generators__Noise.html" title="Reproducible xorshift32 sequence with explicit caller&#45;owned state." alt="" coords="299,55,398,80"/>
+<area shape="rect" id="Node000003" href="$group__DspCore__Generators__Periodic.html" title="Sine, saw, square and triangle cycles without a duplicate endpoint." alt="" coords="289,104,408,129"/>
+<area shape="rect" id="Node000004" href="$group__DspCore__Generators__Shaping.html" title="Atan/tanh raw, normalized and positive&#45;half curves; gamma and gamma morph." alt="" coords="288,153,409,179"/>
+<area shape="rect" id="Node000007" href="$group__DspCore__Generators__Windows.html" title="Symmetric Hann and Hamming coefficient tables." alt="" coords="308,203,389,228"/>
+</map>

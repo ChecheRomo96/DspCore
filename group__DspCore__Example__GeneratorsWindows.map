@@ -1,0 +1,4 @@
+<map id="Windows" name="Windows">
+<area shape="rect" id="Node000001" title="Generate symmetric Hann and Hamming analysis windows." alt="" coords="148,5,229,31"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples__Generators.html" title="Tutorials for periodic, shaping, envelope, noise and window generators." alt="" coords="5,5,100,31"/>
+</map>

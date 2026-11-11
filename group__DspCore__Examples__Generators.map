@@ -1,0 +1,10 @@
+<map id="Generators" name="Generators">
+<area shape="rect" id="Node000003" href="$group__DspCore__Example__GeneratorsEnvelopes.html" title="Generate stable exponential and logarithmic curve shapes." alt="" coords="368,5,519,31"/>
+<area shape="rect" id="Node000004" href="$group__DspCore__Example__GeneratorsLUTEnvelope.html" title="Use a normalized table as an envelope shape over an output range." alt="" coords="388,55,499,80"/>
+<area shape="rect" id="Node000005" href="$group__DspCore__Example__GeneratorsNoise.html" title="Demonstrate reproducible, stateful noise generation across block boundaries." alt="" coords="394,104,493,129"/>
+<area shape="rect" id="Node000006" href="$group__DspCore__Example__GeneratorsPeriodic.html" title="Inspect phase conventions for sine, saw, square and triangle waves." alt="" coords="384,153,503,179"/>
+<area shape="rect" id="Node000007" href="$group__DspCore__Example__GeneratorsShaping.html" title="Compare normalized sigmoid endpoints with gamma shaping and morphing." alt="" coords="383,203,504,228"/>
+<area shape="rect" id="Node000008" href="$group__DspCore__Example__GeneratorsWindows.html" title="Generate symmetric Hann and Hamming analysis windows." alt="" coords="403,252,484,277"/>
+<area shape="rect" id="Node000002" href="$group__DspCore__Examples.html" title="Runnable, reproducible walkthroughs of the public DspCore API." alt="" coords="5,129,177,155"/>
+<area shape="rect" id="Node000001" title="Tutorials for periodic, shaping, envelope, noise and window generators." alt="" coords="225,129,320,155"/>
+</map>
