@@ -2,7 +2,6 @@ param(
     [Parameter(Mandatory = $true, Position = 0)]
     [string]$Preset,
 
-    [string]$FoundationPrefix = "",
     [int]$Parallel = 0,
     [switch]$Fresh
 )
@@ -14,21 +13,8 @@ if ($Preset -notmatch "^(macos|linux|windows)_") {
     throw "Package consumer tests require a runnable desktop preset"
 }
 
-# Without an explicit prefix, DspCore resolves Foundation itself: sibling export,
-# GitHub Release package or sources (see cmake/DspCoreFoundation.cmake).
-if (-not $FoundationPrefix -and $env:DSPCORE_FOUNDATION_PREFIX) {
-    $FoundationPrefix = $env:DSPCORE_FOUNDATION_PREFIX
-}
 $exportParameters = @{
     Preset = $Preset
-}
-if ($FoundationPrefix) {
-    $FoundationPrefix = Resolve-DspCorePath -Path $FoundationPrefix
-    $foundationConfig = Join-Path $FoundationPrefix "lib/cmake/Foundation/FoundationConfig.cmake"
-    if (-not (Test-Path -LiteralPath $foundationConfig -PathType Leaf)) {
-        throw "Foundation package not found at $FoundationPrefix"
-    }
-    $exportParameters.CMakeArguments = @("-DDSPCORE_FOUNDATION_PREFIX=$FoundationPrefix")
 }
 if ($Parallel -gt 0) {
     $exportParameters.Parallel = $Parallel
@@ -39,16 +25,6 @@ if ($Fresh) {
 & "$PSScriptRoot/export.ps1" @exportParameters
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
-}
-
-# The Foundation package DspCore used; empty when Foundation was built from
-# sources and installed next to DspCore.
-$cachePath = Join-Path (Get-DspCoreBuildDirectory -Preset $Preset) "CMakeCache.txt"
-$resolvedFoundationPrefix = ""
-$resolvedLine = Select-String -LiteralPath $cachePath `
-    -Pattern "^DSPCORE_FOUNDATION_RESOLVED_PREFIX:INTERNAL=(.*)$" | Select-Object -First 1
-if ($resolvedLine) {
-    $resolvedFoundationPrefix = $resolvedLine.Matches[0].Groups[1].Value
 }
 
 $dspcorePrefix = Join-Path $script:DspCoreDistRoot $Preset
@@ -98,7 +74,7 @@ $configureArguments = @(
     "-B", $consumerBuild,
     "-G", $generator,
     "-DDspCore_DIR=$(Join-Path $dspcorePrefix 'lib/cmake/DspCore')",
-    "-DCMAKE_PREFIX_PATH=$dspcorePrefix;$resolvedFoundationPrefix"
+    "-DCMAKE_PREFIX_PATH=$dspcorePrefix"
 )
 
 if ($generatorPlatform) {
